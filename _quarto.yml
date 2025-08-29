@@ -7,8 +7,10 @@ website:
     left:
       - text: "Hands-on Exercise"
         menu:
-        - text: "Hands-on Exercise 0"
-          href: "Hands-on_Ex/Hands-on_Ex00/Hands-on_Ex00.html"
+        - text: "Hands-on Exercise 1a"
+          href: "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html"
+        - text: "Hands-on Exercise 1b"
+          href: "Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html"
     right:
       - href: index.qmd
         text: Home
@@ -16,7 +18,7 @@ website:
 
 format:
   html:
-    theme: morph
+    theme: minty
     css: styles.css
     toc: true
 

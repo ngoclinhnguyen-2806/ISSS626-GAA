@@ -1,5 +1,9 @@
 ---
-title: "ISSS626-GAA"
+title: "Geospatial Analytics and Applications"
+author: Linh Nguyen
+date-modified: "last-modified" # auto render date
 ---
 
-Welcome to **ISSS626 - Geospatial Analytics and Applications**. In this website you will find my coursework prepared for this course.
+💃 Welcome to my website 🕺
+
+In this website you will find my efforts to fulfill all the exercises and assignments in the course module **ISSS626 - Geospatial Analytics and Applications**, instructed by my dear professor Kam Tin Seong of Singapore Management University.

@@ -1,9 +1,25 @@
 ---
-title: "About"
+title: "About Me"
 ---
 
-About this site
+👋 Hi there!
 
-```{r}
-1 + 1
-```
+I’m **Linh**, a data enthusiast with a passion for turning numbers into meaningful insights 📊.
+
+With a background in Economics and International Business, I’ve spent the past few years diving into data analysis and business intelligence—discovering the thrill of spotting patterns in complex datasets and building automation solutions ⚙️ that turn hours of manual work into streamlined workflows.
+
+I’m currently pursuing my Master of IT in Business (Data Science and Analytics Track) at Singapore Management University 🎓, where I’m sharpening my skills to step into the exciting fields of Data Science and Machine Learning Engineering 🤖. I’m always curious and eager to explore new tools, technologies, and methodologies to solve real-world problems.
+
+💡 What I bring to the table:
+
+🐍 Technical expertise in MySQL, Python, PySpark, and BI tools like Power Query and SAS
+
+🔎 A calm, detail-oriented approach—because the best insights often hide in the small details
+
+💪 A can-do attitude, thriving under pressure while delivering high-quality results
+
+⚡ A passion for automation—I love creating time-saving, efficient solutions
+
+🤝 Strong collaboration skills, often becoming the go-to person for data questions
+
+🎶 Outside of work and study, you’ll often find me singing my favorite tunes 🎤 or enjoying delicious Vietnamese food 🍜. I’m always open to connecting with fellow data enthusiasts and exploring exciting opportunities in the field!
