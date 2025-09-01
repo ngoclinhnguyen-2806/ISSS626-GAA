@@ -154,12 +154,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul>
 <li><a href="#learning-outcome" id="toc-learning-outcome" class="nav-link active" data-scroll-target="#learning-outcome"><span class="header-section-number">1</span> Learning Outcome</a></li>
   <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2</span> The Data</a></li>
-  <li>
-<a href="#installing-and-loading-the-r-packages" id="toc-installing-and-loading-the-r-packages" class="nav-link" data-scroll-target="#installing-and-loading-the-r-packages"><span class="header-section-number">3</span> Installing and Loading the R Packages</a>
-  <ul class="collapse">
-<li><a href="#tidyverse-sub-packages" id="toc-tidyverse-sub-packages" class="nav-link" data-scroll-target="#tidyverse-sub-packages"><span class="header-section-number">3.1</span> Tidyverse Sub-packages</a></li>
-  </ul>
-</li>
+  <li><a href="#installing-and-loading-the-r-packages" id="toc-installing-and-loading-the-r-packages" class="nav-link" data-scroll-target="#installing-and-loading-the-r-packages"><span class="header-section-number">3</span> Installing and Loading the R Packages</a></li>
   <li>
 <a href="#import-geospatial-data" id="toc-import-geospatial-data" class="nav-link" data-scroll-target="#import-geospatial-data"><span class="header-section-number">4</span> Import Geospatial Data</a>
   <ul class="collapse">
@@ -228,7 +223,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">August 30, 2025</p>
+      <p class="date-modified">September 2, 2025</p>
     </div>
   </div>
     
@@ -283,9 +278,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Two main R packages will be used in this exercise:</p>
 <table class="caption-top table">
 <colgroup>
-<col style="width: 12%">
-<col style="width: 46%">
+<col style="width: 25%">
 <col style="width: 40%">
+<col style="width: 34%">
 </colgroup>
 <thead><tr class="header">
 <th>Package</th>
@@ -305,8 +300,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<section id="tidyverse-sub-packages" class="level3" data-number="3.1"><h3 data-number="3.1" class="anchored" data-anchor-id="tidyverse-sub-packages">
-<span class="header-section-number">3.1</span> Tidyverse Sub-packages</h3>
 <p>The <code>tidyverse</code> package includes the following sub-packages used in this exercise:</p>
 <table class="caption-top table">
 <thead><tr class="header">
@@ -338,9 +331,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </table>
 <p>To install and load these packages, use the following code:</p>
 <div class="cell">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">tidyverse</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">tidyverse</span><span class="op">)</span> <span class="co"># pacman is to replace all the library() function call each time we want to import a library</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="import-geospatial-data" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="import-geospatial-data">
+</section><section id="import-geospatial-data" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="import-geospatial-data">
 <span class="header-section-number">4</span> Import Geospatial Data</h2>
 <p>The code block below uses st_read() function of sf package to import the <code>MP14_SUBZONE_WEB_PL</code> shapefile into R as a polygon feature data frame.</p>
 <ul>
@@ -617,6 +610,9 @@ Tip
 </div>
 </div>
 </div>
+<div class="Note">
+<p>Note that the preschool point objects failed to plot ontop of the mpsz layer because <strong>preschool</strong> is in WGS 84, while <strong>mpsz</strong> is in SVY21.</p>
+</div>
 </section><section id="working-with-map-projection" class="level2" data-number="7"><h2 data-number="7" class="anchored" data-anchor-id="working-with-map-projection">
 <span class="header-section-number">7</span> Working with Map Projection</h2>
 <p>Map projection is an important property of a geospatial data. In order to perform geoprocessing using two geospatial data, <strong>we need to ensure that both geospatial data are projected using similar coordinate system.</strong></p>
@@ -740,7 +736,7 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>In practice, we need find out the appropriate project coordinate system to use before performing the projection transformation.</p>
+<p>In practice, we need to find out the appropriate project coordinate system to use before performing the projection transformation.</p>
 </div>
 </div>
 <p>Next, let us display the content of preschool3414 sf data frame as shown below.</p>
