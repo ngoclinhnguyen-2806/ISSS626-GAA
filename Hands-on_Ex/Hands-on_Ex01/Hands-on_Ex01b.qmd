@@ -30,9 +30,9 @@ Geovisualisation, on the other hand, is the process of using visual representati
 The following data sources will be used in this exercise:
 
 | Dataset | Source | Description | Format |
-|-----------------|-----------------|---------------------|-----------------|
+|------------------|------------------|--------------------|------------------|
 | **Master Plan 2019 Subzone Boundary (Web) (**`MasterPlan2019SubzoneBoundaryNoSeaKML.kml`**)** | [data.gov.sg](https://www.data.gov.sg/) | Geographical boundary of Singapore at the planning subzone level. The data is based on URA Master Plan 2019. | KML |
-| **Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2024 (**`respopagesex2024.csv`**)** | [Department of Statistics, Singapore](https://www.singstat.gov.sg/) | Aspatial data containingPA and SZ fields, which can be used as unique identifiers to georeference to Master Plan 2019 Subzone Boundary | CSV |
+| **Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2024 (**`respopagesextod2024.csv`**)** | [Department of Statistics, Singapore](https://www.singstat.gov.sg/) | Aspatial data containingPA and SZ fields, which can be used as unique identifiers to georeference to Master Plan 2019 Subzone Boundary | CSV |
 
 ## Installing and Loading the R Packages
 
@@ -45,6 +45,7 @@ The following R packages will be used in this exercise:
 | **readr** | Importing delimited text files (part of `tidyverse`). | Loading CSV data files. |
 | **tidyr** | Tidying data into a usable format (part of `tidyverse`). | Reshaping and organizing data. |
 | **dplyr** | Data wrangling and transformation tasks (part of `tidyverse`). | Manipulating and transforming datasets. |
+| **rvest** | Scraping (or harvesting) data from web pages, or tidying HTML data. | Tidying data by extracting values from the HTML description |
 
 To install and load these packages in R, use the following code:
 
@@ -100,7 +101,7 @@ mpsz
 
 ### Importing Attribute Data into R
 
-Next, *respopagsex2024.csv* file is imported into RStudio and save the file into an R dataframe called *popdata*.
+Next, *respopagsextod2024.csv* file is imported into RStudio and save the file into an R dataframe called *popdata*.
 
 The task will be performed by using *read_csv()* function of **readr** package as shown in the code block below.
 
@@ -112,7 +113,15 @@ popdata <- read_csv("data/aspatial/respopagesextod2024.csv")
 
 Before a thematic map can be prepared, you are required to prepare a data table with year 2020 values. The data table should include the variables PA, SZ, YOUNG, ECONOMY ACTIVE, AGED, TOTAL, DEPENDENCY.
 
-YOUNG: age group 0 to 4 until age groyup 20 to 24, ECONOMY ACTIVE: age group 25-29 until age group 60-64, AGED: age group 65 and above, TOTAL: all age group, and DEPENDENCY: the ratio between young and aged against economy active group
+-   YOUNG: age group 0 to 4 until age group 20 to 24
+
+-   ECONOMY ACTIVE: age group 25-29 until age group 60-64
+
+-   AGED: age group 65 and above
+
+-   TOTAL: all age group
+
+-   DEPENDENCY: the ratio between young and aged against economy active group
 
 #### Data wrangling
 
@@ -269,7 +278,7 @@ To add the boundary of the planning subzones, tm_borders will be used as shown i
 ```{r}
 tm_shape(mpsz_pop2024)+
   tm_fill("DEPENDENCY") +
-  tm_borders(lwd = 0.1,  alpha = 1)
+  tm_borders()
 ```
 
 Note that light-gray border lines have been added on the choropleth map.
@@ -631,7 +640,7 @@ tm_shape(mpsz_pop2024) +
 
 #### By arrange multiples choropleth maps in a grid layout
 
-In this example, multiple choropleth maps are created and **tmap_arrnage()** is used to arrnage them in a grid layout.
+In this example, multiple choropleth maps are created and **tmap_arrnage()** is used to arrange them in a grid layout.
 
 ```{r}
 youngmap <- tm_shape(mpsz_pop2024)+ 
@@ -718,7 +727,7 @@ mpsz_pop2024 %>%
   tm_layout(asp = 0.8)
 ```
 
-In the code chunk below, We improve the visual representation further by highlighting and lebaling the outliers on the choropleth map.
+In the code chunk below, We improve the visual representation further by highlighting and labeling the outliers on the choropleth map.
 
 ```{r}
 mpsz_selected <- mpsz_pop2024 %>%
@@ -807,6 +816,7 @@ tm_shape(region_selected,
 ```{r}
 tmap_mode("plot")
 ```
+
 ## References
 
 ### All about **tmap** package

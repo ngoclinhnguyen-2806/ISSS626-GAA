@@ -610,8 +610,18 @@ Tip
 </div>
 </div>
 </div>
-<div class="Note">
-<p>Note that the preschool point objects failed to plot ontop of the mpsz layer because <em>preschool</em> is in WGS 84, while <em>mpsz</em> is in SVY21.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Note that the preschool point objects failed to plot on top of the mpsz layer because <em>preschool</em> is in WGS 84, while <em>mpsz</em> is in SVY21.</p>
+</div>
 </div>
 </section><section id="working-with-map-projection" class="level2" data-number="7"><h2 data-number="7" class="anchored" data-anchor-id="working-with-map-projection">
 <span class="header-section-number">7</span> Working with Map Projection</h2>
@@ -919,7 +929,19 @@ $ geometry                       &lt;POINT [m]&gt; POINT (41972.5 36390.05), POI
 </div>
 </div>
 <p>Table above shows the content of listing_sf. Notice that a new column called geometry has been added into the data frame. On the other hand, the longitude and latitude columns have been dropped from the data frame.</p>
-<p>::: Try plotting listing_sf layer on top of mpsz layer</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We can try plotting listing_sf layer on top of mpsz layer now as both are SVY 21.</p>
+</div>
+</div>
 <div class="cell">
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu">st_geometry</span><span class="op">(</span><span class="va">mpsz</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu">st_geometry</span><span class="op">(</span><span class="va">listings_sf</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -930,7 +952,6 @@ $ geometry                       &lt;POINT [m]&gt; POINT (41972.5 36390.05), POI
 </div>
 </div>
 </div>
-<p>:::</p>
 </section></section><section id="geoprocessing-with-sf" class="level2" data-number="9"><h2 data-number="9" class="anchored" data-anchor-id="geoprocessing-with-sf">
 <span class="header-section-number">9</span> Geoprocessing with <em>sf</em>
 </h2>

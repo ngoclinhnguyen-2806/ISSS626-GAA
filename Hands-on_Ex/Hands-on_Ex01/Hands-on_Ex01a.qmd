@@ -181,8 +181,8 @@ plot(st_geometry(preschool),
      add = TRUE)
 ```
 
-::: Note
-Note that the preschool point objects failed to plot ontop of the mpsz layer because *preschool* is in WGS 84, while *mpsz* is in SVY21.
+::: callout-note
+Note that the preschool point objects failed to plot on top of the mpsz layer because *preschool* is in WGS 84, while *mpsz* is in SVY21.
 :::
 
 ## Working with Map Projection
@@ -332,13 +332,14 @@ glimpse(listings_sf)
 
 Table above shows the content of listing_sf. Notice that a new column called geometry has been added into the data frame. On the other hand, the longitude and latitude columns have been dropped from the data frame.
 
-::: Try plotting listing_sf layer on top of mpsz layer
+::: callout-note
+We can try plotting listing_sf layer on top of mpsz layer now as both are SVY 21.
+:::
 
 ```{r}
 plot(st_geometry(mpsz))
 plot(st_geometry(listings_sf), add = TRUE)
 ```
-:::
 
 ## Geoprocessing with *sf*
 
