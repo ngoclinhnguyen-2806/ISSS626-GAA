@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
-
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
 <meta name="generator" content="quarto-1.7.33">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-
 <meta name="author" content="Linh Nguyen">
-
-<title>Geospatial Analytics and Applications – ISSS626-GAA</title>
+<meta name="dcterms.date" content="2025-09-02">
+<title>Hands-on 2B | Second Order Spatial Point Patterns Analysis – ISSS626-GAA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,27 +19,60 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
 </style>
 
-
-<script src="site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="site_libs/quarto-nav/headroom.min.js"></script>
-<script src="site_libs/clipboard/clipboard.min.js"></script>
-<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
-<script src="site_libs/quarto-search/fuse.min.js"></script>
-<script src="site_libs/quarto-search/quarto-search.js"></script>
-<meta name="quarto:offset" content="./">
-<script src="site_libs/quarto-html/quarto.js" type="module"></script>
-<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
-<script src="site_libs/quarto-html/popper.min.js"></script>
-<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
-<script src="site_libs/quarto-html/anchor.min.js"></script>
-<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
-<script src="site_libs/bootstrap/bootstrap.min.js"></script>
-<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-941d7e14017e1a43777b60853515243b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<script id="quarto-search-options" type="application/json">{
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-941d7e14017e1a43777b60853515243b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
   "collapse-after": 3,
@@ -67,20 +98,14 @@ ul.task-list li input[type="checkbox"] {
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
-}</script>
-
-
-<link rel="stylesheet" href="styles.css">
+}</script><link rel="stylesheet" href="../../styles.css">
 </head>
-
 <body class="nav-fixed quarto-light">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
-      <div class="navbar-container container-fluid">
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
       <div class="navbar-brand-container mx-auto">
-    <a class="navbar-brand" href="./index.html">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">ISSS626-GAA</span>
     </a>
   </div>
@@ -90,59 +115,68 @@ ul.task-list li input[type="checkbox"] {
 </button>
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll me-auto">
-  <li class="nav-item dropdown ">
+<li class="nav-item dropdown ">
     <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
  <span class="menu-text">Hands-on Exercise</span>
     </a>
-    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">    
-        <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html">
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">
+<li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html">
  <span class="dropdown-text">Hands-on Exercise 1a</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html">
  <span class="dropdown-text">Hands-on Exercise 1b</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02a.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02a.html">
  <span class="dropdown-text">Hands-on Exercise 2a</span></a>
   </li>  
         <li>
-    <a class="dropdown-item" href="./Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html">
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html">
  <span class="dropdown-text">Hands-on Exercise 2b</span></a>
   </li>  
     </ul>
-  </li>
+</li>
 </ul>
-            <ul class="navbar-nav navbar-nav-scroll ms-auto">
-  <li class="nav-item">
-    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
 <span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./about.html"> 
+    <a class="nav-link" href="../../about.html"> 
 <span class="menu-text">About Me</span></a>
   </li>  
 </ul>
-          </div> <!-- /navcollapse -->
+</div> <!-- /navcollapse -->
             <div class="quarto-navbar-tools">
 </div>
       </div> <!-- /container-fluid -->
-    </nav>
-</header>
-<!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+    </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
-        
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a></li>
+  <li><a href="#learning-outcome" id="toc-learning-outcome" class="nav-link" data-scroll-target="#learning-outcome"><span class="header-section-number">2</span> Learning Outcome</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">3</span> The Data</a></li>
+  <li><a href="#installing-and-loading-the-r-packages" id="toc-installing-and-loading-the-r-packages" class="nav-link" data-scroll-target="#installing-and-loading-the-r-packages"><span class="header-section-number">4</span> Installing and Loading the R Packages</a></li>
+  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility"><span class="header-section-number">5</span> Reproducibility</a></li>
+  <li>
+<a href="#spatial-data-wrangling" id="toc-spatial-data-wrangling" class="nav-link" data-scroll-target="#spatial-data-wrangling"><span class="header-section-number">6</span> Spatial Data Wrangling</a>
+  <ul class="collapse">
+<li><a href="#importing-the-spatial-data" id="toc-importing-the-spatial-data" class="nav-link" data-scroll-target="#importing-the-spatial-data"><span class="header-section-number">6.1</span> Importing the Spatial Data</a></li>
+  </ul>
+</li>
+  </ul></nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Geospatial Analytics and Applications</h1>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">Hands-on 2B | Second Order Spatial Point Patterns Analysis</h1>
+<p class="subtitle lead">In this exercise, we will learn to apply 2nd-order spatial point pattern analysis methods in R, including G, F, K, and L functions, to evaluate spatial point distributions and perform hypothesis testing using the spatstat package.</p>
 </div>
 
 
@@ -156,11 +190,17 @@ ul.task-list li input[type="checkbox"] {
           </div>
   </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 2, 2025</p>
+    </div>
+  </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 2, 2025</p>
+      <p class="date-modified">September 3, 2025</p>
     </div>
   </div>
     
@@ -168,17 +208,115 @@ ul.task-list li input[type="checkbox"] {
   
 
 
-</header>
+</header><section id="overview" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="overview">
+<span class="header-section-number">1</span> Overview</h2>
+<p>Spatial Point Pattern Analysis is the evaluation of the pattern or distribution, of a set of points on a surface. The point can be location of:</p>
+<ul>
+<li>events such as crime, traffic accident and disease onset, or</li>
+<li>business services (coffee and fastfood outlets) or facilities such as childcare and eldercare.</li>
+</ul>
+<p>Using appropriate functions of <a href="https://cran.r-project.org/web/packages/spatstat/">spatstat</a>, this hands-on exercise aims to discover the spatial point processes of childecare centres in Singapore.</p>
+<p>The specific questions we would like to answer are as follows:</p>
+<ul>
+<li>are the childcare centres in Singapore randomly distributed throughout the country?<br>
+</li>
+<li>if the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?</li>
+</ul>
+<p>This hands-on exercise continues from <a href="../..\hands-on_ex/hands-on_ex02/hands-on_ex02a">Hands-on Exercise 2A</a></p>
+</section><section id="learning-outcome" class="level2" data-number="2"><h2 data-number="2" class="anchored" data-anchor-id="learning-outcome">
+<span class="header-section-number">2</span> Learning Outcome</h2>
+<ul>
+<li>Importing and managing geospatial data using <code>sf</code> and <code>spatstat</code> packages.</li>
+<li>Converting spatial data formats from <code>sf</code> to <code>spatstat</code>’s <code>ppp</code> format.</li>
+<li>Handling and correcting duplicate spatial points in datasets.</li>
+<li>Defining and applying spatial windows (<code>owin</code> objects) for focused analysis.</li>
+<li>Conducting 2nd-order spatial point pattern analyses using G, F, K, and L functions.</li>
+<li>Performing Monte Carlo simulations and hypothesis testing to assess spatial randomness.</li>
+<li>Visualizing spatial patterns and statistical results using appropriate plotting functions.</li>
+</ul></section><section id="the-data" class="level2" data-number="3"><h2 data-number="3" class="anchored" data-anchor-id="the-data">
+<span class="header-section-number">3</span> The Data</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 23%">
+<col style="width: 28%">
+<col style="width: 23%">
+<col style="width: 23%">
+</colgroup>
+<thead><tr class="header">
+<th>Dataset</th>
+<th>Description</th>
+<th>Source</th>
+<th>Format</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>ChildCareServices</strong></td>
+<td>Point data containing location and attributes of childcare centers.</td>
+<td>Data.gov.sg</td>
+<td>GeoJSON</td>
+</tr>
+<tr class="even">
+<td><strong>MasterPlan2019SubzoneBoundaryNoSeaKML</strong></td>
+<td>Polygon data with URA 2014 Master Plan Planning Subzone boundaries.</td>
+<td>Data.gov.sg</td>
+<td>KML</td>
+</tr>
+</tbody>
+</table></section><section id="installing-and-loading-the-r-packages" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="installing-and-loading-the-r-packages">
+<span class="header-section-number">4</span> Installing and Loading the R Packages</h2>
+<p>The following R packages will be used in this exercise:</p>
+<table class="caption-top table">
+<thead><tr class="header">
+<th>Package</th>
+<th>Purpose</th>
+<th>Use Case in Exercise</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>sf</strong></td>
+<td>Imports, manages, and processes vector-based geospatial data.</td>
+<td>Handling vector geospatial data in R.</td>
+</tr>
+<tr class="even">
+<td><strong>spatstat</strong></td>
+<td>Provides tools for point pattern analysis.</td>
+<td>Performing 1st- and 2nd-order spatial point pattern analysis and deriving kernel density estimation (KDE).</td>
+</tr>
+<tr class="odd">
+<td><strong>terra</strong></td>
+<td>Creating, reading, manipulating, and writing raster and vector data.</td>
+<td>Convert image output generate by <code>spatstat</code> into <code>terra</code> format.</td>
+</tr>
+<tr class="even">
+<td><strong>tmap</strong></td>
+<td>Creates static and interactive thematic maps using cartographic quality elements.</td>
+<td>Plotting cartographic quality static point patterns maps or interactive maps by using&nbsp;<a href="https://leafletjs.com/"><strong>leaflet</strong></a>&nbsp;API.</td>
+</tr>
+<tr class="odd">
+<td><strong>rvest</strong></td>
+<td>Scraping (or harvesting) data from web pages, or tidying HTML data.</td>
+<td>Tidying data by extracting values from the HTML description</td>
+</tr>
+</tbody>
+</table>
+<p>To install and load these packages in R, use the following code:</p>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">raster</span>, <span class="va">spatstat</span>, <span class="va">tmap</span>, <span class="va">tidyverse</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="reproducibility" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="reproducibility">
+<span class="header-section-number">5</span> Reproducibility</h2>
+<p>As this document involves Monte Carlo simulations, we will set the seed to ensure reproducibility</p>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="spatial-data-wrangling" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="spatial-data-wrangling">
+<span class="header-section-number">6</span> Spatial Data Wrangling</h2>
+<section id="importing-the-spatial-data" class="level3" data-number="6.1"><h3 data-number="6.1" class="anchored" data-anchor-id="importing-the-spatial-data">
+<span class="header-section-number">6.1</span> Importing the Spatial Data</h3>
+<p>To import the geographical datasets, we will use <code>st_read()</code> from <code>sf</code>.</p>
 
 
-<p>💃 Welcome to my website 🕺</p>
-<p>In this website you will find my efforts to fulfill all the exercises and assignments in the course module <strong>ISSS626 - Geospatial Analytics and Applications</strong>, instructed by my dear professor Kam Tin Seong of Singapore Management University.</p>
-<p>Geospatial Analytics and R-language is a whole new horizon to me. Let’s get started!</p>
-
-
-
-</main> <!-- /main -->
-<script id="quarto-html-after-body" type="application/javascript">
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
     const anchorJS = new window.AnchorJS();
@@ -578,7 +716,6 @@ ul.task-list li input[type="checkbox"] {
   });
   </script>
 </div> <!-- /content -->
-
 
 
 

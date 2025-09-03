@@ -7,3 +7,5 @@ date-modified: "last-modified" # auto render date
 💃 Welcome to my website 🕺
 
 In this website you will find my efforts to fulfill all the exercises and assignments in the course module **ISSS626 - Geospatial Analytics and Applications**, instructed by my dear professor Kam Tin Seong of Singapore Management University.
+
+Geospatial Analytics and R-language is a whole new horizon to me. Let's get started!

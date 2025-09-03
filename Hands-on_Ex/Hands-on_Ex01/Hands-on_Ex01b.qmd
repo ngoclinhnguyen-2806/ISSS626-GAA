@@ -55,7 +55,7 @@ pacman::p_load(sf, tmap, tidyverse, rvest)
 
 ## Import Geospatial Data into R
 
-The code block below uses st_read() function of sf package to import the `MP14_SUBZONE_WEB_PL` shapefile into R as a polygon feature data frame.
+The code block below uses st_read() function of sf package to import the `MasterPlan2019SubzoneBoundaryNoSeaKML` shapefile into R as a polygon feature data frame.
 
 ```{r}
 mpsz <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")

@@ -1,0 +1,84 @@
+---
+title: "Hands-on 2B | Second Order Spatial Point Patterns Analysis"
+subtitle: "In this exercise, we will learn to apply 2nd-order spatial point pattern analysis methods in R, including G, F, K, and L functions, to evaluate spatial point distributions and perform hypothesis testing using the spatstat package."
+date: "Sep 2, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+format:
+  html:
+    code-link: true
+    toc: true
+number-sections: true
+number-offset: 1
+editor: visual
+---
+## Overview
+
+Spatial Point Pattern Analysis is the evaluation of the pattern or distribution, of a set of points on a surface. The point can be location of:
+
+-   events such as crime, traffic accident and disease onset, or
+-   business services (coffee and fastfood outlets) or facilities such as childcare and eldercare.
+
+Using appropriate functions of [spatstat](https://cran.r-project.org/web/packages/spatstat/), this hands-on exercise aims to discover the spatial point processes of childecare centres in Singapore.
+
+The specific questions we would like to answer are as follows:
+
+-   are the childcare centres in Singapore randomly distributed throughout the country?\
+-   if the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
+
+This hands-on exercise continues from [Hands-on Exercise 2A](/hands-on_ex/hands-on_ex02/hands-on_ex02a)
+
+## Learning Outcome
+
+-   Importing and managing geospatial data using `sf` and `spatstat` packages.
+-   Converting spatial data formats from `sf` to `spatstat`'s `ppp` format.
+-   Handling and correcting duplicate spatial points in datasets.
+-   Defining and applying spatial windows (`owin` objects) for focused analysis.
+-   Conducting 2nd-order spatial point pattern analyses using G, F, K, and L functions.
+-   Performing Monte Carlo simulations and hypothesis testing to assess spatial randomness.
+-   Visualizing spatial patterns and statistical results using appropriate plotting functions.
+
+## The Data
+
+| Dataset | Description | Source | Format |
+|-----------------|--------------------|-----------------|-----------------|
+| **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
+| **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
+
+## Installing and Loading the R Packages
+
+The following R packages will be used in this exercise:
+
+| Package | Purpose | Use Case in Exercise |
+|-------------------|--------------------------|---------------------------|
+| **sf** | Imports, manages, and processes vector-based geospatial data. | Handling vector geospatial data in R. |
+| **spatstat** | Provides tools for point pattern analysis. | Performing 1st- and 2nd-order spatial point pattern analysis and deriving kernel density estimation (KDE). |
+| **tmap** | Creates static and interactive thematic maps using cartographic quality elements. | Plotting cartographic quality static point patterns maps or interactive maps by using [**leaflet**](https://leafletjs.com/) API. |
+| **tidyverse** | Supports data manipulation, analysis, and visualization in R a more intuitive and efficient way | Tidying data |
+
+To install and load these packages in R, use the following code:
+
+```{r}
+pacman::p_load(sf, spatstat, tmap, tidyverse)
+```
+
+## Reproducibility
+
+As this document involves Monte Carlo simulations, we will set the seed to ensure reproducibility
+
+```{r}
+set.seed(1234)
+```
+
+## Spatial Data Wrangling
+
+### Importing the Spatial Data
+
+To import the geographical datasets, we will use `st_read()` from `sf`.
+
