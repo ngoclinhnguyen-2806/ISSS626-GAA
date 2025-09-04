@@ -68,7 +68,7 @@ To install and load these packages in R, use the following code:
 pacman::p_load(sf, terra, spatstat, tmap, tidyverse, rvest)
 ```
 
-#### Reproducibility
+**Reproducibility**
 
 As this document involves Monte Carlo simulations, we will set the seed to ensure reproducibility
 
@@ -80,13 +80,13 @@ set.seed(1234)
 
 ### Master Plan 2019 Subzone Boundary No Sea KML
 
-**Import data**
+#### Import data
 
 ```{r}
 mpsz_sf <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
 ```
 
-**Inspect and Reproject to Same Projection System**
+#### Inspect and Reproject to Same Projection System
 
 Before we can use these data for analysis, it is important for us to ensure that they are projected in same projection system.
 
@@ -101,7 +101,7 @@ mpsz_sf <- st_transform(mpsz_sf, 3414)
 st_crs(mpsz_sf)
 ```
 
-**Build a function to extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field**
+#### Build a function to extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field
 
 ```{r}
 extract_kml_field <- function(html_text, field_name) {
@@ -145,13 +145,13 @@ write_rds(mpsz_cl,
 
 ### Child Care Services
 
-**Import data**
+#### Import data
 
 ```{r}
 childcare_sf <- st_read("data/geospatial/ChildCareServices.geojson")
 ```
 
-**Inspect and Reproject to Same Projection System**
+#### Inspect and Reproject to Same Projection System**
 
 ```{r}
 st_crs(childcare_sf)
@@ -283,7 +283,9 @@ childcareSG_ppp
 
 Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose
 
-::: call-out note NNA is a broad term for methods that examine the spatial distribution of points, whereas the Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose. :::
+::: callout-note 
+NNA is a broad term for methods that examine the spatial distribution of points, whereas the Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose. 
+:::
 
 In this section, we will perform the Clark-Evans test of aggregation for a spatial point pattern by using [clarkevans.test()](https://cran.r-project.org/web/packages/spatstat.explore/refman/spatstat.explore.html#clarkevans.test) of `spatstat.explore` package.
 
@@ -347,7 +349,7 @@ kde_SG_diggle <- density(
   kernel="gaussian") 
 ```
 
-::: call-out note
+::: callout-note
 The output of `density()` of spatstat is an **im** class, represents a two-dimensional pixel image. It’s a class used to store and manipulate raster data, where the spatial domain is divided into a grid of rectangular pixels. Each pixel has an associated value, which can be numerical or a factor.
 :::
 
@@ -362,7 +364,7 @@ In the code chunk below, `summary()` of Base R is used to print the summary repo
 summary(kde_SG_diggle)
 ```
 
-::: call-out warning
+::: callout-warning
 The output of `density()` of spatstat is an **im** class, represents a two-dimensional pixel image. It’s a class used to store and manipulate raster data, where the spatial domain is divided into a grid of rectangular pixels. Each pixel has an associated value, which can be numerical or a factor.
 :::
 
