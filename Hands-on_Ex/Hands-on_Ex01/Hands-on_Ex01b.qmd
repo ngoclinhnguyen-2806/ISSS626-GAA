@@ -89,7 +89,7 @@ mpsz <- mpsz %>%
     SUBZONE_N = map_chr(Description, extract_kml_field, "SUBZONE_N"),
     SUBZONE_C = map_chr(Description, extract_kml_field, "SUBZONE_C")
   ) %>%
-  select(-Name, -Description) %>%
+  select(-Name, -Description) %>% # The dash (-) means "deletion", we want to delete Name and Description columns because we no longer need them.
   relocate(geometry, .after = last_col())
 ```
 
@@ -624,6 +624,7 @@ In **tmap**, small multiple maps can be created through three methods:
 In this example, small multiple choropleth maps are created by defining ***ncols*** in **tm_fill()**
 
 ```{r}
+#| fig-width: 12 # default width is 8. Enlarging the width helps accomodating more elements horizontally
 tm_shape(mpsz_pop2024) + 
   tm_polygons(
     fill = c("YOUNG", "AGED"),
