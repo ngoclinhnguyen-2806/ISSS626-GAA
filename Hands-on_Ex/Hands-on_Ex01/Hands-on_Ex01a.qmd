@@ -198,7 +198,7 @@ One of the common issue that can happen during importing geospatial data into R 
 This is an example the coordinate system of `mpsz` simple feature data frame by using *st_crs()* of *sf* package as shown in the code block below.
 
 ```{r}
-st_crs(mpsz)
+st_crs(mpsz) # This function is just to report the data frame and make no changes
 ```
 
 Although `mpsz` data frame is projected in svy21 but when we read until the end of the print, it indicates that the EPSG is 9001. This is a wrong EPSG code because the correct EPSG code for svy21 should be [3414](https://epsg.io/3414).

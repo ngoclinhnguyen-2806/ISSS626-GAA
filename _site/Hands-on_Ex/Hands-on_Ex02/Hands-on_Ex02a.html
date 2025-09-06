@@ -359,17 +359,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">terra</span>, <span class="va">spatstat</span>, <span class="va">tmap</span>, <span class="va">tidyverse</span>, <span class="va">rvest</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="reproducibility" class="level4" data-number="4.0.1"><h4 data-number="4.0.1" class="anchored" data-anchor-id="reproducibility">
-<span class="header-section-number">4.0.1</span> Reproducibility</h4>
+<p><strong>Reproducibility</strong></p>
 <p>As this document involves Monte Carlo simulations, we will set the seed to ensure reproducibility</p>
 <div class="cell">
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="importing-and-wrangling-geospatial-data-sets" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="importing-and-wrangling-geospatial-data-sets">
+</section><section id="importing-and-wrangling-geospatial-data-sets" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="importing-and-wrangling-geospatial-data-sets">
 <span class="header-section-number">5</span> Importing and Wrangling Geospatial Data Sets</h2>
 <section id="master-plan-2019-subzone-boundary-no-sea-kml" class="level3" data-number="5.1"><h3 data-number="5.1" class="anchored" data-anchor-id="master-plan-2019-subzone-boundary-no-sea-kml">
 <span class="header-section-number">5.1</span> Master Plan 2019 Subzone Boundary No Sea KML</h3>
-<p><strong>Import data</strong></p>
+<section id="import-data" class="level4" data-number="5.1.1"><h4 data-number="5.1.1" class="anchored" data-anchor-id="import-data">
+<span class="header-section-number">5.1.1</span> Import data</h4>
 <div class="cell">
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mpsz_sf</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -383,7 +383,8 @@ Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-<p><strong>Inspect and Reproject to Same Projection System</strong></p>
+</section><section id="inspect-and-reproject-to-same-projection-system" class="level4" data-number="5.1.2"><h4 data-number="5.1.2" class="anchored" data-anchor-id="inspect-and-reproject-to-same-projection-system">
+<span class="header-section-number">5.1.2</span> Inspect and Reproject to Same Projection System</h4>
 <p>Before we can use these data for analysis, it is important for us to ensure that they are projected in same projection system.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">st_crs</span><span class="op">(</span><span class="va">mpsz_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -455,7 +456,8 @@ PROJCRS["SVY21 / Singapore TM",
     ID["EPSG",3414]]</code></pre>
 </div>
 </div>
-<p><strong>Build a function to extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field</strong></p>
+</section><section id="build-a-function-to-extract-region_n-pln_area_n-subzone_n-subzone_c-from-description-field" class="level4" data-number="5.1.3"><h4 data-number="5.1.3" class="anchored" data-anchor-id="build-a-function-to-extract-region_n-pln_area_n-subzone_n-subzone_c-from-description-field">
+<span class="header-section-number">5.1.3</span> Build a function to extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field</h4>
 <div class="cell">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">extract_kml_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">html_text</span>, <span class="va">field_name</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">html_text</span><span class="op">)</span> <span class="op">||</span> <span class="va">html_text</span> <span class="op">==</span> <span class="st">""</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="cn">NA_character_</span><span class="op">)</span></span>
@@ -492,9 +494,10 @@ PROJCRS["SVY21 / Singapore TM",
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">write_rds</span><span class="op">(</span><span class="va">mpsz_cl</span>, </span>
 <span>          <span class="st">"data/geospatial/mpsz_cl.rds"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="child-care-services" class="level3" data-number="5.2"><h3 data-number="5.2" class="anchored" data-anchor-id="child-care-services">
+</section></section><section id="child-care-services" class="level3" data-number="5.2"><h3 data-number="5.2" class="anchored" data-anchor-id="child-care-services">
 <span class="header-section-number">5.2</span> Child Care Services</h3>
-<p><strong>Import data</strong></p>
+<section id="import-data-1" class="level4" data-number="5.2.1"><h4 data-number="5.2.1" class="anchored" data-anchor-id="import-data-1">
+<span class="header-section-number">5.2.1</span> Import data</h4>
 <div class="cell">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">childcare_sf</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">"data/geospatial/ChildCareServices.geojson"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -509,7 +512,8 @@ z_range:       zmin: 0 zmax: 0
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-<p><strong>Inspect and Reproject to Same Projection System</strong></p>
+</section><section id="inspect-and-reproject-to-same-projection-system-1" class="level4" data-number="5.2.2"><h4 data-number="5.2.2" class="anchored" data-anchor-id="inspect-and-reproject-to-same-projection-system-1">
+<span class="header-section-number">5.2.2</span> Inspect and Reproject to Same Projection System**</h4>
 <div class="cell">
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">st_crs</span><span class="op">(</span><span class="va">childcare_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -581,7 +585,7 @@ PROJCRS["SVY21 / Singapore TM",
 </div>
 </div>
 <p>The childcare dataset has been reprojected to SVY21 successfully.</p>
-</section></section><section id="mapping-the-geospatial-datasets" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="mapping-the-geospatial-datasets">
+</section></section></section><section id="mapping-the-geospatial-datasets" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="mapping-the-geospatial-datasets">
 <span class="header-section-number">6</span> Mapping the Geospatial Datasets</h2>
 <p>After checking the referencing system of each geospatial data data frame, it is also useful for us to plot a map to show their spatial patterns.</p>
 <section id="static-map" class="level3" data-number="6.1"><h3 data-number="6.1" class="anchored" data-anchor-id="static-map">
