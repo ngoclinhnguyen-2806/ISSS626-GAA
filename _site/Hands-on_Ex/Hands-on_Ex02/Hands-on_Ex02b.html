@@ -136,6 +136,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html">
  <span class="dropdown-text">Hands-on Exercise 2b</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
     </ul>
 </li>
 </ul>
@@ -164,23 +168,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#learning-outcome" id="toc-learning-outcome" class="nav-link" data-scroll-target="#learning-outcome"><span class="header-section-number">2</span> Learning Outcome</a></li>
   <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">3</span> The Data</a></li>
   <li><a href="#installing-and-loading-the-r-packages" id="toc-installing-and-loading-the-r-packages" class="nav-link" data-scroll-target="#installing-and-loading-the-r-packages"><span class="header-section-number">4</span> Installing and Loading the R Packages</a></li>
-  <li><a href="#reproducibility" id="toc-reproducibility" class="nav-link" data-scroll-target="#reproducibility"><span class="header-section-number">5</span> Reproducibility</a></li>
   <li>
-<a href="#importing-and-wrangling-geospatial-data-sets" id="toc-importing-and-wrangling-geospatial-data-sets" class="nav-link" data-scroll-target="#importing-and-wrangling-geospatial-data-sets"><span class="header-section-number">6</span> Importing and Wrangling Geospatial Data Sets</a>
+<a href="#importing-and-wrangling-geospatial-data-sets" id="toc-importing-and-wrangling-geospatial-data-sets" class="nav-link" data-scroll-target="#importing-and-wrangling-geospatial-data-sets"><span class="header-section-number">5</span> Importing and Wrangling Geospatial Data Sets</a>
   <ul class="collapse">
-<li><a href="#master-plan-2019-subzone-boundary-no-sea-kml" id="toc-master-plan-2019-subzone-boundary-no-sea-kml" class="nav-link" data-scroll-target="#master-plan-2019-subzone-boundary-no-sea-kml"><span class="header-section-number">6.1</span> Master Plan 2019 Subzone Boundary No Sea KML</a></li>
-  <li><a href="#extract-study-areas" id="toc-extract-study-areas" class="nav-link" data-scroll-target="#extract-study-areas"><span class="header-section-number">6.2</span> Extract study areas</a></li>
-  <li><a href="#child-care-services" id="toc-child-care-services" class="nav-link" data-scroll-target="#child-care-services"><span class="header-section-number">6.3</span> Child Care Services</a></li>
-  <li><a href="#combining-point-events-object-and-owin-object" id="toc-combining-point-events-object-and-owin-object" class="nav-link" data-scroll-target="#combining-point-events-object-and-owin-object"><span class="header-section-number">6.4</span> Combining point events object and owin object</a></li>
+<li><a href="#master-plan-2019-subzone-boundary-no-sea-kml" id="toc-master-plan-2019-subzone-boundary-no-sea-kml" class="nav-link" data-scroll-target="#master-plan-2019-subzone-boundary-no-sea-kml"><span class="header-section-number">5.1</span> Master Plan 2019 Subzone Boundary No Sea KML</a></li>
+  <li><a href="#child-care-services" id="toc-child-care-services" class="nav-link" data-scroll-target="#child-care-services"><span class="header-section-number">5.2</span> Child Care Services</a></li>
+  <li><a href="#combining-point-events-object-and-owin-object" id="toc-combining-point-events-object-and-owin-object" class="nav-link" data-scroll-target="#combining-point-events-object-and-owin-object"><span class="header-section-number">5.3</span> Combining point events object and owin object</a></li>
   </ul>
 </li>
   <li>
-<a href="#second-order-spatial-point-patterns-analysis" id="toc-second-order-spatial-point-patterns-analysis" class="nav-link" data-scroll-target="#second-order-spatial-point-patterns-analysis"><span class="header-section-number">7</span> Second-order Spatial Point Patterns Analysis</a>
+<a href="#second-order-spatial-point-patterns-analysis" id="toc-second-order-spatial-point-patterns-analysis" class="nav-link" data-scroll-target="#second-order-spatial-point-patterns-analysis"><span class="header-section-number">6</span> Second-order Spatial Point Patterns Analysis</a>
   <ul class="collapse">
-<li><a href="#analysing-spatial-point-process-using-g-function" id="toc-analysing-spatial-point-process-using-g-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-g-function"><span class="header-section-number">7.1</span> Analysing Spatial Point Process Using G-Function</a></li>
-  <li><a href="#analysing-spatial-point-process-using-f-function" id="toc-analysing-spatial-point-process-using-f-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-f-function"><span class="header-section-number">7.2</span> Analysing Spatial Point Process Using F-Function</a></li>
-  <li><a href="#analysing-spatial-point-process-using-k-function" id="toc-analysing-spatial-point-process-using-k-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-k-function"><span class="header-section-number">7.3</span> Analysing Spatial Point Process Using K-Function</a></li>
-  <li><a href="#analysing-spatial-point-process-using-l-function" id="toc-analysing-spatial-point-process-using-l-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-l-function"><span class="header-section-number">7.4</span> Analysing Spatial Point Process Using L-Function</a></li>
+<li><a href="#analysing-spatial-point-process-using-g-function" id="toc-analysing-spatial-point-process-using-g-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-g-function"><span class="header-section-number">6.1</span> Analysing Spatial Point Process Using G-Function</a></li>
+  <li><a href="#analysing-spatial-point-process-using-f-function" id="toc-analysing-spatial-point-process-using-f-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-f-function"><span class="header-section-number">6.2</span> Analysing Spatial Point Process Using F-Function</a></li>
+  <li><a href="#analysing-spatial-point-process-using-k-function" id="toc-analysing-spatial-point-process-using-k-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-k-function"><span class="header-section-number">6.3</span> Analysing Spatial Point Process Using K-Function</a></li>
+  <li><a href="#analysing-spatial-point-process-using-l-function" id="toc-analysing-spatial-point-process-using-l-function" class="nav-link" data-scroll-target="#analysing-spatial-point-process-using-l-function"><span class="header-section-number">6.4</span> Analysing Spatial Point Process Using L-Function</a></li>
   </ul>
 </li>
   </ul></nav>
@@ -212,7 +214,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 4, 2025</p>
+      <p class="date-modified">September 6, 2025</p>
     </div>
   </div>
     
@@ -315,18 +317,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">spatstat</span>, <span class="va">tmap</span>, <span class="va">tidyverse</span>, <span class="va">rvest</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="reproducibility" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="reproducibility">
-<span class="header-section-number">5</span> Reproducibility</h2>
+<p><strong>Reproducibility</strong></p>
 <p>As this document involves Monte Carlo simulations, we will set the seed to ensure reproducibility</p>
 <div class="cell">
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="importing-and-wrangling-geospatial-data-sets" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="importing-and-wrangling-geospatial-data-sets">
-<span class="header-section-number">6</span> Importing and Wrangling Geospatial Data Sets</h2>
-<section id="master-plan-2019-subzone-boundary-no-sea-kml" class="level3" data-number="6.1"><h3 data-number="6.1" class="anchored" data-anchor-id="master-plan-2019-subzone-boundary-no-sea-kml">
-<span class="header-section-number">6.1</span> Master Plan 2019 Subzone Boundary No Sea KML</h3>
-<section id="import-data" class="level4" data-number="6.1.1"><h4 data-number="6.1.1" class="anchored" data-anchor-id="import-data">
-<span class="header-section-number">6.1.1</span> Import data</h4>
+</section><section id="importing-and-wrangling-geospatial-data-sets" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="importing-and-wrangling-geospatial-data-sets">
+<span class="header-section-number">5</span> Importing and Wrangling Geospatial Data Sets</h2>
+<section id="master-plan-2019-subzone-boundary-no-sea-kml" class="level3" data-number="5.1"><h3 data-number="5.1" class="anchored" data-anchor-id="master-plan-2019-subzone-boundary-no-sea-kml">
+<span class="header-section-number">5.1</span> Master Plan 2019 Subzone Boundary No Sea KML</h3>
+<section id="import-data" class="level4" data-number="5.1.1"><h4 data-number="5.1.1" class="anchored" data-anchor-id="import-data">
+<span class="header-section-number">5.1.1</span> Import data</h4>
 <div class="cell">
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mpsz_sf</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -340,8 +341,8 @@ Bounding box:  xmin: 103.6057 ymin: 1.158699 xmax: 104.0885 ymax: 1.470775
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-</section><section id="inspect-and-reproject-to-same-projection-system" class="level4" data-number="6.1.2"><h4 data-number="6.1.2" class="anchored" data-anchor-id="inspect-and-reproject-to-same-projection-system">
-<span class="header-section-number">6.1.2</span> Inspect and Reproject to Same Projection System</h4>
+</section><section id="inspect-and-reproject-to-same-projection-system" class="level4" data-number="5.1.2"><h4 data-number="5.1.2" class="anchored" data-anchor-id="inspect-and-reproject-to-same-projection-system">
+<span class="header-section-number">5.1.2</span> Inspect and Reproject to Same Projection System</h4>
 <p>Before we can use these data for analysis, it is important for us to ensure that they are projected in same projection system.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">st_crs</span><span class="op">(</span><span class="va">mpsz_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -413,8 +414,8 @@ PROJCRS["SVY21 / Singapore TM",
     ID["EPSG",3414]]</code></pre>
 </div>
 </div>
-</section><section id="build-a-function-to-extract-region_n-pln_area_n-subzone_n-subzone_c-from-description-field" class="level4" data-number="6.1.3"><h4 data-number="6.1.3" class="anchored" data-anchor-id="build-a-function-to-extract-region_n-pln_area_n-subzone_n-subzone_c-from-description-field">
-<span class="header-section-number">6.1.3</span> Build a function to extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field</h4>
+</section><section id="build-a-function-to-extract-region_n-pln_area_n-subzone_n-subzone_c-from-description-field" class="level4" data-number="5.1.3"><h4 data-number="5.1.3" class="anchored" data-anchor-id="build-a-function-to-extract-region_n-pln_area_n-subzone_n-subzone_c-from-description-field">
+<span class="header-section-number">5.1.3</span> Build a function to extract REGION_N, PLN_AREA_N, SUBZONE_N, SUBZONE_C from Description field</h4>
 <div class="cell">
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">extract_kml_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">html_text</span>, <span class="va">field_name</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">html_text</span><span class="op">)</span> <span class="op">||</span> <span class="va">html_text</span> <span class="op">==</span> <span class="st">""</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="cn">NA_character_</span><span class="op">)</span></span>
@@ -451,8 +452,8 @@ PROJCRS["SVY21 / Singapore TM",
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">write_rds</span><span class="op">(</span><span class="va">mpsz_cl</span>, </span>
 <span>          <span class="st">"data/geospatial/mpsz_cl.rds"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="extract-study-areas" class="level3" data-number="6.2"><h3 data-number="6.2" class="anchored" data-anchor-id="extract-study-areas">
-<span class="header-section-number">6.2</span> Extract study areas</h3>
+</section><section id="extract-study-areas" class="level4" data-number="5.1.4"><h4 data-number="5.1.4" class="anchored" data-anchor-id="extract-study-areas">
+<span class="header-section-number">5.1.4</span> Extract study areas</h4>
 <div class="cell">
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">pg</span> <span class="op">&lt;-</span> <span class="va">mpsz_cl</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">PLN_AREA_N</span> <span class="op">==</span> <span class="st">"PUNGGOL"</span><span class="op">)</span></span>
@@ -463,8 +464,8 @@ PROJCRS["SVY21 / Singapore TM",
 <span><span class="va">jw</span> <span class="op">&lt;-</span> <span class="va">mpsz_cl</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">PLN_AREA_N</span> <span class="op">==</span> <span class="st">"JURONG WEST"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="creating-owin-object" class="level4" data-number="6.2.1"><h4 data-number="6.2.1" class="anchored" data-anchor-id="creating-owin-object">
-<span class="header-section-number">6.2.1</span> Creating <code>owin</code> object</h4>
+</section><section id="creating-owin-object" class="level4" data-number="5.1.5"><h4 data-number="5.1.5" class="anchored" data-anchor-id="creating-owin-object">
+<span class="header-section-number">5.1.5</span> Creating <code>owin</code> object</h4>
 <p>When analysing spatial point patterns, it is a good practice to confine the analysis with a geographical area like Singapore boundary. In <code>spatstat</code>, an object called <code>owin</code> is specially designed to represent this polygonal region.</p>
 <p>The code chunk below, <code>as.owin()</code> of spatstat is used to convert <code>mpsz_cl</code> as well as <code>pg</code>, <code>tm</code>, <code>ck</code>, <code>jw</code> into <code>owin</code> object.</p>
 <div class="cell">
@@ -497,10 +498,10 @@ PROJCRS["SVY21 / Singapore TM",
 </div>
 </div>
 </div>
-</section></section><section id="child-care-services" class="level3" data-number="6.3"><h3 data-number="6.3" class="anchored" data-anchor-id="child-care-services">
-<span class="header-section-number">6.3</span> Child Care Services</h3>
-<section id="import-data-1" class="level4" data-number="6.3.1"><h4 data-number="6.3.1" class="anchored" data-anchor-id="import-data-1">
-<span class="header-section-number">6.3.1</span> Import data</h4>
+</section></section><section id="child-care-services" class="level3" data-number="5.2"><h3 data-number="5.2" class="anchored" data-anchor-id="child-care-services">
+<span class="header-section-number">5.2</span> Child Care Services</h3>
+<section id="import-data-1" class="level4" data-number="5.2.1"><h4 data-number="5.2.1" class="anchored" data-anchor-id="import-data-1">
+<span class="header-section-number">5.2.1</span> Import data</h4>
 <div class="cell">
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">childcare_sf</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">"data/geospatial/ChildCareServices.geojson"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -515,8 +516,8 @@ z_range:       zmin: 0 zmax: 0
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-</section><section id="inspect-and-reproject-to-same-projection-system-1" class="level4" data-number="6.3.2"><h4 data-number="6.3.2" class="anchored" data-anchor-id="inspect-and-reproject-to-same-projection-system-1">
-<span class="header-section-number">6.3.2</span> Inspect and Reproject to Same Projection System**</h4>
+</section><section id="inspect-and-reproject-to-same-projection-system-1" class="level4" data-number="5.2.2"><h4 data-number="5.2.2" class="anchored" data-anchor-id="inspect-and-reproject-to-same-projection-system-1">
+<span class="header-section-number">5.2.2</span> Inspect and Reproject to Same Projection System**</h4>
 <div class="cell">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">st_crs</span><span class="op">(</span><span class="va">childcare_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -587,16 +588,16 @@ PROJCRS["SVY21 / Singapore TM",
     ID["EPSG",3414]]</code></pre>
 </div>
 </div>
-</section><section id="converting-sf-data-frames-to-ppp-class" class="level4" data-number="6.3.3"><h4 data-number="6.3.3" class="anchored" data-anchor-id="converting-sf-data-frames-to-ppp-class">
-<span class="header-section-number">6.3.3</span> Converting sf data frames to ppp class</h4>
+</section><section id="converting-sf-data-frames-to-ppp-class" class="level4" data-number="5.2.3"><h4 data-number="5.2.3" class="anchored" data-anchor-id="converting-sf-data-frames-to-ppp-class">
+<span class="header-section-number">5.2.3</span> Converting sf data frames to ppp class</h4>
 <p><code>spatstat</code> requires the point event data in ppp object form. The code chunk below uses <code>as.ppp()</code> of <code>spatstat</code> package to convert <code>childcare_sf</code> to ppp format.</p>
 <div class="cell">
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">childcare_ppp</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">childcare_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="combining-point-events-object-and-owin-object" class="level3" data-number="6.4"><h3 data-number="6.4" class="anchored" data-anchor-id="combining-point-events-object-and-owin-object">
-<span class="header-section-number">6.4</span> Combining point events object and owin object</h3>
-<section id="combine-ppp-and-owin-objects" class="level4" data-number="6.4.1"><h4 data-number="6.4.1" class="anchored" data-anchor-id="combine-ppp-and-owin-objects">
-<span class="header-section-number">6.4.1</span> Combine <code>ppp</code> and <code>owin</code> objects</h4>
+</section></section><section id="combining-point-events-object-and-owin-object" class="level3" data-number="5.3"><h3 data-number="5.3" class="anchored" data-anchor-id="combining-point-events-object-and-owin-object">
+<span class="header-section-number">5.3</span> Combining point events object and owin object</h3>
+<section id="combine-ppp-and-owin-objects" class="level4" data-number="5.3.1"><h4 data-number="5.3.1" class="anchored" data-anchor-id="combine-ppp-and-owin-objects">
+<span class="header-section-number">5.3.1</span> Combine <code>ppp</code> and <code>owin</code> objects</h4>
 <p>In this last step of geospatial data wrangling, we will extract childcare events that are located within Singapore and each regions by using the code chunk below.</p>
 <div class="cell">
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">childcareSG_ppp</span> <span class="op">=</span> <span class="va">childcare_ppp</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span></span>
@@ -605,16 +606,16 @@ PROJCRS["SVY21 / Singapore TM",
 <span><span class="va">childcare_ck_ppp</span> <span class="op">=</span> <span class="va">childcare_ppp</span><span class="op">[</span><span class="va">ck_owin</span><span class="op">]</span></span>
 <span><span class="va">childcare_jw_ppp</span> <span class="op">=</span> <span class="va">childcare_ppp</span><span class="op">[</span><span class="va">jw_owin</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="transform-measurement-to-km" class="level4" data-number="6.4.2"><h4 data-number="6.4.2" class="anchored" data-anchor-id="transform-measurement-to-km">
-<span class="header-section-number">6.4.2</span> Transform measurement to km</h4>
+</section><section id="transform-measurement-to-km" class="level4" data-number="5.3.2"><h4 data-number="5.3.2" class="anchored" data-anchor-id="transform-measurement-to-km">
+<span class="header-section-number">5.3.2</span> Transform measurement to km</h4>
 <div class="cell">
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">childcare_pg_ppp.km</span> <span class="op">=</span> <span class="fu">rescale.ppp</span><span class="op">(</span><span class="va">childcare_pg_ppp</span>, <span class="fl">1000</span>, <span class="st">"km"</span><span class="op">)</span></span>
 <span><span class="va">childcare_tm_ppp.km</span> <span class="op">=</span> <span class="fu">rescale.ppp</span><span class="op">(</span><span class="va">childcare_tm_ppp</span>, <span class="fl">1000</span>, <span class="st">"km"</span><span class="op">)</span></span>
 <span><span class="va">childcare_ck_ppp.km</span> <span class="op">=</span> <span class="fu">rescale.ppp</span><span class="op">(</span><span class="va">childcare_ck_ppp</span>, <span class="fl">1000</span>, <span class="st">"km"</span><span class="op">)</span></span>
 <span><span class="va">childcare_jw_ppp.km</span> <span class="op">=</span> <span class="fu">rescale.ppp</span><span class="op">(</span><span class="va">childcare_jw_ppp</span>, <span class="fl">1000</span>, <span class="st">"km"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="plot" class="level4" data-number="6.4.3"><h4 data-number="6.4.3" class="anchored" data-anchor-id="plot">
-<span class="header-section-number">6.4.3</span> Plot</h4>
+</section><section id="plot" class="level4" data-number="5.3.3"><h4 data-number="5.3.3" class="anchored" data-anchor-id="plot">
+<span class="header-section-number">5.3.3</span> Plot</h4>
 <div class="cell">
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu">unmark</span><span class="op">(</span><span class="va">childcare_pg_ppp.km</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"Punggol"</span><span class="op">)</span></span>
@@ -628,15 +629,15 @@ PROJCRS["SVY21 / Singapore TM",
 </div>
 </div>
 </div>
-</section></section></section><section id="second-order-spatial-point-patterns-analysis" class="level2" data-number="7"><h2 data-number="7" class="anchored" data-anchor-id="second-order-spatial-point-patterns-analysis">
-<span class="header-section-number">7</span> Second-order Spatial Point Patterns Analysis</h2>
-<section id="analysing-spatial-point-process-using-g-function" class="level3" data-number="7.1"><h3 data-number="7.1" class="anchored" data-anchor-id="analysing-spatial-point-process-using-g-function">
-<span class="header-section-number">7.1</span> Analysing Spatial Point Process Using G-Function</h3>
+</section></section></section><section id="second-order-spatial-point-patterns-analysis" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="second-order-spatial-point-patterns-analysis">
+<span class="header-section-number">6</span> Second-order Spatial Point Patterns Analysis</h2>
+<section id="analysing-spatial-point-process-using-g-function" class="level3" data-number="6.1"><h3 data-number="6.1" class="anchored" data-anchor-id="analysing-spatial-point-process-using-g-function">
+<span class="header-section-number">6.1</span> Analysing Spatial Point Process Using G-Function</h3>
 <p>The G function measures the distribution of the distances from an arbitrary event to its nearest event. In this section, you will learn how to compute G-function estimation by using <code>Gest()</code> of spatstat package. You will also learn how to perform Monte Carlo simulation test using <code>envelope()</code> of <code>spatstat</code> package.</p>
-<section id="choa-chu-kang-planning-area" class="level4" data-number="7.1.1"><h4 data-number="7.1.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area">
-<span class="header-section-number">7.1.1</span> Choa Chu Kang planning area</h4>
-<section id="computing-g-function-estimation" class="level5" data-number="7.1.1.1"><h5 data-number="7.1.1.1" class="anchored" data-anchor-id="computing-g-function-estimation">
-<span class="header-section-number">7.1.1.1</span> Computing G-function estimation</h5>
+<section id="choa-chu-kang-planning-area" class="level4" data-number="6.1.1"><h4 data-number="6.1.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area">
+<span class="header-section-number">6.1.1</span> Choa Chu Kang planning area</h4>
+<section id="computing-g-function-estimation" class="level5" data-number="6.1.1.1"><h5 data-number="6.1.1.1" class="anchored" data-anchor-id="computing-g-function-estimation">
+<span class="header-section-number">6.1.1.1</span> Computing G-function estimation</h5>
 <p>The code chunk below is used to compute G-function using <code>Gest()</code> of <code>spastat</code> package.</p>
 <div class="cell">
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">G_CK</span> <span class="op">=</span> <span class="fu">Gest</span><span class="op">(</span><span class="va">childcare_ck_ppp</span>, correction <span class="op">=</span> <span class="st">"border"</span><span class="op">)</span></span>
@@ -648,8 +649,8 @@ PROJCRS["SVY21 / Singapore TM",
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test" class="level5" data-number="7.1.1.2"><h5 data-number="7.1.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test">
-<span class="header-section-number">7.1.1.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test" class="level5" data-number="6.1.1.2"><h5 data-number="6.1.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test">
+<span class="header-section-number">6.1.1.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Choa Chu Kang are randomly distributed.</p></li>
@@ -690,11 +691,11 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="tampines-planning-area" class="level4" data-number="7.1.2"><h4 data-number="7.1.2" class="anchored" data-anchor-id="tampines-planning-area">
-<span class="header-section-number">7.1.2</span> Tampines planning area</h4>
+</section></section><section id="tampines-planning-area" class="level4" data-number="6.1.2"><h4 data-number="6.1.2" class="anchored" data-anchor-id="tampines-planning-area">
+<span class="header-section-number">6.1.2</span> Tampines planning area</h4>
 <p>We do the same steps with Tampines.</p>
-<section id="computing-g-function-estimation-1" class="level5" data-number="7.1.2.1"><h5 data-number="7.1.2.1" class="anchored" data-anchor-id="computing-g-function-estimation-1">
-<span class="header-section-number">7.1.2.1</span> Computing G-function estimation</h5>
+<section id="computing-g-function-estimation-1" class="level5" data-number="6.1.2.1"><h5 data-number="6.1.2.1" class="anchored" data-anchor-id="computing-g-function-estimation-1">
+<span class="header-section-number">6.1.2.1</span> Computing G-function estimation</h5>
 <div class="cell">
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">G_tm</span> <span class="op">=</span> <span class="fu">Gest</span><span class="op">(</span><span class="va">childcare_tm_ppp</span>, correction <span class="op">=</span> <span class="st">"best"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">G_tm</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -705,8 +706,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-1" class="level5" data-number="7.1.2.2"><h5 data-number="7.1.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-1">
-<span class="header-section-number">7.1.2.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-1" class="level5" data-number="6.1.2.2"><h5 data-number="6.1.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-1">
+<span class="header-section-number">6.1.2.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Tampines are randomly distributed.</p></li>
@@ -747,13 +748,13 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section></section><section id="analysing-spatial-point-process-using-f-function" class="level3" data-number="7.2"><h3 data-number="7.2" class="anchored" data-anchor-id="analysing-spatial-point-process-using-f-function">
-<span class="header-section-number">7.2</span> Analysing Spatial Point Process Using F-Function</h3>
+</section></section></section><section id="analysing-spatial-point-process-using-f-function" class="level3" data-number="6.2"><h3 data-number="6.2" class="anchored" data-anchor-id="analysing-spatial-point-process-using-f-function">
+<span class="header-section-number">6.2</span> Analysing Spatial Point Process Using F-Function</h3>
 <p>The F function estimates the empty space function <strong>F(r)</strong> or its hazard rate <strong>h(r)</strong> from a point pattern in a window of arbitrary shape. In this section, you will learn how to compute F-function estimation by using <code>Fest()</code> of <code>spatstat</code> package. You will also learn how to perform monta carlo simulation test using <code>envelope()</code> of <code>spatstat</code> package.</p>
-<section id="choa-chu-kang-planning-area-1" class="level4" data-number="7.2.1"><h4 data-number="7.2.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area-1">
-<span class="header-section-number">7.2.1</span> Choa Chu Kang planning area</h4>
-<section id="computing-f-function-estimation" class="level5" data-number="7.2.1.1"><h5 data-number="7.2.1.1" class="anchored" data-anchor-id="computing-f-function-estimation">
-<span class="header-section-number">7.2.1.1</span> Computing F-function estimation</h5>
+<section id="choa-chu-kang-planning-area-1" class="level4" data-number="6.2.1"><h4 data-number="6.2.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area-1">
+<span class="header-section-number">6.2.1</span> Choa Chu Kang planning area</h4>
+<section id="computing-f-function-estimation" class="level5" data-number="6.2.1.1"><h5 data-number="6.2.1.1" class="anchored" data-anchor-id="computing-f-function-estimation">
+<span class="header-section-number">6.2.1.1</span> Computing F-function estimation</h5>
 <p>The code chunk below is used to compute F-function using <code>Fest()</code> of <code>spatat</code> package.</p>
 <div class="cell">
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">F_CK</span> <span class="op">=</span> <span class="fu">Fest</span><span class="op">(</span><span class="va">childcare_ck_ppp</span><span class="op">)</span></span>
@@ -765,8 +766,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-2" class="level5" data-number="7.2.1.2"><h5 data-number="7.2.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-2">
-<span class="header-section-number">7.2.1.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-2" class="level5" data-number="6.2.1.2"><h5 data-number="6.2.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-2">
+<span class="header-section-number">6.2.1.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Choa Chu Kang are randomly distributed.</p></li>
@@ -807,11 +808,11 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="tampines-planning-area-1" class="level4" data-number="7.2.2"><h4 data-number="7.2.2" class="anchored" data-anchor-id="tampines-planning-area-1">
-<span class="header-section-number">7.2.2</span> Tampines planning area</h4>
+</section></section><section id="tampines-planning-area-1" class="level4" data-number="6.2.2"><h4 data-number="6.2.2" class="anchored" data-anchor-id="tampines-planning-area-1">
+<span class="header-section-number">6.2.2</span> Tampines planning area</h4>
 <p>We do the same for Tampines.</p>
-<section id="computing-f-function-estimation-1" class="level5" data-number="7.2.2.1"><h5 data-number="7.2.2.1" class="anchored" data-anchor-id="computing-f-function-estimation-1">
-<span class="header-section-number">7.2.2.1</span> Computing F-function estimation</h5>
+<section id="computing-f-function-estimation-1" class="level5" data-number="6.2.2.1"><h5 data-number="6.2.2.1" class="anchored" data-anchor-id="computing-f-function-estimation-1">
+<span class="header-section-number">6.2.2.1</span> Computing F-function estimation</h5>
 <div class="cell">
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">F_TM</span> <span class="op">=</span> <span class="fu">Fest</span><span class="op">(</span><span class="va">childcare_tm_ppp</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">F_TM</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -822,8 +823,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-3" class="level5" data-number="7.2.2.2"><h5 data-number="7.2.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-3">
-<span class="header-section-number">7.2.2.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-3" class="level5" data-number="6.2.2.2"><h5 data-number="6.2.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-3">
+<span class="header-section-number">6.2.2.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Tampines are randomly distributed.</p></li>
@@ -864,13 +865,13 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section></section><section id="analysing-spatial-point-process-using-k-function" class="level3" data-number="7.3"><h3 data-number="7.3" class="anchored" data-anchor-id="analysing-spatial-point-process-using-k-function">
-<span class="header-section-number">7.3</span> Analysing Spatial Point Process Using K-Function</h3>
+</section></section></section><section id="analysing-spatial-point-process-using-k-function" class="level3" data-number="6.3"><h3 data-number="6.3" class="anchored" data-anchor-id="analysing-spatial-point-process-using-k-function">
+<span class="header-section-number">6.3</span> Analysing Spatial Point Process Using K-Function</h3>
 <p>K-function measures the number of events found up to a given distance of any particular event. In this section, you will learn how to compute K-function estimates by using <code>Kest()</code> of <code>spatstat</code> package. You will also learn how to perform Monte Carlo simulation test using <code>envelope()</code> of <code>spatstat</code> package.</p>
-<section id="choa-chu-kang-planning-area-2" class="level4" data-number="7.3.1"><h4 data-number="7.3.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area-2">
-<span class="header-section-number">7.3.1</span> Choa Chu Kang planning area</h4>
-<section id="computing-k-function-estimate" class="level5" data-number="7.3.1.1"><h5 data-number="7.3.1.1" class="anchored" data-anchor-id="computing-k-function-estimate">
-<span class="header-section-number">7.3.1.1</span> Computing K-function estimate</h5>
+<section id="choa-chu-kang-planning-area-2" class="level4" data-number="6.3.1"><h4 data-number="6.3.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area-2">
+<span class="header-section-number">6.3.1</span> Choa Chu Kang planning area</h4>
+<section id="computing-k-function-estimate" class="level5" data-number="6.3.1.1"><h5 data-number="6.3.1.1" class="anchored" data-anchor-id="computing-k-function-estimate">
+<span class="header-section-number">6.3.1.1</span> Computing K-function estimate</h5>
 <div class="cell">
 <div class="sourceCode" id="cb43"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">K_ck</span> <span class="op">=</span> <span class="fu">Kest</span><span class="op">(</span><span class="va">childcare_ck_ppp</span>, correction <span class="op">=</span> <span class="st">"Ripley"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">K_ck</span>, <span class="va">.</span> <span class="op">-</span><span class="va">r</span> <span class="op">~</span> <span class="va">r</span>, ylab<span class="op">=</span> <span class="st">"K(d)-r"</span>, xlab <span class="op">=</span> <span class="st">"d(m)"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -881,8 +882,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-4" class="level5" data-number="7.3.1.2"><h5 data-number="7.3.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-4">
-<span class="header-section-number">7.3.1.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-4" class="level5" data-number="6.3.1.2"><h5 data-number="6.3.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-4">
+<span class="header-section-number">6.3.1.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Choa Chu Kang are randomly distributed.</p></li>
@@ -913,10 +914,10 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="tampines-planning-area-2" class="level4" data-number="7.3.2"><h4 data-number="7.3.2" class="anchored" data-anchor-id="tampines-planning-area-2">
-<span class="header-section-number">7.3.2</span> Tampines planning area</h4>
-<section id="computing-k-function-estimate-1" class="level5" data-number="7.3.2.1"><h5 data-number="7.3.2.1" class="anchored" data-anchor-id="computing-k-function-estimate-1">
-<span class="header-section-number">7.3.2.1</span> Computing K-function estimate</h5>
+</section></section><section id="tampines-planning-area-2" class="level4" data-number="6.3.2"><h4 data-number="6.3.2" class="anchored" data-anchor-id="tampines-planning-area-2">
+<span class="header-section-number">6.3.2</span> Tampines planning area</h4>
+<section id="computing-k-function-estimate-1" class="level5" data-number="6.3.2.1"><h5 data-number="6.3.2.1" class="anchored" data-anchor-id="computing-k-function-estimate-1">
+<span class="header-section-number">6.3.2.1</span> Computing K-function estimate</h5>
 <div class="cell">
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">K_tm</span> <span class="op">=</span> <span class="fu">Kest</span><span class="op">(</span><span class="va">childcare_tm_ppp</span>, correction <span class="op">=</span> <span class="st">"Ripley"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">K_tm</span>, <span class="va">.</span> <span class="op">-</span><span class="va">r</span> <span class="op">~</span> <span class="va">r</span>, </span>
@@ -929,8 +930,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-5" class="level5" data-number="7.3.2.2"><h5 data-number="7.3.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-5">
-<span class="header-section-number">7.3.2.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-5" class="level5" data-number="6.3.2.2"><h5 data-number="6.3.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-5">
+<span class="header-section-number">6.3.2.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Tampines are randomly distributed.</p></li>
@@ -962,13 +963,13 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section></section><section id="analysing-spatial-point-process-using-l-function" class="level3" data-number="7.4"><h3 data-number="7.4" class="anchored" data-anchor-id="analysing-spatial-point-process-using-l-function">
-<span class="header-section-number">7.4</span> Analysing Spatial Point Process Using L-Function</h3>
+</section></section></section><section id="analysing-spatial-point-process-using-l-function" class="level3" data-number="6.4"><h3 data-number="6.4" class="anchored" data-anchor-id="analysing-spatial-point-process-using-l-function">
+<span class="header-section-number">6.4</span> Analysing Spatial Point Process Using L-Function</h3>
 <p>In this section, you will learn how to compute L-function estimation by using <code>Lest()</code> of <code>spatstat</code> package. You will also learn how to perform Monte Carlo simulation test using <code>envelope()</code> of <code>spatstat</code> package.</p>
-<section id="choa-chu-kang-planning-area-3" class="level4" data-number="7.4.1"><h4 data-number="7.4.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area-3">
-<span class="header-section-number">7.4.1</span> Choa Chu Kang planning area</h4>
-<section id="computing-l-function-estimate" class="level5" data-number="7.4.1.1"><h5 data-number="7.4.1.1" class="anchored" data-anchor-id="computing-l-function-estimate">
-<span class="header-section-number">7.4.1.1</span> Computing L-function estimate</h5>
+<section id="choa-chu-kang-planning-area-3" class="level4" data-number="6.4.1"><h4 data-number="6.4.1" class="anchored" data-anchor-id="choa-chu-kang-planning-area-3">
+<span class="header-section-number">6.4.1</span> Choa Chu Kang planning area</h4>
+<section id="computing-l-function-estimate" class="level5" data-number="6.4.1.1"><h5 data-number="6.4.1.1" class="anchored" data-anchor-id="computing-l-function-estimate">
+<span class="header-section-number">6.4.1.1</span> Computing L-function estimate</h5>
 <div class="cell">
 <div class="sourceCode" id="cb51"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">L_ck</span> <span class="op">=</span> <span class="fu">Lest</span><span class="op">(</span><span class="va">childcare_ck_ppp</span>, correction <span class="op">=</span> <span class="st">"Ripley"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">L_ck</span>, <span class="va">.</span> <span class="op">-</span><span class="va">r</span> <span class="op">~</span> <span class="va">r</span>, </span>
@@ -980,8 +981,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-6" class="level5" data-number="7.4.1.2"><h5 data-number="7.4.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-6">
-<span class="header-section-number">7.4.1.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-6" class="level5" data-number="6.4.1.2"><h5 data-number="6.4.1.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-6">
+<span class="header-section-number">6.4.1.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Choa Chu Kang are randomly distributed.</p></li>
@@ -1012,10 +1013,10 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="tampines-planning-area-3" class="level4" data-number="7.4.2"><h4 data-number="7.4.2" class="anchored" data-anchor-id="tampines-planning-area-3">
-<span class="header-section-number">7.4.2</span> Tampines planning area</h4>
-<section id="computing-k-function-estimate-2" class="level5" data-number="7.4.2.1"><h5 data-number="7.4.2.1" class="anchored" data-anchor-id="computing-k-function-estimate-2">
-<span class="header-section-number">7.4.2.1</span> Computing K-function estimate</h5>
+</section></section><section id="tampines-planning-area-3" class="level4" data-number="6.4.2"><h4 data-number="6.4.2" class="anchored" data-anchor-id="tampines-planning-area-3">
+<span class="header-section-number">6.4.2</span> Tampines planning area</h4>
+<section id="computing-k-function-estimate-2" class="level5" data-number="6.4.2.1"><h5 data-number="6.4.2.1" class="anchored" data-anchor-id="computing-k-function-estimate-2">
+<span class="header-section-number">6.4.2.1</span> Computing K-function estimate</h5>
 <div class="cell">
 <div class="sourceCode" id="cb55"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">L_tm</span> <span class="op">=</span> <span class="fu">Lest</span><span class="op">(</span><span class="va">childcare_tm_ppp</span>, correction <span class="op">=</span> <span class="st">"Ripley"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">L_tm</span>, <span class="va">.</span> <span class="op">-</span><span class="va">r</span> <span class="op">~</span> <span class="va">r</span>, </span>
@@ -1028,8 +1029,8 @@ Done.</code></pre>
 </div>
 </div>
 </div>
-</section><section id="performing-complete-spatial-randomness-test-7" class="level5" data-number="7.4.2.2"><h5 data-number="7.4.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-7">
-<span class="header-section-number">7.4.2.2</span> Performing Complete Spatial Randomness Test</h5>
+</section><section id="performing-complete-spatial-randomness-test-7" class="level5" data-number="6.4.2.2"><h5 data-number="6.4.2.2" class="anchored" data-anchor-id="performing-complete-spatial-randomness-test-7">
+<span class="header-section-number">6.4.2.2</span> Performing Complete Spatial Randomness Test</h5>
 <p>To confirm the observed spatial patterns above, a hypothesis test will be conducted. The hypothesis and test are as follows:</p>
 <ul>
 <li><p>Ho = The distribution of childcare services at Tampines are randomly distributed.</p></li>
