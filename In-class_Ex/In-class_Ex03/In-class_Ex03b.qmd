@@ -1,0 +1,88 @@
+---
+title: "In-class Exercise 3b"
+author: "Linh Nguyen"
+---
+
+# Import R packages
+
+```{r}
+pacman::p_load(sf, httr, tmap, tidyverse)
+```
+
+# Import ACRA data
+
+```{r}
+folder_path <- "data/aspatial/ACRA"
+file_list <- list.files(path=folder_path,
+                        pattern="^ACRA*.*\\csv$",
+                        full.names=TRUE)
+acra_data <- file_list %>%
+  map_dfr(read_csv)
+```
+```{r}
+write_rds(acra_data, "data/rds/acra_data.rds") 
+```
+
+# Tidying ACRA data
+
+Choose the business type you like. In the example below, 56111 is Restaurant.
+
+```{r}
+biz_56111 <- acra_data %>%
+  select(1:24) %>%
+  filter(primary_ssic_code == 56111) %>%
+  rename(date = registration_incorporation_date) %>%
+  mutate(date = as.Date(date),
+         YEAR = year(date),
+         MONTH_NUM = month(date),
+         MONTH_ABBR = month(date, label=TRUE, abbr=TRUE)) %>%
+  mutate(
+    postal_code = str_pad(postal_code,
+                          width = 6, side = "left", pad = "0"
+                          )) %>%
+      filter(YEAR == 2025)
+```
+
+# Geocoding
+
+```{r}
+postcode <- unique(biz_56111$postal_code)
+
+url <- "https://onemap.gov.sg/api/common/elastic/search"
+
+found <- data.frame() # can geocode
+not_found <- data.frame(postcode = character()) # cannot geocode
+
+for (pc in postcode) {
+  query <- list(
+    searchVal = pc,
+    returnGeom = "Y",
+    getAddrDetails = "Y",
+    pageNum = "1"
+  )
+  
+  res <- GET(url, query = query)
+  json <- content(res)
+  
+  if (json$found != 0) {
+    df <- as.data.frame(json$results, stringsAsFactors = FALSE)
+    df$input_postcode <- pc
+    found <- bind_rows(found, df)
+  }
+  else {
+    not_found <- bind_rows(not_found, data.frame(postcode=pc))
+  }
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+

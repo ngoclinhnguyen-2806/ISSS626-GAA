@@ -35,7 +35,7 @@ The specific questions we would like to answer are:
 # The Data
 
 | Dataset | Description | Source | Format |
-|------------------|-------------------|------------------|------------------|
+|----|----|----|----|
 | **forestfires** | Locations of forest fire detected from the Moderate Resolution Imaging Spectroradiometer (MODIS) sensor data in 2023 | [Fire Information for Resource Management System](https://firms.modaps.eosdis.nasa.gov/download/) | CSV |
 | **Kepulauan_Bangka_Belitung** | Sub-district (i.e. [kelurahan](https://en.wikipedia.org/wiki/Villages_of_Indonesia)) boundary of Kepulauan Bangka Belitung | [Indonesia Geospatial](https://www.indonesia-geospasial.com/2023/05/download-shapefile-batas-administrasi.html) | ESRI shapefile |
 
@@ -44,7 +44,7 @@ The specific questions we would like to answer are:
 The following R packages will be used in this exercise:
 
 | Package | Purpose |
-|----------------------|--------------------------------------------------|
+|----|----|
 | [**sf**](https://r-spatial.github.io/sf/) | Importing, managing, and processing vector-based geospatial data. |
 | [**raster**](https://rspatial.org/raster/) | Handling raster data |
 | [**spatstat**](https://cran.r-project.org/web/packages/spatstat/index.html) | Provides tools for point pattern analysis. |
@@ -54,7 +54,7 @@ The following R packages will be used in this exercise:
 
 To install `sparr`, use the following code:
 
-```
+```         
 install.packages("sparr")
 ```
 
@@ -171,6 +171,7 @@ Next, we will check if there are duplicated point events by using the code chunk
 ```{r}
 any(duplicated(fire_month_ppp))
 ```
+
 ## Including Owin object
 
 The code chunk below is used to combine origin_am_ppp and am_owin objects into one.
@@ -179,11 +180,13 @@ The code chunk below is used to combine origin_am_ppp and am_owin objects into o
 fire_month_owin <- fire_month_ppp[kbb_owin]
 summary(fire_month_owin)
 ```
+
 As a good practice, `plot()` is used to plot `ff_owin` so that we can examine the correctness of the output object.
 
 ```{r}
 plot(fire_month_owin)
 ```
+
 ## Computing Spatio-temporal KDE
 
 Next, `spattemp.density()` of sparr package is used to compute the STKDE.
@@ -192,6 +195,7 @@ Next, `spattemp.density()` of sparr package is used to compute the STKDE.
 st_kde <- spattemp.density(fire_month_owin)
 summary(st_kde)
 ```
+
 ## Plotting the spatio-temporal KDE object
 
 In the code chunk below, plot() of R base is used to the KDE for between July 2023 - December 2023.
@@ -229,12 +233,14 @@ Next, code chunk below is used to combine the ppp object and the owin object.
 fire_yday_owin <- fire_yday_ppp[kbb_owin]
 summary(fire_yday_owin)
 ```
+
 ## Spatio-temporal Kernel Density Estimate
 
 ```{r}
 kde_yday <- spattemp.density(fire_yday_owin)
 summary(kde_yday)
 ```
+
 # Computing STKDE by Day of Year: Improved method
 
 One of the nice function provides in sparr package is `BOOT.spattemp()`. It support bandwidth selection for standalone spatiotemporal density/intensity based on bootstrap estimation of the MISE, providing an isotropic scalar spatial bandwidth and a scalar temporal bandwidth.
@@ -258,11 +264,3 @@ summary(kde_yday)
 ```
 
 ## Plotting the output spatio-temporal KDE
-
-
-
-
-
-
-
-

@@ -46,7 +46,7 @@ The specific questions we would like to answer are as follows:
 ## The Data
 
 | Dataset | Description | Source | Format |
-|-----------------|--------------------|-----------------|-----------------|
+|----|----|----|----|
 | **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
 
@@ -55,7 +55,7 @@ The specific questions we would like to answer are as follows:
 The following R packages will be used in this exercise:
 
 | Package | Purpose | Use Case in Exercise |
-|-------------------|--------------------------|---------------------------|
+|----|----|----|
 | **sf** | Imports, manages, and processes vector-based geospatial data. | Handling vector geospatial data in R. |
 | **spatstat** | Provides tools for point pattern analysis. | Performing 1st- and 2nd-order spatial point pattern analysis and deriving kernel density estimation (KDE). |
 | **terra** | Creating, reading, manipulating, and writing raster and vector data. | Convert image output generate by `spatstat` into `terra` format. |
@@ -151,7 +151,7 @@ write_rds(mpsz_cl,
 childcare_sf <- st_read("data/geospatial/ChildCareServices.geojson")
 ```
 
-#### Inspect and Reproject to Same Projection System**
+#### Inspect and Reproject to Same Projection System\*\*
 
 ```{r}
 st_crs(childcare_sf)
@@ -283,8 +283,8 @@ childcareSG_ppp
 
 Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose
 
-::: callout-note 
-NNA is a broad term for methods that examine the spatial distribution of points, whereas the Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose. 
+::: callout-note
+NNA is a broad term for methods that examine the spatial distribution of points, whereas the Clark-Evans test is a specific statistical method used within NNA to quantify whether a point pattern is clustered, random, or uniformly spaced, using the Clark-Evans aggregation index (R) to describe this pattern. NNA provides a numerical value that describes the degree of clustering or regularity, and the Clark-Evans test calculates a specific index (R) for this purpose.
 :::
 
 In this section, we will perform the Clark-Evans test of aggregation for a spatial point pattern by using [clarkevans.test()](https://cran.r-project.org/web/packages/spatstat.explore/refman/spatstat.explore.html#clarkevans.test) of `spatstat.explore` package.
@@ -358,6 +358,7 @@ The `plot()` function of Base R is then used to display the kernel density deriv
 ```{r}
 plot(kde_SG_diggle)
 ```
+
 In the code chunk below, `summary()` of Base R is used to print the summary report of the
 
 ```{r}
@@ -374,6 +375,7 @@ Before we move on to next section, it is good to know that you can retrieve the 
 bw <- bw.diggle(childcareSG_ppp)
 bw
 ```
+
 ### Rescalling KDE values
 
 In the code chunk below, rescale.ppp() is used to covert the unit of measurement from meter to kilometer.
@@ -397,6 +399,7 @@ Next, plot() is used to plot the kde object as shown below.
 ```{r}
 plot(kde_childcareSG_km)
 ```
+
 Notice that output image looks identical to the earlier version, the only changes in the data values (refer to the legend).
 
 ### Working with different automatic badwidth methods
@@ -406,7 +409,6 @@ Beside `bw.diggle()`, there are three other `spatstat` functions can be used to 
 Let us take a look at the bandwidth return by these automatic bandwidth calculation methods by using the code chunks below.
 
 ::: panel-tabset
-
 #### CvL
 
 ```{r}
@@ -445,6 +447,7 @@ par(mfrow=c(1,2))
 plot(kde_childcareSG_km, main = "bw.diggle")
 plot(kde_childcareSG.ppl, main = "bw.ppl")
 ```
+
 ### Working with different kernel methods
 
 By default, the kernel method used in `density.ppp()` is gaussian. But there are three other options, namely: Epanechnikov, Quartic and Dics.
@@ -474,6 +477,7 @@ plot(density(childcareSG_ppp_km,
              kernel="disc"), 
      main="Disc")
 ```
+
 ## Fixed and Adaptive KDE
 
 ### Computing KDE by using fixed bandwidth
@@ -487,6 +491,7 @@ kde_childcareSG_fb <- density(childcareSG_ppp_km,
                               kernel="gaussian")
 plot(kde_childcareSG_fb)
 ```
+
 ### Computing KDE by using adaptive bandwidth
 
 Fixed bandwidth method is very sensitive to highly skew distribution of spatial point patterns over geographical units for example urban versus rural. One way to overcome this problem is by using adaptive bandwidth instead.
@@ -499,6 +504,7 @@ kde_childcareSG_ab <- adaptive.density(
   method="kernel")
 plot(kde_childcareSG_ab)
 ```
+
 We can compare the fixed and adaptive kernel density estimation outputs by using the code chunk below.
 
 ```{r}
@@ -506,6 +512,7 @@ par(mfrow=c(1,2))
 plot(kde_childcareSG_fb, main = "Fixed bandwidth")
 plot(kde_childcareSG_ab, main = "Adaptive bandwidth")
 ```
+
 ## Plotting cartographic quality KDE map
 
 ### Converting gridded output into raster
@@ -521,11 +528,13 @@ Again, `class()` is used to verify if `kde_childcareSG_bw_terra` data are belong
 ```{r}
 class(kde_childcareSG_bw_terra)
 ```
+
 Yes, it is indeed in SpatRaster class. Let us take a look at the properties of kde_childcareSG_bw_terra .
 
 ```{r}
 kde_childcareSG_bw_terra
 ```
+
 Notice that the crs property is empty.
 
 ### Assigning projection systems
@@ -541,6 +550,7 @@ Let us take a look at the properties of kde_childcareSG_bw_raster RasterLayer.
 ```{r}
 kde_childcareSG_bw_terra
 ```
+
 Notice that the coordicates reference (i.e. coord. ref.) is in SVY21 now.
 
 ### Plotting KDE map with tmap
@@ -565,6 +575,7 @@ tm_shape(kde_childcareSG_bw_terra) +
   tm_compass() +
   tm_layout(scale = 1.0)
 ```
+
 Notice that the raster values are encoded explicitly onto the raster pixel using the values in “layer.1” field.
 
 ## First Order SPPA at the Planning Subzone Level
@@ -654,6 +665,7 @@ clarkevans.test(childcare_ck_ppp,
                 alternative=c("two.sided"),
                 nsim=999)
 ```
+
 #### Tampines planning area
 
 In the code chunk below, the similar test is used to analyse the spatial point patterns of childcare centre in Tampines planning area.
@@ -665,6 +677,7 @@ clarkevans.test(childcare_tm_ppp,
                 alternative=c("two.sided"),
                 nsim=999)
 ```
+
 ### Computing KDE surfaces by planning area
 
 The code chunk below will be used to compute the KDE of these four planning area. `bw.diggle` method is used to derive the bandwidth of each
@@ -692,6 +705,3 @@ plot(density(childcare_jw_ppp.km,
              kernel="gaussian"),
      main="Jurong West")
 ```
-
-
-
