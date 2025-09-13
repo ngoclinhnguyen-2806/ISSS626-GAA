@@ -6,9 +6,10 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Dr.&nbsp;Kam Tin Seong">
+<meta name="author" content="Linh Nguyen">
+<meta name="dcterms.date" content="2025-09-13">
 
-<title>Hands-on Exercise 0 – ISSS626-GAA</title>
+<title>Take-home Exercise 1 | Geospatial Analytics for Public Good – ISSS626-GAA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -20,41 +21,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -189,12 +155,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#getting-started" id="toc-getting-started" class="nav-link active" data-scroll-target="#getting-started">Getting Started</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">2</span> Overview</a>
   <ul class="collapse">
-  <li><a href="#install-and-launch-r-packages" id="toc-install-and-launch-r-packages" class="nav-link" data-scroll-target="#install-and-launch-r-packages">Install and launch R packages</a></li>
-  <li><a href="#importing-the-data" id="toc-importing-the-data" class="nav-link" data-scroll-target="#importing-the-data">Importing the data</a></li>
+  <li><a href="#setting-the-scene" id="toc-setting-the-scene" class="nav-link" data-scroll-target="#setting-the-scene"><span class="header-section-number">2.1</span> Setting The Scene</a></li>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link" data-scroll-target="#objectives"><span class="header-section-number">2.2</span> Objectives</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2.3</span> The Data</a></li>
   </ul></li>
-  <li><a href="#plotting-a-simple-bar-chart" id="toc-plotting-a-simple-bar-chart" class="nav-link" data-scroll-target="#plotting-a-simple-bar-chart">Plotting a simple bar chart</a></li>
+  <li><a href="#set-up-r-environment" id="toc-set-up-r-environment" class="nav-link" data-scroll-target="#set-up-r-environment"><span class="header-section-number">3</span> Set up R environment</a>
+  <ul class="collapse">
+  <li><a href="#import-r-packages" id="toc-import-r-packages" class="nav-link" data-scroll-target="#import-r-packages"><span class="header-section-number">3.1</span> Import R Packages</a></li>
+  <li><a href="#set-seed" id="toc-set-seed" class="nav-link" data-scroll-target="#set-seed"><span class="header-section-number">3.2</span> Set Seed</a></li>
+  </ul></li>
+  <li><a href="#spatial-data-wrangling" id="toc-spatial-data-wrangling" class="nav-link" data-scroll-target="#spatial-data-wrangling"><span class="header-section-number">4</span> Spatial Data Wrangling</a>
+  <ul class="collapse">
+  <li><a href="#data-import-preparation" id="toc-data-import-preparation" class="nav-link" data-scroll-target="#data-import-preparation"><span class="header-section-number">4.1</span> Data Import &amp; Preparation</a></li>
+  <li><a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">4.2</span> Data Wrangling</a></li>
+  </ul></li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis"><span class="header-section-number">5</span> Exploratory Data Analysis</a></li>
+  <li><a href="#spatial-and-spatio-temporal-kde-of-business-types" id="toc-spatial-and-spatio-temporal-kde-of-business-types" class="nav-link" data-scroll-target="#spatial-and-spatio-temporal-kde-of-business-types"><span class="header-section-number">6</span> Spatial and spatio-temporal KDE of business types</a></li>
+  <li><a href="#second-order-spatial-and-spatio-temporal-analysis-on-the-selected-business-types" id="toc-second-order-spatial-and-spatio-temporal-analysis-on-the-selected-business-types" class="nav-link" data-scroll-target="#second-order-spatial-and-spatio-temporal-analysis-on-the-selected-business-types"><span class="header-section-number">7</span> Second order spatial and spatio-temporal analysis on the selected business types</a></li>
+  <li><a href="#conclusions-and-future-improvements" id="toc-conclusions-and-future-improvements" class="nav-link" data-scroll-target="#conclusions-and-future-improvements"><span class="header-section-number">8</span> Conclusions and Future Improvements</a></li>
   </ul>
 </nav>
     </div>
@@ -203,7 +183,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Hands-on Exercise 0</h1>
+<h1 class="title">Take-home Exercise 1 | Geospatial Analytics for Public Good</h1>
+<p class="subtitle lead">In this take-home exercise, we are interested to investigate the spatial and spatio-temporal patterns of new businesses and firms established in Singapore for the first six months of 2025.</p>
 </div>
 
 
@@ -213,11 +194,23 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Dr.&nbsp;Kam Tin Seong </p>
+             <p>Linh Nguyen </p>
           </div>
   </div>
     
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 13, 2025</p>
+    </div>
+  </div>
   
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 13, 2025</p>
+    </div>
+  </div>
     
   </div>
   
@@ -226,47 +219,78 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="getting-started" class="level1">
-<h1>Getting Started</h1>
-<section id="install-and-launch-r-packages" class="level2">
-<h2 class="anchored" data-anchor-id="install-and-launch-r-packages">Install and launch R packages</h2>
-<p>The code chunk below uses p_load() of pacman package to check if tidyverse packages are installed in the computer. If they are, they will be launched into R.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
+<section id="overview" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Overview</h1>
+<section id="setting-the-scene" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="setting-the-scene"><span class="header-section-number">2.1</span> Setting The Scene</h2>
+<p>Where businesses choose to locate plays a huge role in how Singapore continues to grow and develop as a city-state. Smart locations give companies advantages like easier access to skilled workers and excellent infrastructure, while also shaping different districts like the Central Business District, Jurong Innovation District, or Punggol Digital District, and making it easier for goods to move through our efficient transport networks and for employees to commute via MRT and buses.</p>
+<p>Studying how businesses spread out across Singapore and change over time is crucial for urban planning by agencies like URA and JTC. This research helps planners understand how economic activity and our urban landscape develop together, enabling them to design better integrated developments, plan for future growth in areas like the Greater Southern Waterfront, use our limited land resources efficiently, and build infrastructure that supports both business competitiveness and residents’ quality of life in our compact island nation.</p>
 </section>
-<section id="importing-the-data" class="level2">
-<h2 class="anchored" data-anchor-id="importing-the-data">Importing the data</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>listings_data <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/aspatial/listings.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 3659 Columns: 18
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-chr   (6): name, host_name, neighbourhood_group, neighbourhood, room_type, l...
-dbl  (11): id, host_id, latitude, longitude, price, minimum_nights, number_o...
-date  (1): last_review
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
-</div>
+<section id="objectives" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="objectives"><span class="header-section-number">2.2</span> Objectives</h2>
+<ul>
+<li><p>To identify where and when new businesses are established in Singapore, revealing clusters, patterns, and trends that help inform urban planning, resource allocation, and economic development decisions.</p></li>
+<li><p>To uncover complex relationships in how new businesses are distributed across the island - such as how related industries cluster together, how past business locations influence future ones, and how commercial districts develop structurally over time. These insights are essential for evidence-based urban planning and policy-making.</p></li>
+</ul>
+<p>By understanding business locations and how their distribution evolves, Singapore’s urban planners and agencies can gain valuable spatial insights, optimize city operations, and develop effective strategies to attract investment and promote sustainable growth across our city-state.</p>
+</section>
+<section id="the-data" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="the-data"><span class="header-section-number">2.3</span> The Data</h2>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Dataset</th>
+<th>Description</th>
+<th>Source</th>
+<th>Format</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>ACRA Information on Corporate Entities</strong></td>
+<td>Information of registered entities in Singapore, including location data</td>
+<td><a href="https://data.gov.sg/datasets?query=ACRA+Information+on+Corporate+Entities&amp;page=1&amp;resultId=2">data.gov.sg</a></td>
+<td>CSV</td>
+</tr>
+<tr class="even">
+<td><strong>SSIC: Singapore Standard Industrial Classification 2020</strong></td>
+<td>List of codes represented economic activity of business establishments in Singapore, 2020 version.</td>
+<td><a href="https://classification.codes/classifications/industry/ssic-singapore">SSIC: Singapore Standard Industrial Classification</a></td>
+<td>Excel</td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
-<section id="plotting-a-simple-bar-chart" class="level1">
-<h1>Plotting a simple bar chart</h1>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> listings_data, </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x=</span> neighbourhood_group)) <span class="sc">+</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Hands-on_Ex00_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
+<section id="set-up-r-environment" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Set up R environment</h1>
+<section id="import-r-packages" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="import-r-packages"><span class="header-section-number">3.1</span> Import R Packages</h2>
+</section>
+<section id="set-seed" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="set-seed"><span class="header-section-number">3.2</span> Set Seed</h2>
+</section>
+</section>
+<section id="spatial-data-wrangling" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Spatial Data Wrangling</h1>
+<section id="data-import-preparation" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="data-import-preparation"><span class="header-section-number">4.1</span> Data Import &amp; Preparation</h2>
+</section>
+<section id="data-wrangling" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="data-wrangling"><span class="header-section-number">4.2</span> Data Wrangling</h2>
+</section>
+</section>
+<section id="exploratory-data-analysis" class="level1" data-number="5">
+<h1 data-number="5"><span class="header-section-number">5</span> Exploratory Data Analysis</h1>
+</section>
+<section id="spatial-and-spatio-temporal-kde-of-business-types" class="level1" data-number="6">
+<h1 data-number="6"><span class="header-section-number">6</span> Spatial and spatio-temporal KDE of business types</h1>
+</section>
+<section id="second-order-spatial-and-spatio-temporal-analysis-on-the-selected-business-types" class="level1" data-number="7">
+<h1 data-number="7"><span class="header-section-number">7</span> Second order spatial and spatio-temporal analysis on the selected business types</h1>
+</section>
+<section id="conclusions-and-future-improvements" class="level1" data-number="8">
+<h1 data-number="8"><span class="header-section-number">8</span> Conclusions and Future Improvements</h1>
 
 
 </section>

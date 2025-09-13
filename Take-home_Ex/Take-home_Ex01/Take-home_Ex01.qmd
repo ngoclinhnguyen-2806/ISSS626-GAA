@@ -1,0 +1,63 @@
+---
+title: "Take-home Exercise 1 | Geospatial Analytics for Public Good"
+subtitle: "In this take-home exercise, we are interested to investigate the spatial and spatio-temporal patterns of new businesses and firms established in Singapore for the first six months of 2025."
+date: "Sep 13, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+format:
+  html:
+    code-link: true
+    toc: true
+number-sections: true
+number-offset: 1
+editor: visual
+---
+
+# Overview
+
+## Setting The Scene
+
+Where businesses choose to locate plays a huge role in how Singapore continues to grow and develop as a city-state. Smart locations give companies advantages like easier access to skilled workers and excellent infrastructure, while also shaping different districts like the Central Business District, Jurong Innovation District, or Punggol Digital District, and making it easier for goods to move through our efficient transport networks and for employees to commute via MRT and buses.
+
+Studying how businesses spread out across Singapore and change over time is crucial for urban planning by agencies like URA and JTC. This research helps planners understand how economic activity and our urban landscape develop together, enabling them to design better integrated developments, plan for future growth in areas like the Greater Southern Waterfront, use our limited land resources efficiently, and build infrastructure that supports both business competitiveness and residents' quality of life in our compact island nation.
+
+## Objectives
+
+-   To identify where and when new businesses are established in Singapore, revealing clusters, patterns, and trends that help inform urban planning, resource allocation, and economic development decisions.
+
+-   To uncover complex relationships in how new businesses are distributed across the island - such as how related industries cluster together, how past business locations influence future ones, and how commercial districts develop structurally over time. These insights are essential for evidence-based urban planning and policy-making.
+
+By understanding business locations and how their distribution evolves, Singapore's urban planners and agencies can gain valuable spatial insights, optimize city operations, and develop effective strategies to attract investment and promote sustainable growth across our city-state.
+
+## The Data
+
+| Dataset | Description | Source | Format |
+|------------------|-------------------|------------------|------------------|
+| **ACRA Information on Corporate Entities** | Information of registered entities in Singapore, including location data | [data.gov.sg](https://data.gov.sg/datasets?query=ACRA+Information+on+Corporate+Entities&page=1&resultId=2) | CSV |
+| **SSIC: Singapore Standard Industrial Classification 2020** | List of codes represented economic activity of business establishments in Singapore, 2020 version. | [SSIC: Singapore Standard Industrial Classification](https://classification.codes/classifications/industry/ssic-singapore) | Excel |
+
+# Set up R environment
+
+## Import R Packages
+
+## Set Seed
+
+# Spatial Data Wrangling
+
+## Data Import & Preparation
+
+## Data Wrangling
+
+# Exploratory Data Analysis
+
+# Spatial and spatio-temporal KDE of business types
+
+# Second order spatial and spatio-temporal analysis on the selected business types
+
+# Conclusions and Future Improvements
