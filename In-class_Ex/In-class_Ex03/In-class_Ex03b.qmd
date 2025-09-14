@@ -75,8 +75,20 @@ for (pc in postcode) {
 }
 ```
 
+# Appending the location information
 
+```{r}
+biz_56511 = biz_56111 %>%
+  left_join(found, by = c('postal_code' = 'POSTAL'))
+```
 
+# Converting into SF data frame
+
+```
+biz_56511_sf <- st_as_sf(biz_56111, 
+                         coords = c("X","Y"), 
+                         crs=3414)
+```
 
 
 

@@ -158,8 +158,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     </a>
     <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">    
         <li>
-    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex01/In-class_Ex01.html">
- <span class="dropdown-text">In-class Exercise 1a</span></a>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03a.html">
+ <span class="dropdown-text">In-class Exercise 3a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03b.html">
+ <span class="dropdown-text">In-class Exercise 3b</span></a>
   </li>  
     </ul>
   </li>
@@ -203,6 +207,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#import-r-packages" id="toc-import-r-packages" class="nav-link active" data-scroll-target="#import-r-packages">Import R packages</a></li>
   <li><a href="#import-acra-data" id="toc-import-acra-data" class="nav-link" data-scroll-target="#import-acra-data">Import ACRA data</a></li>
   <li><a href="#tidying-acra-data" id="toc-tidying-acra-data" class="nav-link" data-scroll-target="#tidying-acra-data">Tidying ACRA data</a></li>
+  <li><a href="#geocoding" id="toc-geocoding" class="nav-link" data-scroll-target="#geocoding">Geocoding</a></li>
+  <li><a href="#appending-the-location-information" id="toc-appending-the-location-information" class="nav-link" data-scroll-target="#appending-the-location-information">Appending the location information</a></li>
+  <li><a href="#converting-into-sf-data-frame" id="toc-converting-into-sf-data-frame" class="nav-link" data-scroll-target="#converting-into-sf-data-frame">Converting into SF data frame</a></li>
   </ul>
 </nav>
     </div>
@@ -517,6 +524,51 @@ date  (2): registration_incorporation_date, uen_issue_date
 <span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>                          )) <span class="sc">%&gt;%</span></span>
 <span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">filter</span>(YEAR <span class="sc">==</span> <span class="dv">2025</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+</section>
+<section id="geocoding" class="level1">
+<h1>Geocoding</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>postcode <span class="ot">&lt;-</span> <span class="fu">unique</span>(biz_56111<span class="sc">$</span>postal_code)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>url <span class="ot">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>found <span class="ot">&lt;-</span> <span class="fu">data.frame</span>() <span class="co"># can geocode</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>not_found <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">postcode =</span> <span class="fu">character</span>()) <span class="co"># cannot geocode</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (pc <span class="cf">in</span> postcode) {</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">searchVal =</span> pc,</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">returnGeom =</span> <span class="st">"Y"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">getAddrDetails =</span> <span class="st">"Y"</span>,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">pageNum =</span> <span class="st">"1"</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  res <span class="ot">&lt;-</span> <span class="fu">GET</span>(url, <span class="at">query =</span> query)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>  json <span class="ot">&lt;-</span> <span class="fu">content</span>(res)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (json<span class="sc">$</span>found <span class="sc">!=</span> <span class="dv">0</span>) {</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(json<span class="sc">$</span>results, <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    df<span class="sc">$</span>input_postcode <span class="ot">&lt;-</span> pc</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    found <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(found, df)</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span> {</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>    not_found <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(not_found, <span class="fu">data.frame</span>(<span class="at">postcode=</span>pc))</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="appending-the-location-information" class="level1">
+<h1>Appending the location information</h1>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>biz_56511 <span class="ot">=</span> biz_56111 <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(found, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">'postal_code'</span> <span class="ot">=</span> <span class="st">'POSTAL'</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="converting-into-sf-data-frame" class="level1">
+<h1>Converting into SF data frame</h1>
+<pre><code>biz_56511_sf &lt;- st_as_sf(biz_56111, 
+                         coords = c("X","Y"), 
+                         crs=3414)</code></pre>
 
 
 </section>
