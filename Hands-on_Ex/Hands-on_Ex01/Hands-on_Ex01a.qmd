@@ -19,7 +19,9 @@ number-offset: 1
 editor: visual
 ---
 
-## Learning Outcome
+## Overview
+
+### Learning Outcome
 
 -   installing and loading [sf](https://r-spatial.github.io/sf/) and [tidyverse](https://www.tidyverse.org/) packages into R environment,
 -   importing geospatial data by using appropriate functions of **sf** package,
@@ -31,7 +33,7 @@ editor: visual
 -   performing data wrangling tasks by using appropriate functions of **dplyr** package and
 -   performing Exploratory Data Analysis (EDA) by using appropriate functions from **ggplot2** package.
 
-## The Data
+### The Data
 
 | Dataset | Source | Description |
 |------------------|-------------------------------|-----------------------|
@@ -40,7 +42,7 @@ editor: visual
 | **Cycling Path** | [LTA DataMall](https://www.mytransport.sg/content/mytransport/home/dataMall.html) | Geospatial data for cycling paths in Singapore. |
 | **Singapore Airbnb Listings** | [Inside Airbnb](http://insideairbnb.com/get-the-data.html) | Latest listing data for Airbnb properties in Singapore. |
 
-## Installing and Loading the R Packages
+### Installing and Loading the R Packages
 
 Two main R packages will be used in this exercise:
 

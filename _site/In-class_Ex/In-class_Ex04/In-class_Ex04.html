@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="Linh Nguyen">
 <meta name="dcterms.date" content="2025-09-20">
-<title>In-class 4 | Spatial Weights and Applications – ISSS626-GAA</title>
+<title>In-class Exercise 4 | Spatial Weights and Applications – ISSS626-GAA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -199,52 +199,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
 <li>
-<a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">2</span> Overview</a>
+<a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a>
   <ul class="collapse">
-<li><a href="#learning-outcomes" id="toc-learning-outcomes" class="nav-link" data-scroll-target="#learning-outcomes"><span class="header-section-number">2.1</span> Learning Outcomes</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2.2</span> The Data</a></li>
-  <li><a href="#install-r-packages" id="toc-install-r-packages" class="nav-link" data-scroll-target="#install-r-packages"><span class="header-section-number">2.3</span> Install R packages</a></li>
+<li><a href="#learning-outcomes" id="toc-learning-outcomes" class="nav-link" data-scroll-target="#learning-outcomes"><span class="header-section-number">1.1</span> Learning Outcomes</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">1.2</span> The Data</a></li>
+  <li><a href="#install-r-packages" id="toc-install-r-packages" class="nav-link" data-scroll-target="#install-r-packages"><span class="header-section-number">1.3</span> Install R packages</a></li>
   </ul>
 </li>
-  <li><a href="#getting-the-data-into-r-environment" id="toc-getting-the-data-into-r-environment" class="nav-link" data-scroll-target="#getting-the-data-into-r-environment"><span class="header-section-number">3</span> Getting the Data Into R Environment</a></li>
+  <li><a href="#getting-the-data-into-r-environment" id="toc-getting-the-data-into-r-environment" class="nav-link" data-scroll-target="#getting-the-data-into-r-environment"><span class="header-section-number">2</span> Getting the Data Into R Environment</a></li>
   <li>
-<a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">4</span> Data Wrangling</a>
+<a href="#data-wrangling" id="toc-data-wrangling" class="nav-link" data-scroll-target="#data-wrangling"><span class="header-section-number">3</span> Data Wrangling</a>
   <ul class="collapse">
-<li><a href="#performing-relational-join" id="toc-performing-relational-join" class="nav-link" data-scroll-target="#performing-relational-join"><span class="header-section-number">4.1</span> Performing relational join</a></li>
-  <li><a href="#mapping-gdppc" id="toc-mapping-gdppc" class="nav-link" data-scroll-target="#mapping-gdppc"><span class="header-section-number">4.2</span> Mapping GDPPC</a></li>
-  <li><a href="#converting-to-spatial-polygon-data-frame" id="toc-converting-to-spatial-polygon-data-frame" class="nav-link" data-scroll-target="#converting-to-spatial-polygon-data-frame"><span class="header-section-number">4.3</span> Converting to Spatial Polygon Data Frame</a></li>
-  </ul>
-</li>
-  <li>
-<a href="#geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth" id="toc-geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth" class="nav-link" data-scroll-target="#geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth"><span class="header-section-number">5</span> Geographically Weighted Summary Statistics (GWSS) with adaptive bandwidth</a>
-  <ul class="collapse">
-<li><a href="#determine-adaptive-bandwidth" id="toc-determine-adaptive-bandwidth" class="nav-link" data-scroll-target="#determine-adaptive-bandwidth"><span class="header-section-number">5.1</span> Determine adaptive bandwidth</a></li>
-  <li><a href="#computing-geographically-weighted-summary-statistics" id="toc-computing-geographically-weighted-summary-statistics" class="nav-link" data-scroll-target="#computing-geographically-weighted-summary-statistics"><span class="header-section-number">5.2</span> Computing geographically weighted summary statistics</a></li>
-  <li><a href="#preparing-the-output-data" id="toc-preparing-the-output-data" class="nav-link" data-scroll-target="#preparing-the-output-data"><span class="header-section-number">5.3</span> Preparing the output data</a></li>
-  <li><a href="#visualising-geographically-weighted-summary-statistics" id="toc-visualising-geographically-weighted-summary-statistics" class="nav-link" data-scroll-target="#visualising-geographically-weighted-summary-statistics"><span class="header-section-number">5.4</span> Visualising geographically weighted summary statistics</a></li>
+<li><a href="#performing-relational-join" id="toc-performing-relational-join" class="nav-link" data-scroll-target="#performing-relational-join"><span class="header-section-number">3.1</span> Performing relational join</a></li>
+  <li><a href="#mapping-gdppc" id="toc-mapping-gdppc" class="nav-link" data-scroll-target="#mapping-gdppc"><span class="header-section-number">3.2</span> Mapping GDPPC</a></li>
+  <li><a href="#converting-to-spatial-polygon-data-frame" id="toc-converting-to-spatial-polygon-data-frame" class="nav-link" data-scroll-target="#converting-to-spatial-polygon-data-frame"><span class="header-section-number">3.3</span> Converting to Spatial Polygon Data Frame</a></li>
   </ul>
 </li>
   <li>
-<a href="#geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth" id="toc-geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth" class="nav-link" data-scroll-target="#geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth"><span class="header-section-number">6</span> Geographically Weighted Summary Statistics (GWSS) with fixed bandwidth</a>
+<a href="#geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth" id="toc-geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth" class="nav-link" data-scroll-target="#geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth"><span class="header-section-number">4</span> Geographically Weighted Summary Statistics (GWSS) with adaptive bandwidth</a>
   <ul class="collapse">
-<li><a href="#determine-fixed-bandwidth" id="toc-determine-fixed-bandwidth" class="nav-link" data-scroll-target="#determine-fixed-bandwidth"><span class="header-section-number">6.1</span> Determine fixed bandwidth</a></li>
-  <li><a href="#computing-adaptive-bandwidth-gwss" id="toc-computing-adaptive-bandwidth-gwss" class="nav-link" data-scroll-target="#computing-adaptive-bandwidth-gwss"><span class="header-section-number">6.2</span> Computing adaptive bandwidth GWSS</a></li>
-  <li><a href="#preparing-the-output-data-1" id="toc-preparing-the-output-data-1" class="nav-link" data-scroll-target="#preparing-the-output-data-1"><span class="header-section-number">6.3</span> Preparing the output data</a></li>
-  <li><a href="#visualising-geographically-weighted-summary-statistics-1" id="toc-visualising-geographically-weighted-summary-statistics-1" class="nav-link" data-scroll-target="#visualising-geographically-weighted-summary-statistics-1"><span class="header-section-number">6.4</span> Visualising geographically weighted summary statistics</a></li>
+<li><a href="#determine-adaptive-bandwidth" id="toc-determine-adaptive-bandwidth" class="nav-link" data-scroll-target="#determine-adaptive-bandwidth"><span class="header-section-number">4.1</span> Determine adaptive bandwidth</a></li>
+  <li><a href="#computing-geographically-weighted-summary-statistics" id="toc-computing-geographically-weighted-summary-statistics" class="nav-link" data-scroll-target="#computing-geographically-weighted-summary-statistics"><span class="header-section-number">4.2</span> Computing geographically weighted summary statistics</a></li>
+  <li><a href="#preparing-the-output-data" id="toc-preparing-the-output-data" class="nav-link" data-scroll-target="#preparing-the-output-data"><span class="header-section-number">4.3</span> Preparing the output data</a></li>
+  <li><a href="#visualising-geographically-weighted-summary-statistics" id="toc-visualising-geographically-weighted-summary-statistics" class="nav-link" data-scroll-target="#visualising-geographically-weighted-summary-statistics"><span class="header-section-number">4.4</span> Visualising geographically weighted summary statistics</a></li>
   </ul>
 </li>
   <li>
-<a href="#geographically-weighted-correlation" id="toc-geographically-weighted-correlation" class="nav-link" data-scroll-target="#geographically-weighted-correlation"><span class="header-section-number">7</span> Geographically Weighted Correlation</a>
+<a href="#geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth" id="toc-geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth" class="nav-link" data-scroll-target="#geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth"><span class="header-section-number">5</span> Geographically Weighted Summary Statistics (GWSS) with fixed bandwidth</a>
   <ul class="collapse">
-<li><a href="#geospatial-analytics-solution" id="toc-geospatial-analytics-solution" class="nav-link" data-scroll-target="#geospatial-analytics-solution"><span class="header-section-number">7.1</span> Geospatial analytics solution</a></li>
-  <li><a href="#visualising-local-correlation" id="toc-visualising-local-correlation" class="nav-link" data-scroll-target="#visualising-local-correlation"><span class="header-section-number">7.2</span> Visualising Local Correlation</a></li>
+<li><a href="#determine-fixed-bandwidth" id="toc-determine-fixed-bandwidth" class="nav-link" data-scroll-target="#determine-fixed-bandwidth"><span class="header-section-number">5.1</span> Determine fixed bandwidth</a></li>
+  <li><a href="#computing-adaptive-bandwidth-gwss" id="toc-computing-adaptive-bandwidth-gwss" class="nav-link" data-scroll-target="#computing-adaptive-bandwidth-gwss"><span class="header-section-number">5.2</span> Computing adaptive bandwidth GWSS</a></li>
+  <li><a href="#preparing-the-output-data-1" id="toc-preparing-the-output-data-1" class="nav-link" data-scroll-target="#preparing-the-output-data-1"><span class="header-section-number">5.3</span> Preparing the output data</a></li>
+  <li><a href="#visualising-geographically-weighted-summary-statistics-1" id="toc-visualising-geographically-weighted-summary-statistics-1" class="nav-link" data-scroll-target="#visualising-geographically-weighted-summary-statistics-1"><span class="header-section-number">5.4</span> Visualising geographically weighted summary statistics</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#geographically-weighted-correlation" id="toc-geographically-weighted-correlation" class="nav-link" data-scroll-target="#geographically-weighted-correlation"><span class="header-section-number">6</span> Geographically Weighted Correlation</a>
+  <ul class="collapse">
+<li><a href="#geospatial-analytics-solution" id="toc-geospatial-analytics-solution" class="nav-link" data-scroll-target="#geospatial-analytics-solution"><span class="header-section-number">6.1</span> Geospatial analytics solution</a></li>
+  <li><a href="#visualising-local-correlation" id="toc-visualising-local-correlation" class="nav-link" data-scroll-target="#visualising-local-correlation"><span class="header-section-number">6.2</span> Visualising Local Correlation</a></li>
   </ul>
 </li>
   </ul></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">In-class 4 | Spatial Weights and Applications</h1>
+<h1 class="title">In-class Exercise 4 | Spatial Weights and Applications</h1>
 <p class="subtitle lead">In this hands-on exercise, we will learn how to compute spatial weights using R.</p>
 </div>
 
@@ -277,10 +277,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
 
 
-</header><section id="overview" class="level1" data-number="2"><h1 data-number="2">
-<span class="header-section-number">2</span> Overview</h1>
-<section id="learning-outcomes" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="learning-outcomes">
-<span class="header-section-number">2.1</span> Learning Outcomes</h2>
+</header><section id="overview" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="overview">
+<span class="header-section-number">1</span> Overview</h2>
+<section id="learning-outcomes" class="level3" data-number="1.1"><h3 data-number="1.1" class="anchored" data-anchor-id="learning-outcomes">
+<span class="header-section-number">1.1</span> Learning Outcomes</h3>
 <p>In this hands-on exercise, you will learn how to compute spatial weights using R using the following techniques:</p>
 <ul>
 <li>Import geospatial data using appropriate function(s) of sf package,</li>
@@ -288,8 +288,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Perform relational join using appropriate join function of dplyr package,</li>
 <li>Compute spatial weights using appropriate functions of spdep package, and</li>
 <li>Calculate spatially lagged variables using appropriate functions of spdep package.</li>
-</ul></section><section id="the-data" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="the-data">
-<span class="header-section-number">2.2</span> The Data</h2>
+</ul></section><section id="the-data" class="level3" data-number="1.2"><h3 data-number="1.2" class="anchored" data-anchor-id="the-data">
+<span class="header-section-number">1.2</span> The Data</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 30%">
@@ -313,18 +313,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Hunan_2012.csv</td>
 </tr>
 </tbody>
-</table></section><section id="install-r-packages" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="install-r-packages">
-<span class="header-section-number">2.3</span> Install R packages</h2>
+</table></section><section id="install-r-packages" class="level3" data-number="1.3"><h3 data-number="1.3" class="anchored" data-anchor-id="install-r-packages">
+<span class="header-section-number">1.3</span> Install R packages</h3>
 <p>Before we get started, we need to ensure that spdep, sf, tmap and tidyverse packages of R are currently installed in your R.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">spdep</span>, <span class="va">tmap</span>, <span class="va">tidyverse</span>, <span class="va">knitr</span>, <span class="va">GWmodel</span>, <span class="va">ggstatsplot</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="getting-the-data-into-r-environment" class="level1" data-number="3"><h1 data-number="3">
-<span class="header-section-number">3</span> Getting the Data Into R Environment</h1>
+</section></section><section id="getting-the-data-into-r-environment" class="level2" data-number="2"><h2 data-number="2" class="anchored" data-anchor-id="getting-the-data-into-r-environment">
+<span class="header-section-number">2</span> Getting the Data Into R Environment</h2>
 <p>In this section, you will learn how to bring a geospatial data and its associated attribute table into R environment. The geospatial data is in ESRI shapefile format and the attribute table is in csv format.</p>
-<div class="panel_tabset">
-<section id="import-shapefile-into-r-environment" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="import-shapefile-into-r-environment">
-<span class="header-section-number">3.1</span> Import shapefile into r environment</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Import shapefile into r environment</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Import csv file into r environment</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
 <p>The code chunk below uses st_read() of sf package to import Hunan shapefile into R. The imported shapefile will be simple features Object of sf.</p>
 <div class="cell">
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span>dsn <span class="op">=</span> <span class="st">"data/geospatial"</span>, </span>
@@ -340,26 +344,27 @@ Bounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-</section><section id="import-csv-file-into-r-environment" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="import-csv-file-into-r-environment">
-<span class="header-section-number">3.2</span> Import csv file into r environment</h2>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
 <p>Next, we will import Hunan_2012.csv into R by using read_csv() of readr package. The output is R dataframe class.</p>
 <div class="cell">
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan2012</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"data/aspatial/Hunan_2012.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
 </div>
-</section><section id="data-wrangling" class="level1" data-number="4"><h1 data-number="4">
-<span class="header-section-number">4</span> Data Wrangling</h1>
-<section id="performing-relational-join" class="level2" data-number="4.1"><h2 data-number="4.1" class="anchored" data-anchor-id="performing-relational-join">
-<span class="header-section-number">4.1</span> Performing relational join</h2>
+</div>
+</div>
+</section><section id="data-wrangling" class="level2" data-number="3"><h2 data-number="3" class="anchored" data-anchor-id="data-wrangling">
+<span class="header-section-number">3</span> Data Wrangling</h2>
+<section id="performing-relational-join" class="level3" data-number="3.1"><h3 data-number="3.1" class="anchored" data-anchor-id="performing-relational-join">
+<span class="header-section-number">3.1</span> Performing relational join</h3>
 <p>The code chunk below will be used to update the attribute table of hunan’s SpatialPolygonsDataFrame with the attribute fields of hunan2012 dataframe. This is performed by using <code>left_join()</code> of dplyr package.</p>
 <div class="cell">
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Join by County, but no need to explicitly mention because both datasets have this column</span></span>
 <span><span class="va">hunan_sf</span> <span class="op">&lt;-</span> <span class="fu">left_join</span><span class="op">(</span><span class="va">hunan</span>, <span class="va">hunan2012</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">select</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="fl">7</span>, <span class="fl">15</span>, <span class="fl">16</span>, <span class="fl">31</span>, <span class="fl">32</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="mapping-gdppc" class="level2" data-number="4.2"><h2 data-number="4.2" class="anchored" data-anchor-id="mapping-gdppc">
-<span class="header-section-number">4.2</span> Mapping GDPPC</h2>
+</section><section id="mapping-gdppc" class="level3" data-number="3.2"><h3 data-number="3.2" class="anchored" data-anchor-id="mapping-gdppc">
+<span class="header-section-number">3.2</span> Mapping GDPPC</h3>
 <p>Now, we are going to prepare a basemap and a choropleth map showing the distribution of GDPPC 2012 by using <code>qtm()</code> of <code>tmap</code> package.</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basemap</span> <span class="op">&lt;-</span> <span class="fu">tm_shape</span><span class="op">(</span><span class="va">hunan_sf</span><span class="op">)</span> <span class="op">+</span></span>
@@ -376,18 +381,22 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 </div>
-</section><section id="converting-to-spatial-polygon-data-frame" class="level2" data-number="4.3"><h2 data-number="4.3" class="anchored" data-anchor-id="converting-to-spatial-polygon-data-frame">
-<span class="header-section-number">4.3</span> Converting to Spatial Polygon Data Frame</h2>
+</section><section id="converting-to-spatial-polygon-data-frame" class="level3" data-number="3.3"><h3 data-number="3.3" class="anchored" data-anchor-id="converting-to-spatial-polygon-data-frame">
+<span class="header-section-number">3.3</span> Converting to Spatial Polygon Data Frame</h3>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan_sp</span> <span class="op">&lt;-</span> <span class="va">hunan_sf</span> <span class="op">%&gt;%</span> <span class="fu">as_Spatial</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth" class="level1" data-number="5"><h1 data-number="5">
-<span class="header-section-number">5</span> Geographically Weighted Summary Statistics (GWSS) with adaptive bandwidth</h1>
-<section id="determine-adaptive-bandwidth" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="determine-adaptive-bandwidth">
-<span class="header-section-number">5.1</span> Determine adaptive bandwidth</h2>
-<div class="panel_tabset">
-<section id="cross-validation-cv" class="level3" data-number="5.1.1"><h3 data-number="5.1.1" class="anchored" data-anchor-id="cross-validation-cv">
-<span class="header-section-number">5.1.1</span> Cross Validation (CV)</h3>
+</section></section><section id="geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="geographically-weighted-summary-statistics-gwss-with-adaptive-bandwidth">
+<span class="header-section-number">4</span> Geographically Weighted Summary Statistics (GWSS) with adaptive bandwidth</h2>
+<section id="determine-adaptive-bandwidth" class="level3" data-number="4.1"><h3 data-number="4.1" class="anchored" data-anchor-id="determine-adaptive-bandwidth">
+<span class="header-section-number">4.1</span> Determine adaptive bandwidth</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">Cross Validation (CV)</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">AIC</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
 <div class="cell">
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw_CV</span> <span class="op">&lt;-</span> <span class="fu">bw.gwr</span><span class="op">(</span><span class="va">GDPPC</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>                data <span class="op">=</span> <span class="va">hunan_sp</span>,</span>
@@ -432,8 +441,8 @@ Fixed bandwidth: 76.29126 CV score: 13442844676
 Fixed bandwidth: 76.29123 CV score: 13442844676 </code></pre>
 </div>
 </div>
-</section><section id="aic" class="level3" data-number="5.1.2"><h3 data-number="5.1.2" class="anchored" data-anchor-id="aic">
-<span class="header-section-number">5.1.2</span> AIC</h3>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
 <div class="cell">
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw_AIC</span> <span class="op">&lt;-</span> <span class="fu">bw.gwr</span><span class="op">(</span><span class="va">GDPPC</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>                data <span class="op">=</span> <span class="va">hunan_sp</span>,</span>
@@ -457,10 +466,11 @@ Fixed bandwidth: 162.3475 AICc value: 1919.394
 Fixed bandwidth: 160.5517 AICc value: 1919.391 </code></pre>
 </div>
 </div>
-</section>
 </div>
-</section><section id="computing-geographically-weighted-summary-statistics" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="computing-geographically-weighted-summary-statistics">
-<span class="header-section-number">5.2</span> Computing geographically weighted summary statistics</h2>
+</div>
+</div>
+</section><section id="computing-geographically-weighted-summary-statistics" class="level3" data-number="4.2"><h3 data-number="4.2" class="anchored" data-anchor-id="computing-geographically-weighted-summary-statistics">
+<span class="header-section-number">4.2</span> Computing geographically weighted summary statistics</h3>
 <p>The code chunk below computes geographically weighted summary statistics by using <code>gwss()</code> of GWmodel package. The analysis is performed using adaptive distance weighted. The distance is derived using AIC method and the kernel method used id <code>bisquare</code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gwstat</span> <span class="op">&lt;-</span> <span class="fu">gwss</span><span class="op">(</span>data <span class="op">=</span> <span class="va">hunan_sp</span>,</span>
@@ -484,8 +494,8 @@ Note
 <p><code>gwss</code> support five kernel methods, namely gaussian, exponential, bisquare, tricube, and boxcar. Repeat the code chunk above with different kernel methods and compare their results visually.</p>
 </div>
 </div>
-</section><section id="preparing-the-output-data" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="preparing-the-output-data">
-<span class="header-section-number">5.3</span> Preparing the output data</h2>
+</section><section id="preparing-the-output-data" class="level3" data-number="4.3"><h3 data-number="4.3" class="anchored" data-anchor-id="preparing-the-output-data">
+<span class="header-section-number">4.3</span> Preparing the output data</h3>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -507,8 +517,8 @@ Important
 <div class="cell">
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan_gstat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">hunan_sf</span>, <span class="va">gwstat_df</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="visualising-geographically-weighted-summary-statistics" class="level2" data-number="5.4"><h2 data-number="5.4" class="anchored" data-anchor-id="visualising-geographically-weighted-summary-statistics">
-<span class="header-section-number">5.4</span> Visualising geographically weighted summary statistics</h2>
+</section><section id="visualising-geographically-weighted-summary-statistics" class="level3" data-number="4.4"><h3 data-number="4.4" class="anchored" data-anchor-id="visualising-geographically-weighted-summary-statistics">
+<span class="header-section-number">4.4</span> Visualising geographically weighted summary statistics</h3>
 <div class="cell">
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tm_shape</span><span class="op">(</span><span class="va">hunan_gstat</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">tm_polygons</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"GDPPC_LM"</span>,</span>
@@ -530,13 +540,17 @@ Important
 </div>
 </div>
 </div>
-</section></section><section id="geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth" class="level1" data-number="6"><h1 data-number="6">
-<span class="header-section-number">6</span> Geographically Weighted Summary Statistics (GWSS) with fixed bandwidth</h1>
-<section id="determine-fixed-bandwidth" class="level2" data-number="6.1"><h2 data-number="6.1" class="anchored" data-anchor-id="determine-fixed-bandwidth">
-<span class="header-section-number">6.1</span> Determine fixed bandwidth</h2>
-<div class="panel_tabset">
-<section id="cross-validation-cv-1" class="level3" data-number="6.1.1"><h3 data-number="6.1.1" class="anchored" data-anchor-id="cross-validation-cv-1">
-<span class="header-section-number">6.1.1</span> Cross Validation (CV)</h3>
+</section></section><section id="geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="geographically-weighted-summary-statistics-gwss-with-fixed-bandwidth">
+<span class="header-section-number">5</span> Geographically Weighted Summary Statistics (GWSS) with fixed bandwidth</h2>
+<section id="determine-fixed-bandwidth" class="level3" data-number="5.1"><h3 data-number="5.1" class="anchored" data-anchor-id="determine-fixed-bandwidth">
+<span class="header-section-number">5.1</span> Determine fixed bandwidth</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Cross Validation (CV)</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">AIC</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
 <div class="cell">
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw_CV</span> <span class="op">&lt;-</span> <span class="fu">bw.gwr</span><span class="op">(</span><span class="va">GDPPC</span> <span class="op">~</span> <span class="fl">1</span>, </span>
 <span>             data <span class="op">=</span> <span class="va">hunan_sp</span>,</span>
@@ -587,8 +601,8 @@ Fixed bandwidth: 76.29123 CV score: 13442844676 </code></pre>
 <pre><code>[1] 76.29126</code></pre>
 </div>
 </div>
-</section><section id="aic-1" class="level3" data-number="6.1.2"><h3 data-number="6.1.2" class="anchored" data-anchor-id="aic-1">
-<span class="header-section-number">6.1.2</span> AIC</h3>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
 <div class="cell">
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw_AIC</span> <span class="op">&lt;-</span> <span class="fu">bw.gwr</span><span class="op">(</span><span class="va">GDPPC</span> <span class="op">~</span> <span class="fl">1</span>, </span>
 <span>             data <span class="op">=</span> <span class="va">hunan_sp</span>,</span>
@@ -618,10 +632,11 @@ Fixed bandwidth: 160.5517 AICc value: 1919.391 </code></pre>
 <pre><code>[1] 160.5517</code></pre>
 </div>
 </div>
-</section>
 </div>
-</section><section id="computing-adaptive-bandwidth-gwss" class="level2" data-number="6.2"><h2 data-number="6.2" class="anchored" data-anchor-id="computing-adaptive-bandwidth-gwss">
-<span class="header-section-number">6.2</span> Computing adaptive bandwidth GWSS</h2>
+</div>
+</div>
+</section><section id="computing-adaptive-bandwidth-gwss" class="level3" data-number="5.2"><h3 data-number="5.2" class="anchored" data-anchor-id="computing-adaptive-bandwidth-gwss">
+<span class="header-section-number">5.2</span> Computing adaptive bandwidth GWSS</h3>
 <div class="cell">
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gwstat</span> <span class="op">&lt;-</span> <span class="fu">gwss</span><span class="op">(</span>data <span class="op">=</span> <span class="va">hunan_sp</span>,</span>
 <span>                 vars <span class="op">=</span> <span class="st">"GDPPC"</span>,</span>
@@ -631,8 +646,8 @@ Fixed bandwidth: 160.5517 AICc value: 1919.391 </code></pre>
 <span>                 kernel <span class="op">=</span> <span class="st">"bisquare"</span>,</span>
 <span>                 longlat <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="preparing-the-output-data-1" class="level2" data-number="6.3"><h2 data-number="6.3" class="anchored" data-anchor-id="preparing-the-output-data-1">
-<span class="header-section-number">6.3</span> Preparing the output data</h2>
+</section><section id="preparing-the-output-data-1" class="level3" data-number="5.3"><h3 data-number="5.3" class="anchored" data-anchor-id="preparing-the-output-data-1">
+<span class="header-section-number">5.3</span> Preparing the output data</h3>
 <p>The code chunk below is used to extract SDF data table from gwss object output from <code>gwss()</code>. It will be converted into data.frame by using <code><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gwstat_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">gwstat</span><span class="op">$</span><span class="va">SDF</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -641,8 +656,8 @@ Fixed bandwidth: 160.5517 AICc value: 1919.391 </code></pre>
 <div class="cell">
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan_gstat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">hunan_sf</span>, <span class="va">gwstat_df</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="visualising-geographically-weighted-summary-statistics-1" class="level2" data-number="6.4"><h2 data-number="6.4" class="anchored" data-anchor-id="visualising-geographically-weighted-summary-statistics-1">
-<span class="header-section-number">6.4</span> Visualising geographically weighted summary statistics</h2>
+</section><section id="visualising-geographically-weighted-summary-statistics-1" class="level3" data-number="5.4"><h3 data-number="5.4" class="anchored" data-anchor-id="visualising-geographically-weighted-summary-statistics-1">
+<span class="header-section-number">5.4</span> Visualising geographically weighted summary statistics</h3>
 <div class="cell">
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tm_shape</span><span class="op">(</span><span class="va">hunan_gstat</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">tm_polygons</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"GDPPC_LM"</span>,</span>
@@ -664,8 +679,8 @@ Fixed bandwidth: 160.5517 AICc value: 1919.391 </code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="geographically-weighted-correlation" class="level1" data-number="7"><h1 data-number="7">
-<span class="header-section-number">7</span> Geographically Weighted Correlation</h1>
+</section></section><section id="geographically-weighted-correlation" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="geographically-weighted-correlation">
+<span class="header-section-number">6</span> Geographically Weighted Correlation</h2>
 <p>Business question: Is there any relationship between GDP per capita and Gross Industry Output?</p>
 <div class="cell">
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggscatterstats</span><span class="op">(</span></span>
@@ -687,11 +702,16 @@ Fixed bandwidth: 160.5517 AICc value: 1919.391 </code></pre>
 </div>
 </div>
 </div>
-<section id="geospatial-analytics-solution" class="level2" data-number="7.1"><h2 data-number="7.1" class="anchored" data-anchor-id="geospatial-analytics-solution">
-<span class="header-section-number">7.1</span> Geospatial analytics solution</h2>
-<div class="panel_tabset">
-<section id="determine-the-bandwidth" class="level3" data-number="7.1.1"><h3 data-number="7.1.1" class="anchored" data-anchor-id="determine-the-bandwidth">
-<span class="header-section-number">7.1.1</span> Determine the bandwidth</h3>
+<section id="geospatial-analytics-solution" class="level3" data-number="6.1"><h3 data-number="6.1" class="anchored" data-anchor-id="geospatial-analytics-solution">
+<span class="header-section-number">6.1</span> Geospatial analytics solution</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">Determine the bandwidth</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">Computing gWCorrelation</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">Extracting the result</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
 <div class="cell">
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">bw</span> <span class="op">&lt;-</span> <span class="fu">bw.gwr</span><span class="op">(</span><span class="va">GDPPC</span> <span class="op">~</span> <span class="va">GIO</span>, </span>
 <span>             data <span class="op">=</span> <span class="va">hunan_sp</span>, </span>
@@ -709,8 +729,8 @@ Adaptive bandwidth (number of nearest neighbours): 83 AICc value: 1869.567
 Adaptive bandwidth (number of nearest neighbours): 84 AICc value: 1869.537 </code></pre>
 </div>
 </div>
-</section><section id="computing-gwcorrelation" class="level3" data-number="7.1.2"><h3 data-number="7.1.2" class="anchored" data-anchor-id="computing-gwcorrelation">
-<span class="header-section-number">7.1.2</span> Computing gWCorrelation</h3>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
 <div class="cell">
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gwstats</span> <span class="op">&lt;-</span> <span class="fu">gwss</span><span class="op">(</span><span class="va">hunan_sp</span>, </span>
 <span>                vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"GDPPC"</span>, <span class="st">"GIO"</span><span class="op">)</span>, </span>
@@ -719,8 +739,8 @@ Adaptive bandwidth (number of nearest neighbours): 84 AICc value: 1869.537 </cod
 <span>                adaptive <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                longlat <span class="op">=</span> <span class="cn">T</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="extracting-the-result" class="level3" data-number="7.1.3"><h3 data-number="7.1.3" class="anchored" data-anchor-id="extracting-the-result">
-<span class="header-section-number">7.1.3</span> Extracting the result</h3>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
 <p>Code chunk below is used to extract SDF data table from gwss object output from <code>gwss()</code>. It will be converted into data.frame by using <code><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame()</a></code>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">gwstat_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">gwstats</span><span class="op">$</span><span class="va">SDF</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
@@ -732,15 +752,21 @@ Adaptive bandwidth (number of nearest neighbours): 84 AICc value: 1869.537 </cod
 <div class="cell">
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan_Corr</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/cbind.html">cbind</a></span><span class="op">(</span><span class="va">hunan_sf</span>, <span class="va">gwstat_df</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section>
 </div>
-</section><section id="visualising-local-correlation" class="level2" data-number="7.2"><h2 data-number="7.2" class="anchored" data-anchor-id="visualising-local-correlation">
-<span class="header-section-number">7.2</span> Visualising Local Correlation</h2>
-<div class="panel_tabset">
-<section id="local-correlation-coefficient" class="level3" data-number="7.2.1"><h3 data-number="7.2.1" class="anchored" data-anchor-id="local-correlation-coefficient">
-<span class="header-section-number">7.2.1</span> Local Correlation Coefficient</h3>
-</section><section id="local-spearman-coefficient" class="level3" data-number="7.2.2"><h3 data-number="7.2.2" class="anchored" data-anchor-id="local-spearman-coefficient">
-<span class="header-section-number">7.2.2</span> Local Spearman Coefficient</h3>
+</div>
+</div>
+</section><section id="visualising-local-correlation" class="level3" data-number="6.2"><h3 data-number="6.2" class="anchored" data-anchor-id="visualising-local-correlation">
+<span class="header-section-number">6.2</span> Visualising Local Correlation</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">Local Correlation Coefficient</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">Local Spearman Coefficient</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
 <div class="cell">
 <div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">tm_shape</span><span class="op">(</span><span class="va">hunan_Corr</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">tm_polygons</span><span class="op">(</span>fill <span class="op">=</span> <span class="st">"gwSpearman"</span>,</span>
@@ -761,7 +787,8 @@ Adaptive bandwidth (number of nearest neighbours): 84 AICc value: 1869.537 </cod
 </div>
 </div>
 </div>
-</section>
+</div>
+</div>
 </div>
 
 

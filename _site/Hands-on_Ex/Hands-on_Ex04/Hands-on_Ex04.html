@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="Linh Nguyen">
 <meta name="dcterms.date" content="2025-09-14">
-<title>Hands-on 4 | Spatial Weights and Applications – ISSS626-GAA</title>
+<title>Hands-on Exercise 4 | Spatial Weights and Applications – ISSS626-GAA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -199,24 +199,24 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
 <li>
-<a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">2</span> Overview</a>
+<a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a>
   <ul class="collapse">
-<li><a href="#learning-outcomes" id="toc-learning-outcomes" class="nav-link" data-scroll-target="#learning-outcomes"><span class="header-section-number">2.1</span> Learning Outcomes</a></li>
-  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2.2</span> The Data</a></li>
-  <li><a href="#install-r-packages" id="toc-install-r-packages" class="nav-link" data-scroll-target="#install-r-packages"><span class="header-section-number">2.3</span> Install R packages</a></li>
+<li><a href="#learning-outcomes" id="toc-learning-outcomes" class="nav-link" data-scroll-target="#learning-outcomes"><span class="header-section-number">1.1</span> Learning Outcomes</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">1.2</span> The Data</a></li>
+  <li><a href="#install-r-packages" id="toc-install-r-packages" class="nav-link" data-scroll-target="#install-r-packages"><span class="header-section-number">1.3</span> Install R packages</a></li>
   </ul>
 </li>
   <li>
-<a href="#getting-the-data-into-r-environment" id="toc-getting-the-data-into-r-environment" class="nav-link" data-scroll-target="#getting-the-data-into-r-environment"><span class="header-section-number">3</span> Getting the Data Into R Environment</a>
+<a href="#getting-the-data-into-r-environment" id="toc-getting-the-data-into-r-environment" class="nav-link" data-scroll-target="#getting-the-data-into-r-environment"><span class="header-section-number">2</span> Getting the Data Into R Environment</a>
   <ul class="collapse">
-<li><a href="#import-shapefile-into-r-environment" id="toc-import-shapefile-into-r-environment" class="nav-link" data-scroll-target="#import-shapefile-into-r-environment"><span class="header-section-number">3.1</span> Import shapefile into r environment</a></li>
+<li><a href="#import-shapefile-into-r-environment" id="toc-import-shapefile-into-r-environment" class="nav-link" data-scroll-target="#import-shapefile-into-r-environment"><span class="header-section-number">2.1</span> Import shapefile into r environment</a></li>
   </ul>
 </li>
   </ul></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">Hands-on 4 | Spatial Weights and Applications</h1>
+<h1 class="title">Hands-on Exercise 4 | Spatial Weights and Applications</h1>
 <p class="subtitle lead">In this hands-on exercise, we will learn how to compute spatial weights using R.</p>
 </div>
 
@@ -249,10 +249,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   
 
 
-</header><section id="overview" class="level1" data-number="2"><h1 data-number="2">
-<span class="header-section-number">2</span> Overview</h1>
-<section id="learning-outcomes" class="level2" data-number="2.1"><h2 data-number="2.1" class="anchored" data-anchor-id="learning-outcomes">
-<span class="header-section-number">2.1</span> Learning Outcomes</h2>
+</header><section id="overview" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="overview">
+<span class="header-section-number">1</span> Overview</h2>
+<section id="learning-outcomes" class="level3" data-number="1.1"><h3 data-number="1.1" class="anchored" data-anchor-id="learning-outcomes">
+<span class="header-section-number">1.1</span> Learning Outcomes</h3>
 <p>In this hands-on exercise, you will learn how to compute spatial weights using R using the following techniques:</p>
 <ul>
 <li>Import geospatial data using appropriate function(s) of sf package,</li>
@@ -260,8 +260,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Perform relational join using appropriate join function of dplyr package,</li>
 <li>Compute spatial weights using appropriate functions of spdep package, and</li>
 <li>Calculate spatially lagged variables using appropriate functions of spdep package.</li>
-</ul></section><section id="the-data" class="level2" data-number="2.2"><h2 data-number="2.2" class="anchored" data-anchor-id="the-data">
-<span class="header-section-number">2.2</span> The Data</h2>
+</ul></section><section id="the-data" class="level3" data-number="1.2"><h3 data-number="1.2" class="anchored" data-anchor-id="the-data">
+<span class="header-section-number">1.2</span> The Data</h3>
 <table class="caption-top table">
 <colgroup>
 <col style="width: 30%">
@@ -285,17 +285,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <td>Hunan_2012.csv</td>
 </tr>
 </tbody>
-</table></section><section id="install-r-packages" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="install-r-packages">
-<span class="header-section-number">2.3</span> Install R packages</h2>
+</table></section><section id="install-r-packages" class="level3" data-number="1.3"><h3 data-number="1.3" class="anchored" data-anchor-id="install-r-packages">
+<span class="header-section-number">1.3</span> Install R packages</h3>
 <p>Before we get started, we need to ensure that <code>spdep</code>, <code>sf</code>, <code>tmap</code> and <code>tidyverse</code> packages of R are currently installed in your R.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">spdep</span>, <span class="va">tmap</span>, <span class="va">tidyverse</span>, <span class="va">knitr</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="getting-the-data-into-r-environment" class="level1" data-number="3"><h1 data-number="3">
-<span class="header-section-number">3</span> Getting the Data Into R Environment</h1>
+</section></section><section id="getting-the-data-into-r-environment" class="level2" data-number="2"><h2 data-number="2" class="anchored" data-anchor-id="getting-the-data-into-r-environment">
+<span class="header-section-number">2</span> Getting the Data Into R Environment</h2>
 <p>In this section, you will learn how to bring a geospatial data and its associated attribute table into R environment. The geospatial data is in ESRI shapefile format and the attribute table is in csv format.</p>
-<section id="import-shapefile-into-r-environment" class="level2 panel_tabset" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="import-shapefile-into-r-environment">
-<span class="header-section-number">3.1</span> Import shapefile into r environment</h2>
+<section id="import-shapefile-into-r-environment" class="level3 panel_tabset" data-number="2.1"><h3 data-number="2.1" class="anchored">
+<span class="header-section-number">2.1</span> Import shapefile into r environment</h3>
 <div style="font-size: 1.20em">
 <p>The code chunk below uses st_read() of sf package to import Hunan shapefile into R. The imported shapefile will be simple features Object of sf.</p>
 <div class="cell">
@@ -311,15 +311,15 @@ Bounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-<section id="import-csv-file-into-r-environment" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="import-csv-file-into-r-environment">
-<span class="header-section-number">3.2</span> Import csv file into r environment</h2>
+<section id="import-csv-file-into-r-environment" class="level3" data-number="2.2"><h3 data-number="2.2" class="anchored">
+<span class="header-section-number">2.2</span> Import csv file into r environment</h3>
 <div style="font-size: 1.20em">
 <p>Next, we will import Hunan_2012.csv into R by using <code>read_csv()</code> of readr package. The output is R dataframe class.</p>
 <div class="cell">
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan2012</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"data/aspatial/Hunan_2012.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<section id="performing-relational-join" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="performing-relational-join">
-<span class="header-section-number">3.3</span> Performing relational join</h2>
+<section id="performing-relational-join" class="level3" data-number="2.3"><h3 data-number="2.3" class="anchored" data-anchor-id="performing-relational-join">
+<span class="header-section-number">2.3</span> Performing relational join</h3>
 <div style="font-size: 1.20em">
 <p>The code chunk below will be used to update the attribute table of hunan’s SpatialPolygonsDataFrame with the attribute fields of hunan2012 dataframe. This is performed by using <code>left_join()</code> of <code>dplyr</code> package.</p>
 <div class="cell">
@@ -327,8 +327,8 @@ Geodetic CRS:  WGS 84</code></pre>
 <span>  <span class="fu">select</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">7</span>, <span class="fl">15</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
-</section><section id="visualising-regional-development-indicator" class="level1" data-number="4"><h1 data-number="4">
-<span class="header-section-number">4</span> Visualising Regional Development Indicator</h1>
+</section><section id="visualising-regional-development-indicator" class="level2" data-number="3"><h2 data-number="3" class="anchored" data-anchor-id="visualising-regional-development-indicator">
+<span class="header-section-number">3</span> Visualising Regional Development Indicator</h2>
 <p>Now, we are going to prepare a basemap and a choropleth map showing the distribution of GDPPC 2012 by using <code>qtm()</code> of <code>tmap</code> package.</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basemap</span> <span class="op">&lt;-</span> <span class="fu">tm_shape</span><span class="op">(</span><span class="va">hunan</span><span class="op">)</span> <span class="op">+</span></span>
@@ -346,11 +346,11 @@ Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
 </div>
-</section><section id="computing-contiguity-spatial-weights" class="level1" data-number="5"><h1 data-number="5">
-<span class="header-section-number">5</span> Computing Contiguity Spatial Weights</h1>
+</section><section id="computing-contiguity-spatial-weights" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="computing-contiguity-spatial-weights">
+<span class="header-section-number">4</span> Computing Contiguity Spatial Weights</h2>
 <p>In this section, you will learn how to use <code>poly2nb()</code> of <code>spdep</code> package to compute contiguity weight matrices for the study area. This function builds a neighbours list based on regions with contiguous boundaries. If you look at the documentation you will see that you can pass a “queen” argument that takes TRUE or FALSE as options. If you do not specify this argument the default is set to TRUE, that is, if you don’t specify <code>queen = FALSE</code> this function will return a list of first order neighbours using the Queen criteria.</p>
-<section id="computing-queen-contiguity-based-neighbours" class="level2" data-number="5.1"><h2 data-number="5.1" class="anchored" data-anchor-id="computing-queen-contiguity-based-neighbours">
-<span class="header-section-number">5.1</span> Computing (QUEEN) contiguity based neighbours</h2>
+<section id="computing-queen-contiguity-based-neighbours" class="level3" data-number="4.1"><h3 data-number="4.1" class="anchored" data-anchor-id="computing-queen-contiguity-based-neighbours">
+<span class="header-section-number">4.1</span> Computing (QUEEN) contiguity based neighbours</h3>
 <p>The code chunk below is used to compute Queen contiguity weight matrix.</p>
 <div class="cell">
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">wm_q</span> <span class="op">&lt;-</span> <span class="fu">poly2nb</span><span class="op">(</span><span class="va">hunan</span>, queen<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span> </span>
@@ -510,8 +510,8 @@ Link number distribution:
 </div>
 </div>
 <p>Be warned: The output might cut across several pages. Save the trees if you are going to print out the report.</p>
-</section><section id="creating-rook-contiguity-based-neighbours" class="level2" data-number="5.2"><h2 data-number="5.2" class="anchored" data-anchor-id="creating-rook-contiguity-based-neighbours">
-<span class="header-section-number">5.2</span> Creating (ROOK) contiguity based neighbours</h2>
+</section><section id="creating-rook-contiguity-based-neighbours" class="level3" data-number="4.2"><h3 data-number="4.2" class="anchored" data-anchor-id="creating-rook-contiguity-based-neighbours">
+<span class="header-section-number">4.2</span> Creating (ROOK) contiguity based neighbours</h3>
 <p>The code chunk below is used to compute Rook contiguity weight matrix.</p>
 <div class="cell">
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">wm_r</span> <span class="op">&lt;-</span> <span class="fu">poly2nb</span><span class="op">(</span><span class="va">hunan</span>, queen<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span>
@@ -533,8 +533,8 @@ Link number distribution:
 </div>
 </div>
 <p>The summary report above shows that there are 88 area units in Hunan. The most connect area unit has 10 neighbours. There are two area units with only one neighbours.</p>
-</section><section id="visualising-contiguity-weights" class="level2" data-number="5.3"><h2 data-number="5.3" class="anchored" data-anchor-id="visualising-contiguity-weights">
-<span class="header-section-number">5.3</span> Visualising contiguity weights</h2>
+</section><section id="visualising-contiguity-weights" class="level3" data-number="4.3"><h3 data-number="4.3" class="anchored" data-anchor-id="visualising-contiguity-weights">
+<span class="header-section-number">4.3</span> Visualising contiguity weights</h3>
 <p>A connectivity graph takes a point and displays a line to each neighboring point. We are working with polygons at the moment, so we will need to get points in order to make our connectivity graphs. The most typically method for this will be polygon centroids. We will calculate these in the sf package before moving onto the graphs. Getting Latitude and Longitude of Polygon Centroids</p>
 <p>We will need points to associate with each polygon before we can make our connectivity graph. It will be a little more complicated than just running <code>st_centroid</code> on the sf object: <code>us.bound</code>. We need the coordinates in a separate data frame for this to work. To do this we will use a mapping function. The mapping function applies a given function to each element of a vector and returns a vector of the same length. Our input vector will be the geometry column of us.bound. Our function will be <code>st_centroid</code>. We will be using map_dbl variation of map from the purrr package. For more documentation, check out map documentation</p>
 <p>To get our longitude values we map the <code>st_centroid</code> function over the geometry column of us.bound and access the longitude value through double bracket notation [[]] and 1. This allows us to get only the longitude, which is the first value in each centroid.</p>
@@ -562,8 +562,8 @@ Link number distribution:
 [6,]  111.0341 29.79863</code></pre>
 </div>
 </div>
-<section id="plotting-queen-contiguity-based-neighbours-map" class="level3" data-number="5.3.1"><h3 data-number="5.3.1" class="anchored" data-anchor-id="plotting-queen-contiguity-based-neighbours-map">
-<span class="header-section-number">5.3.1</span> Plotting Queen contiguity based neighbours map</h3>
+<section id="plotting-queen-contiguity-based-neighbours-map" class="level4" data-number="4.3.1"><h4 data-number="4.3.1" class="anchored" data-anchor-id="plotting-queen-contiguity-based-neighbours-map">
+<span class="header-section-number">4.3.1</span> Plotting Queen contiguity based neighbours map</h4>
 <div class="cell">
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hunan</span><span class="op">$</span><span class="va">geometry</span>, border<span class="op">=</span><span class="st">"lightgrey"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">wm_q</span>, <span class="va">coords</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.6</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col<span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -574,8 +574,8 @@ Link number distribution:
 </div>
 </div>
 </div>
-</section><section id="plotting-rook-contiguity-based-neighbours-map" class="level3" data-number="5.3.2"><h3 data-number="5.3.2" class="anchored" data-anchor-id="plotting-rook-contiguity-based-neighbours-map">
-<span class="header-section-number">5.3.2</span> Plotting Rook contiguity based neighbours map</h3>
+</section><section id="plotting-rook-contiguity-based-neighbours-map" class="level4" data-number="4.3.2"><h4 data-number="4.3.2" class="anchored" data-anchor-id="plotting-rook-contiguity-based-neighbours-map">
+<span class="header-section-number">4.3.2</span> Plotting Rook contiguity based neighbours map</h4>
 <div class="cell">
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hunan</span><span class="op">$</span><span class="va">geometry</span>, border<span class="op">=</span><span class="st">"lightgrey"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">wm_q</span>, <span class="va">coords</span>, pch <span class="op">=</span> <span class="fl">19</span>, cex <span class="op">=</span> <span class="fl">0.6</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col<span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -586,8 +586,8 @@ Link number distribution:
 </div>
 </div>
 </div>
-</section><section id="plotting-both-queen-and-rook-contiguity-based-neighbours-maps" class="level3" data-number="5.3.3"><h3 data-number="5.3.3" class="anchored" data-anchor-id="plotting-both-queen-and-rook-contiguity-based-neighbours-maps">
-<span class="header-section-number">5.3.3</span> Plotting both Queen and Rook contiguity based neighbours maps</h3>
+</section><section id="plotting-both-queen-and-rook-contiguity-based-neighbours-maps" class="level4" data-number="4.3.3"><h4 data-number="4.3.3" class="anchored" data-anchor-id="plotting-both-queen-and-rook-contiguity-based-neighbours-maps">
+<span class="header-section-number">4.3.3</span> Plotting both Queen and Rook contiguity based neighbours maps</h4>
 <div class="cell">
 <div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hunan</span><span class="op">$</span><span class="va">geometry</span>, border<span class="op">=</span><span class="st">"lightgrey"</span>, main<span class="op">=</span><span class="st">"Queen Contiguity"</span><span class="op">)</span></span>
@@ -601,12 +601,12 @@ Link number distribution:
 </div>
 </div>
 </div>
-</section></section></section><section id="computing-distance-based-neighbours" class="level1" data-number="6"><h1 data-number="6">
-<span class="header-section-number">6</span> Computing distance based neighbours</h1>
+</section></section></section><section id="computing-distance-based-neighbours" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="computing-distance-based-neighbours">
+<span class="header-section-number">5</span> Computing distance based neighbours</h2>
 <p>In this section, you will learn how to derive distance-based weight matrices by using <a href="https://r-spatial.github.io/spdep/reference/dnearneigh.html">dnearneigh()</a> of <code>spdep</code> package.</p>
 <p>The function identifies neighbours of region points by Euclidean distance with a distance band with lower <code>d1=</code> and upper <code>d2=</code> bounds controlled by the bounds= argument. If unprojected coordinates are used and either specified in the coordinates object x or with x as a two column matrix and <code>longlat=TRUE</code>, great circle distances in <strong>km</strong> will be calculated assuming the WGS84 reference ellipsoid.</p>
-<section id="determine-the-cut-off-distance" class="level2" data-number="6.1"><h2 data-number="6.1" class="anchored" data-anchor-id="determine-the-cut-off-distance">
-<span class="header-section-number">6.1</span> Determine the cut-off distance</h2>
+<section id="determine-the-cut-off-distance" class="level3" data-number="5.1"><h3 data-number="5.1" class="anchored" data-anchor-id="determine-the-cut-off-distance">
+<span class="header-section-number">5.1</span> Determine the cut-off distance</h3>
 <p>Firstly, we need to determine the upper limit for distance band by using the steps below:</p>
 <ul>
 <li>Return a matrix with the indices of points belonging to the set of the k nearest neighbours of each other by using <a href="https://r-spatial.github.io/spdep/reference/knearneigh.html"><code>knearneigh()</code></a> of <code>spdep</code>.</li>
@@ -625,8 +625,8 @@ Link number distribution:
 </div>
 </div>
 <p>The summary report shows that the largest first nearest neighbour distance is 61.79 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.</p>
-</section><section id="computing-fixed-distance-weight-matrix" class="level2" data-number="6.2"><h2 data-number="6.2" class="anchored" data-anchor-id="computing-fixed-distance-weight-matrix">
-<span class="header-section-number">6.2</span> Computing fixed distance weight matrix</h2>
+</section><section id="computing-fixed-distance-weight-matrix" class="level3" data-number="5.2"><h3 data-number="5.2" class="anchored" data-anchor-id="computing-fixed-distance-weight-matrix">
+<span class="header-section-number">5.2</span> Computing fixed distance weight matrix</h3>
 <p>Now, we will compute the distance weight matrix by using <code>dnearneigh()</code> as shown in the code chunk below.</p>
 <div class="cell">
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">wm_d62</span> <span class="op">&lt;-</span> <span class="fu">dnearneigh</span><span class="op">(</span><span class="va">coords</span>, <span class="fl">0</span>, <span class="fl">62</span>, longlat <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
@@ -856,8 +856,8 @@ Average number of links: 3.681818 </code></pre>
 88 </code></pre>
 </div>
 </div>
-<section id="plotting-fixed-distance-weight-matrix" class="level3" data-number="6.2.1"><h3 data-number="6.2.1" class="anchored" data-anchor-id="plotting-fixed-distance-weight-matrix">
-<span class="header-section-number">6.2.1</span> Plotting fixed distance weight matrix</h3>
+<section id="plotting-fixed-distance-weight-matrix" class="level4" data-number="5.2.1"><h4 data-number="5.2.1" class="anchored" data-anchor-id="plotting-fixed-distance-weight-matrix">
+<span class="header-section-number">5.2.1</span> Plotting fixed distance weight matrix</h4>
 <p>Next, we will plot the distance weight matrix by using the code chunk below.</p>
 <div class="cell">
 <div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hunan</span><span class="op">$</span><span class="va">geometry</span>, border<span class="op">=</span><span class="st">"lightgrey"</span><span class="op">)</span></span>
@@ -885,8 +885,8 @@ Average number of links: 3.681818 </code></pre>
 </div>
 </div>
 </div>
-</section></section><section id="computing-adaptive-distance-weight-matrix" class="level2" data-number="6.3"><h2 data-number="6.3" class="anchored" data-anchor-id="computing-adaptive-distance-weight-matrix">
-<span class="header-section-number">6.3</span> Computing adaptive distance weight matrix</h2>
+</section></section><section id="computing-adaptive-distance-weight-matrix" class="level3" data-number="5.3"><h3 data-number="5.3" class="anchored" data-anchor-id="computing-adaptive-distance-weight-matrix">
+<span class="header-section-number">5.3</span> Computing adaptive distance weight matrix</h3>
 <p>One of the characteristics of fixed distance weight matrix is that more densely settled areas (usually the urban areas) tend to have more neighbours and the less densely settled areas (usually the rural counties) tend to have lesser neighbours. Having many neighbours smoothes the neighbour relationship across more neighbours.</p>
 <p>It is possible to control the numbers of neighbours directly using k-nearest neighbours, either accepting asymmetric neighbours or imposing symmetry as shown in the code chunk below.</p>
 <div class="cell">
@@ -1006,8 +1006,8 @@ Non-symmetric neighbours list</code></pre>
 </div>
 </div>
 <p>Notice that each county has six neighbours, no less no more!</p>
-<section id="plotting-distance-based-neighbours" class="level3" data-number="6.3.1"><h3 data-number="6.3.1" class="anchored" data-anchor-id="plotting-distance-based-neighbours">
-<span class="header-section-number">6.3.1</span> Plotting distance based neighbours</h3>
+<section id="plotting-distance-based-neighbours" class="level4" data-number="5.3.1"><h4 data-number="5.3.1" class="anchored" data-anchor-id="plotting-distance-based-neighbours">
+<span class="header-section-number">5.3.1</span> Plotting distance based neighbours</h4>
 <p>We can plot the weight matrix using the code chunk below.</p>
 <div class="cell">
 <div class="sourceCode" id="cb47"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">hunan</span><span class="op">$</span><span class="va">geometry</span>, border<span class="op">=</span><span class="st">"lightgrey"</span><span class="op">)</span></span>
@@ -1019,8 +1019,8 @@ Non-symmetric neighbours list</code></pre>
 </div>
 </div>
 </div>
-</section></section></section><section id="weights-based-on-idw" class="level1" data-number="7"><h1 data-number="7">
-<span class="header-section-number">7</span> Weights based on IDW</h1>
+</section></section></section><section id="weights-based-on-idw" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="weights-based-on-idw">
+<span class="header-section-number">6</span> Weights based on IDW</h2>
 <p>In this section, you will learn how to derive a spatial weight matrix based on Inversed Distance method.</p>
 <p>First, we will compute the distances between areas by using <a href="https://r-spatial.github.io/spdep/reference/nbdists.html"><code>nbdists()</code></a> of <code>spdep</code>.</p>
 <div class="cell">
@@ -1301,8 +1301,8 @@ Non-symmetric neighbours list</code></pre>
 [1] 0.01785036 0.02058034</code></pre>
 </div>
 </div>
-</section><section id="row-standardised-weights-matrix" class="level1" data-number="8"><h1 data-number="8">
-<span class="header-section-number">8</span> Row-standardised Weights Matrix</h1>
+</section><section id="row-standardised-weights-matrix" class="level2" data-number="7"><h2 data-number="7" class="anchored" data-anchor-id="row-standardised-weights-matrix">
+<span class="header-section-number">7</span> Row-standardised Weights Matrix</h2>
 <p>Next, we need to assign weights to each neighboring polygon. In our case, each neighboring polygon will be assigned equal weight (style=“W”). This is accomplished by assigning the fraction <code>1</code>/(#ofneighbors)` to each neighboring county then summing the weighted income values.</p>
 <p>While this is the most intuitive way to summaries the neighbors’ values it has one drawback in that polygons along the edges of the study area will base their lagged values on fewer polygons thus potentially over- or under-estimating the true nature of the spatial autocorrelation in the data.</p>
 <p>For this example, we’ll stick with the <code>style=“W”</code> option for simplicity’s sake but note that other more robust options are available, notably <code>style=“B”</code>.</p>
@@ -1365,8 +1365,8 @@ B 88 7744 8.786867 0.3776535 3.8137</code></pre>
 0.008218 0.015088 0.018739 0.019614 0.022823 0.040338 </code></pre>
 </div>
 </div>
-</section><section id="application-of-spatial-weight-matrix" class="level1" data-number="9"><h1 data-number="9">
-<span class="header-section-number">9</span> Application of Spatial Weight Matrix</h1>
+</section><section id="application-of-spatial-weight-matrix" class="level2" data-number="8"><h2 data-number="8" class="anchored" data-anchor-id="application-of-spatial-weight-matrix">
+<span class="header-section-number">8</span> Application of Spatial Weight Matrix</h2>
 <p>In this section, you will learn how to create four different spatial lagged variables, they are:</p>
 <ul>
 <li>Spatial lag with row-standardized weights</li>
@@ -1374,8 +1374,8 @@ B 88 7744 8.786867 0.3776535 3.8137</code></pre>
 <li>Spatial window average</li>
 <li>Spatial window sum</li>
 </ul>
-<section id="spatial-lag-with-row-standardized-weights" class="level2" data-number="9.1"><h2 data-number="9.1" class="anchored" data-anchor-id="spatial-lag-with-row-standardized-weights">
-<span class="header-section-number">9.1</span> Spatial lag with row-standardized weights</h2>
+<section id="spatial-lag-with-row-standardized-weights" class="level3" data-number="8.1"><h3 data-number="8.1" class="anchored" data-anchor-id="spatial-lag-with-row-standardized-weights">
+<span class="header-section-number">8.1</span> Spatial lag with row-standardized weights</h3>
 <p>Finally, we’ll compute the average neighbor GDPPC value for each polygon. These values are often referred to as <strong>spatially lagged values</strong>.</p>
 <div class="cell">
 <div class="sourceCode" id="cb60"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">GDPPC.lag</span> <span class="op">&lt;-</span> <span class="fu">lag.listw</span><span class="op">(</span><span class="va">rswm_q</span>, <span class="va">hunan</span><span class="op">$</span><span class="va">GDPPC</span><span class="op">)</span></span>
@@ -1448,8 +1448,8 @@ Geodetic CRS:  WGS 84
 </div>
 </div>
 </div>
-</section><section id="spatial-lag-as-a-sum-of-neighboring-values" class="level2" data-number="9.2"><h2 data-number="9.2" class="anchored" data-anchor-id="spatial-lag-as-a-sum-of-neighboring-values">
-<span class="header-section-number">9.2</span> Spatial lag as a sum of neighboring values</h2>
+</section><section id="spatial-lag-as-a-sum-of-neighboring-values" class="level3" data-number="8.2"><h3 data-number="8.2" class="anchored" data-anchor-id="spatial-lag-as-a-sum-of-neighboring-values">
+<span class="header-section-number">8.2</span> Spatial lag as a sum of neighboring values</h3>
 <p>We can calculate spatial lag as a sum of neighboring values by assigning binary weights. This requires us to go back to our neighbors list, then apply a function that will assign binary weights, then we use glist = in the nb2listw function to explicitly assign these weights.</p>
 <p>We start by applying a function that will assign a value of 1 per each neighbor. This is done with lapply, which we have been using to manipulate the neighbors structure throughout the past notebooks. Basically it applies a function across each value in the neighbors structure.</p>
 <div class="cell">
@@ -1535,8 +1535,8 @@ B 88 7744 448 896 10224</code></pre>
 </div>
 </div>
 </div>
-</section><section id="spatial-window-average" class="level2" data-number="9.3"><h2 data-number="9.3" class="anchored" data-anchor-id="spatial-window-average">
-<span class="header-section-number">9.3</span> Spatial window average</h2>
+</section><section id="spatial-window-average" class="level3" data-number="8.3"><h3 data-number="8.3" class="anchored" data-anchor-id="spatial-window-average">
+<span class="header-section-number">8.3</span> Spatial window average</h3>
 <p>The spatial window average uses row-standardized weights and includes the diagonal element. To do this in R, we need to go back to the neighbors structure and add the diagonal element before assigning weights.</p>
 <p>To add the diagonal element to the neighbour list, we just need to use include.self() from spdep.</p>
 <div class="cell">
@@ -2166,8 +2166,8 @@ W 88 7744 88 30.90265 357.5308</code></pre>
 </div>
 </div>
 <p>Note: For more effective comparison, it is advicible to use the core tmap mapping functions.</p>
-</section><section id="spatial-window-sum" class="level2" data-number="9.4"><h2 data-number="9.4" class="anchored" data-anchor-id="spatial-window-sum">
-<span class="header-section-number">9.4</span> Spatial window sum</h2>
+</section><section id="spatial-window-sum" class="level3" data-number="8.4"><h3 data-number="8.4" class="anchored" data-anchor-id="spatial-window-sum">
+<span class="header-section-number">8.4</span> Spatial window sum</h3>
 <p>The spatial window sum is the counter part of the window average, but without using row-standardized weights.</p>
 <p>To add the diagonal element to the neighbour list, we just need to use <code>include.self()</code> from <code>spdep</code>.</p>
 <div class="cell">
@@ -2826,8 +2826,8 @@ B 88 7744 536 1072 14160</code></pre>
 </div>
 </div>
 <p>Note: For more effective comparison, it is advicible to use the core tmap mapping functions.</p>
-</section></section><section id="references" class="level1" data-number="10"><h1 data-number="10">
-<span class="header-section-number">10</span> References</h1>
+</section></section><section id="references" class="level2" data-number="9"><h2 data-number="9" class="anchored" data-anchor-id="references">
+<span class="header-section-number">9</span> References</h2>
 <p><a href="https://cran.r-project.org/web/packages/spdep/vignettes/nb_sf.html">Creating Neighbours using sf objects</a></p>
 
 

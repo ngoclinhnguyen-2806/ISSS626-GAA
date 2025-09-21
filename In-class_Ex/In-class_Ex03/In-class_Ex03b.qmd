@@ -1,6 +1,21 @@
 ---
 title: "In-class Exercise 3b"
-author: "Linh Nguyen"
+date: "Sep 20, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+format:
+  html:
+    code-link: true
+    toc: true
+number-sections: true
+number-offset: 1
+editor: visual
 ---
 
 ## Import R packages

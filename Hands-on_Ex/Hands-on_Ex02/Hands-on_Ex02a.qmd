@@ -33,7 +33,7 @@ The specific questions we would like to answer are as follows:
 -   are the childcare centres in Singapore randomly distributed throughout the country?\
 -   if the answer is not, then the next logical question is where are the locations with higher concentration of childcare centres?
 
-## Learning Outcome
+### Learning Outcome
 
 -   Importing and managing geospatial data using `sf` and `spatstat` packages.
 -   Converting simple feature data frames to various spatial data formats.
@@ -43,14 +43,14 @@ The specific questions we would like to answer are as follows:
 -   Handling duplicate spatial points and creating point patterns for analysis.
 -   Applying appropriate statistical methods for confirmatory spatial point pattern analysis.
 
-## The Data
+### The Data
 
 | Dataset | Description | Source | Format |
 |------------------|------------------|------------------|------------------|
 | **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
 
-## Installing and Loading the R Packages
+### Installing and Loading the R Packages
 
 The following R packages will be used in this exercise:
 

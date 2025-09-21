@@ -35,7 +35,7 @@ The specific questions we would like to answer are as follows:
 
 This hands-on exercise continues from [Hands-on Exercise 2A](/hands-on_ex/hands-on_ex02/hands-on_ex02a)
 
-## Learning Outcome
+### Learning Outcome
 
 -   Importing and managing geospatial data using `sf` and `spatstat` packages.
 -   Converting spatial data formats from `sf` to `spatstat`'s `ppp` format.
@@ -45,14 +45,14 @@ This hands-on exercise continues from [Hands-on Exercise 2A](/hands-on_ex/hands-
 -   Performing Monte Carlo simulations and hypothesis testing to assess spatial randomness.
 -   Visualizing spatial patterns and statistical results using appropriate plotting functions.
 
-## The Data
+### The Data
 
 | Dataset | Description | Source | Format |
-|------------------|--------------------|------------------|------------------|
+|------------------|-------------------|------------------|------------------|
 | **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
 
-## Installing and Loading the R Packages
+### Installing and Loading the R Packages
 
 The following R packages will be used in this exercise:
 
