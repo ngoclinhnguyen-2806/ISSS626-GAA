@@ -38,7 +38,7 @@ By understanding business locations and how their distribution evolves, Singapor
 ## The Data
 
 | Dataset | Description | Source | Format |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **ACRA Information on Corporate Entities** | Information of registered entities in Singapore, including location data | [data.gov.sg](https://data.gov.sg/datasets?query=ACRA+Information+on+Corporate+Entities&page=1&resultId=2) | CSV |
 | **SSIC: Singapore Standard Industrial Classification 2020** | List of codes represented economic activity of business establishments in Singapore, 2020 version. | [SSIC: Singapore Standard Industrial Classification](https://classification.codes/classifications/industry/ssic-singapore) | Excel |
 
@@ -46,15 +46,192 @@ By understanding business locations and how their distribution evolves, Singapor
 
 ## Import R Packages
 
+```{r}
+pacman::p_load(tidyverse, sf, tmap, httr)
+```
+
 ## Set Seed
+
+```{r}
+set.seed(1234)
+```
 
 # Spatial Data Wrangling
 
 ## Data Import & Preparation
 
+Data Import 
+
+```{r}
+#| eval: false
+folder_path <- "data/aspatial/ACRA"
+file_list <- list.files(path = folder_path, 
+                        pattern = "^ACRA*.*\\.csv$", 
+                        full.names = TRUE)
+
+acra_data <- file_list %>%
+  map_dfr(read_csv)
+```
+
+```{r}
+#| echo: false
+#| eval: false
+write_rds(acra_data, "data/rds/acra_data.rds")
+```
+
+```{r}
+#| echo: false
+acra_data <- read_rds("data/rds/acra_data.rds")
+```
+
 ## Data Wrangling
 
+### Extracting data of chosen business types
+
+The chosen business types are:
+- SSIC 56: Food and Beverage Service Activities
+- SSIC 47: Retail Trade  
+- SSIC 68: Real Estate Activities
+
+```{r}
+#| echo: false
+#| eval: false
+biz_selected <- acra_data %>%
+  select(1:24) %>%
+  filter(str_detect(primary_ssic_code, "^(56|47|68)")) %>%
+  rename(date = registration_incorporation_date) %>%
+  mutate(date = as.Date(date),
+         YEAR = year(date),
+         MONTH_NUM = month(date),
+         MONTH_ABBR = month(date, 
+                            label = TRUE, 
+                            abbr = TRUE)) %>% 
+  mutate(
+    postal_code = str_pad(postal_code, 
+    width = 6, side = "left", pad = "0")) %>%
+  filter(YEAR >= 2024 & YEAR <= 2025) %>%  # Updated date range as per assignment
+  filter(date >= as.Date("2024-01-01") & date <= as.Date("2025-06-30"))  # Exact date range
+```
+
+
+```{r}
+#| eval: false
+# Create separate datasets for each business type for individual analysis
+biz_restaurants <- biz_selected %>% filter(str_detect(primary_ssic_code, "^56"))
+biz_retail_nonspec <- biz_selected %>% filter(str_detect(primary_ssic_code, "^47"))    
+biz_real_estate_own <- biz_selected %>% filter(str_detect(primary_ssic_code, "^68"))
+```
+
+```{r}
+#| eval: false
+#| echo: false
+# Write and save so that we don't have to run the above part next time, and reduce the render time
+# write_rds(biz_selected, "data/rds/biz_selected.rds")
+write_rds(biz_food_beverage, "data/rds/biz_food_beverage.rds")
+write_rds(biz_retail, "data/rds/biz_retail.rds")
+write_rds(biz_real_estate, "data/rds/biz_real_estate.rds")
+```
+
+```{r}
+# Read the files you just wrote
+#| echo: false
+# biz_selected <- read_rds("data/rds/biz_selected.rds")
+biz_food_beverage <- read_rds("data/rds/biz_food_beverage.rds")
+biz_retail <- read_rds("data/rds/biz_retail.rds")
+biz_real_estate <- read_rds("data/rds/biz_real_estate.rds")
+```
+
+```{r}
+# Check the counts for each category
+cat("Food & Beverage (56xxx):", nrow(biz_food_beverage), "\n")
+cat("Retail Trade (47xxx):", nrow(biz_retail), "\n") 
+cat("Real Estate (68xxx):", nrow(biz_real_estate), "\n")
+```
+
+### Geocoding
+
+```{r}
+#| eval: false
+postcodes <- unique(biz_real_estate$postal_code)
+
+url <- "https://onemap.gov.sg/api/common/elastic/search"
+
+found <- data.frame()
+not_found <- data.frame(postcode = character())
+
+for (pc in postcodes) {
+  query <- list(
+    searchVal = pc,
+    returnGeom = "Y",
+    getAddrDetails = "Y",
+    pageNum = "1"
+  )
+  
+  res <- GET(url, query = query)
+  json <- content(res)
+  
+  if (json$found != 0) {
+    df <- as.data.frame(json$results, stringsAsFactors = FALSE)
+    df$input_postcode <- pc
+    found <- bind_rows(found, df)
+  } else {
+    not_found <- bind_rows(not_found, data.frame(postcode = pc))
+  }
+}
+```
+
+### Tidying the geocoded data
+
+```{r}
+#| eval: false
+found <- found %>%
+  select(1:10)
+```
+
+### Appending the location information
+
+```{r}
+#| eval: false
+biz_real_estate = biz_real_estate %>%
+  left_join(found, 
+            by = c('postal_code' = 'POSTAL'))
+```
+
+```{r}
+#| eval: false
+write_rds(biz_real_estate, "data/rds/biz_real_estate.rds")
+```
+
+```{r}
+biz_real_estate <- read_rds("data/rds/biz_real_estate.rds")
+```
+
+### Converting into SF data frame
+
+```{r}
+biz_real_estate_sf <- st_as_sf(biz_real_estate, 
+                         coords = c("X","Y"), 
+                         crs=3414)
+```
+
 # Exploratory Data Analysis
+
+## Visualising the distribution
+
+```{r}
+ggplot(data = biz_real_estate,
+       aes(x = MONTH_ABBR)) +
+  geom_bar()
+```
+
+## Visualising the business
+
+```{r}
+tmap_mode('view')
+tm_shape(biz_real_estate_sf)+
+  tm_dots() +
+  tm_view(set_zoom_limits = c(10, 14))
+```
 
 # Spatial and spatio-temporal KDE of business types
 

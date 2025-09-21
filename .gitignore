@@ -7,3 +7,7 @@
 
 /.quarto/
 data/
+
+# R temporary files
+.RDataTmp*
+*.tmp

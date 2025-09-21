@@ -46,7 +46,7 @@ The specific questions we would like to answer are as follows:
 ## The Data
 
 | Dataset | Description | Source | Format |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
 
@@ -55,7 +55,7 @@ The specific questions we would like to answer are as follows:
 The following R packages will be used in this exercise:
 
 | Package | Purpose | Use Case in Exercise |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **sf** | Imports, manages, and processes vector-based geospatial data. | Handling vector geospatial data in R. |
 | **spatstat** | Provides tools for point pattern analysis. | Performing 1st- and 2nd-order spatial point pattern analysis and deriving kernel density estimation (KDE). |
 | **terra** | Creating, reading, manipulating, and writing raster and vector data. | Convert image output generate by `spatstat` into `terra` format. |
@@ -83,6 +83,7 @@ set.seed(1234)
 #### Import data
 
 ```{r}
+#| eval: false
 mpsz_sf <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
 ```
 
@@ -91,12 +92,14 @@ mpsz_sf <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml")
 Before we can use these data for analysis, it is important for us to ensure that they are projected in same projection system.
 
 ```{r}
+#| eval: false
 st_crs(mpsz_sf)
 ```
 
 Since the ID is `EPSG:4326`, we will set the crs to `EPSG:3414`.
 
 ```{r}
+#| eval: false
 mpsz_sf <- st_transform(mpsz_sf, 3414)
 st_crs(mpsz_sf)
 ```
@@ -120,6 +123,7 @@ extract_kml_field <- function(html_text, field_name) {
 ```
 
 ```{r}
+#| eval: false
 mpsz_sf <- mpsz_sf %>%
   mutate(
     REGION_N = map_chr(Description, extract_kml_field, "REGION_N"),
@@ -132,6 +136,12 @@ mpsz_sf <- mpsz_sf %>%
 ```
 
 ```{r}
+#| echo: false
+mpsz_sf <- read_rds("data/geospatial/mpsz_sf.rds")
+```
+
+```{r}
+#| eval: false
 mpsz_cl <- mpsz_sf %>%
   filter(SUBZONE_N != "SOUTHERN GROUP",
          PLN_AREA_N != "WESTERN ISLANDS",
@@ -139,8 +149,14 @@ mpsz_cl <- mpsz_sf %>%
 ```
 
 ```{r}
-write_rds(mpsz_cl, 
-          "data/geospatial/mpsz_cl.rds")
+#| eval: false
+#| echo: false
+write_rds(mpsz_cl, "data/geospatial/mpsz_cl.rds")
+```
+
+```{r}
+#| echo: false
+mpsz_cl <- read_rds("data/geospatial/mpsz_cl.rds")
 ```
 
 ### Child Care Services

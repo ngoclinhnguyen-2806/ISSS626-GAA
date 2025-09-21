@@ -5,8 +5,8 @@
 <meta name="generator" content="quarto-1.7.33">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="Linh Nguyen">
-<meta name="dcterms.date" content="2025-09-08">
-<title>Hands-on 3 | Spatio-Temporal Point Patterns Analysis – ISSS626-GAA</title>
+<meta name="dcterms.date" content="2025-09-14">
+<title>Hands-on 4 | Spatial Weights and Applications – ISSS626-GAA</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -159,6 +159,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03b.html">
  <span class="dropdown-text">In-class Exercise 3b</span></a>
   </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In-class_Ex04.html">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
     </ul>
 </li>
   <li class="nav-item dropdown ">
@@ -206,62 +210,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <a href="#getting-the-data-into-r-environment" id="toc-getting-the-data-into-r-environment" class="nav-link" data-scroll-target="#getting-the-data-into-r-environment"><span class="header-section-number">3</span> Getting the Data Into R Environment</a>
   <ul class="collapse">
 <li><a href="#import-shapefile-into-r-environment" id="toc-import-shapefile-into-r-environment" class="nav-link" data-scroll-target="#import-shapefile-into-r-environment"><span class="header-section-number">3.1</span> Import shapefile into r environment</a></li>
-  <li><a href="#import-csv-file-into-r-environment" id="toc-import-csv-file-into-r-environment" class="nav-link" data-scroll-target="#import-csv-file-into-r-environment"><span class="header-section-number">3.2</span> Import csv file into r environment</a></li>
-  <li><a href="#performing-relational-join" id="toc-performing-relational-join" class="nav-link" data-scroll-target="#performing-relational-join"><span class="header-section-number">3.3</span> Performing relational join</a></li>
   </ul>
 </li>
-  <li><a href="#visualising-regional-development-indicator" id="toc-visualising-regional-development-indicator" class="nav-link" data-scroll-target="#visualising-regional-development-indicator"><span class="header-section-number">4</span> Visualising Regional Development Indicator</a></li>
-  <li>
-<a href="#computing-contiguity-spatial-weights" id="toc-computing-contiguity-spatial-weights" class="nav-link" data-scroll-target="#computing-contiguity-spatial-weights"><span class="header-section-number">5</span> Computing Contiguity Spatial Weights</a>
-  <ul class="collapse">
-<li><a href="#computing-queen-contiguity-based-neighbours" id="toc-computing-queen-contiguity-based-neighbours" class="nav-link" data-scroll-target="#computing-queen-contiguity-based-neighbours"><span class="header-section-number">5.1</span> Computing (QUEEN) contiguity based neighbours</a></li>
-  <li><a href="#creating-rook-contiguity-based-neighbours" id="toc-creating-rook-contiguity-based-neighbours" class="nav-link" data-scroll-target="#creating-rook-contiguity-based-neighbours"><span class="header-section-number">5.2</span> Creating (ROOK) contiguity based neighbours</a></li>
-  <li>
-<a href="#visualising-contiguity-weights" id="toc-visualising-contiguity-weights" class="nav-link" data-scroll-target="#visualising-contiguity-weights"><span class="header-section-number">5.3</span> Visualising contiguity weights</a>
-  <ul class="collapse">
-<li><a href="#plotting-queen-contiguity-based-neighbours-map" id="toc-plotting-queen-contiguity-based-neighbours-map" class="nav-link" data-scroll-target="#plotting-queen-contiguity-based-neighbours-map"><span class="header-section-number">5.3.1</span> Plotting Queen contiguity based neighbours map</a></li>
-  <li><a href="#plotting-rook-contiguity-based-neighbours-map" id="toc-plotting-rook-contiguity-based-neighbours-map" class="nav-link" data-scroll-target="#plotting-rook-contiguity-based-neighbours-map"><span class="header-section-number">5.3.2</span> Plotting Rook contiguity based neighbours map</a></li>
-  <li><a href="#plotting-both-queen-and-rook-contiguity-based-neighbours-maps" id="toc-plotting-both-queen-and-rook-contiguity-based-neighbours-maps" class="nav-link" data-scroll-target="#plotting-both-queen-and-rook-contiguity-based-neighbours-maps"><span class="header-section-number">5.3.3</span> Plotting both Queen and Rook contiguity based neighbours maps</a></li>
-  </ul>
-</li>
-  </ul>
-</li>
-  <li>
-<a href="#computing-distance-based-neighbours" id="toc-computing-distance-based-neighbours" class="nav-link" data-scroll-target="#computing-distance-based-neighbours"><span class="header-section-number">6</span> Computing distance based neighbours</a>
-  <ul class="collapse">
-<li><a href="#determine-the-cut-off-distance" id="toc-determine-the-cut-off-distance" class="nav-link" data-scroll-target="#determine-the-cut-off-distance"><span class="header-section-number">6.1</span> Determine the cut-off distance</a></li>
-  <li>
-<a href="#computing-fixed-distance-weight-matrix" id="toc-computing-fixed-distance-weight-matrix" class="nav-link" data-scroll-target="#computing-fixed-distance-weight-matrix"><span class="header-section-number">6.2</span> Computing fixed distance weight matrix</a>
-  <ul class="collapse">
-<li><a href="#plotting-fixed-distance-weight-matrix" id="toc-plotting-fixed-distance-weight-matrix" class="nav-link" data-scroll-target="#plotting-fixed-distance-weight-matrix"><span class="header-section-number">6.2.1</span> Plotting fixed distance weight matrix</a></li>
-  </ul>
-</li>
-  <li>
-<a href="#computing-adaptive-distance-weight-matrix" id="toc-computing-adaptive-distance-weight-matrix" class="nav-link" data-scroll-target="#computing-adaptive-distance-weight-matrix"><span class="header-section-number">6.3</span> Computing adaptive distance weight matrix</a>
-  <ul class="collapse">
-<li><a href="#plotting-distance-based-neighbours" id="toc-plotting-distance-based-neighbours" class="nav-link" data-scroll-target="#plotting-distance-based-neighbours"><span class="header-section-number">6.3.1</span> Plotting distance based neighbours</a></li>
-  </ul>
-</li>
-  </ul>
-</li>
-  <li><a href="#weights-based-on-idw" id="toc-weights-based-on-idw" class="nav-link" data-scroll-target="#weights-based-on-idw"><span class="header-section-number">7</span> Weights based on IDW</a></li>
-  <li><a href="#row-standardised-weights-matrix" id="toc-row-standardised-weights-matrix" class="nav-link" data-scroll-target="#row-standardised-weights-matrix"><span class="header-section-number">8</span> Row-standardised Weights Matrix</a></li>
-  <li>
-<a href="#application-of-spatial-weight-matrix" id="toc-application-of-spatial-weight-matrix" class="nav-link" data-scroll-target="#application-of-spatial-weight-matrix"><span class="header-section-number">9</span> Application of Spatial Weight Matrix</a>
-  <ul class="collapse">
-<li><a href="#spatial-lag-with-row-standardized-weights" id="toc-spatial-lag-with-row-standardized-weights" class="nav-link" data-scroll-target="#spatial-lag-with-row-standardized-weights"><span class="header-section-number">9.1</span> Spatial lag with row-standardized weights</a></li>
-  <li><a href="#spatial-lag-as-a-sum-of-neighboring-values" id="toc-spatial-lag-as-a-sum-of-neighboring-values" class="nav-link" data-scroll-target="#spatial-lag-as-a-sum-of-neighboring-values"><span class="header-section-number">9.2</span> Spatial lag as a sum of neighboring values</a></li>
-  <li><a href="#spatial-window-average" id="toc-spatial-window-average" class="nav-link" data-scroll-target="#spatial-window-average"><span class="header-section-number">9.3</span> Spatial window average</a></li>
-  <li><a href="#spatial-window-sum" id="toc-spatial-window-sum" class="nav-link" data-scroll-target="#spatial-window-sum"><span class="header-section-number">9.4</span> Spatial window sum</a></li>
-  </ul>
-</li>
-  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">10</span> References</a></li>
   </ul></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
-<h1 class="title">Hands-on 3 | Spatio-Temporal Point Patterns Analysis</h1>
-<p class="subtitle lead">In this exercise, we will learn to analyze spatial point patterns in R, including importing geospatial data, performing kernel density estimation and nearest neighbor analysis, and visualizing results using spatstat, sf, and tmap packages.</p>
+<h1 class="title">Hands-on 4 | Spatial Weights and Applications</h1>
+<p class="subtitle lead">In this hands-on exercise, we will learn how to compute spatial weights using R.</p>
 </div>
 
 
@@ -278,14 +234,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">September 8, 2025</p>
+      <p class="date">September 14, 2025</p>
     </div>
   </div>
   
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">September 17, 2025</p>
+      <p class="date-modified">September 21, 2025</p>
     </div>
   </div>
     
@@ -309,8 +265,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <colgroup>
 <col style="width: 30%">
-<col style="width: 45%">
-<col style="width: 23%">
+<col style="width: 44%">
+<col style="width: 25%">
 </colgroup>
 <thead><tr class="header">
 <th>Dataset</th>
@@ -331,19 +287,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table></section><section id="install-r-packages" class="level2" data-number="2.3"><h2 data-number="2.3" class="anchored" data-anchor-id="install-r-packages">
 <span class="header-section-number">2.3</span> Install R packages</h2>
-<p>Before we get started, we need to ensure that spdep, sf, tmap and tidyverse packages of R are currently installed in your R.</p>
+<p>Before we get started, we need to ensure that <code>spdep</code>, <code>sf</code>, <code>tmap</code> and <code>tidyverse</code> packages of R are currently installed in your R.</p>
 <div class="cell">
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">sf</span>, <span class="va">spdep</span>, <span class="va">tmap</span>, <span class="va">tidyverse</span>, <span class="va">knitr</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section></section><section id="getting-the-data-into-r-environment" class="level1" data-number="3"><h1 data-number="3">
 <span class="header-section-number">3</span> Getting the Data Into R Environment</h1>
-<p>In this section, you will learn how to bring a geospatial data and its associated attribute table into R environment. The geospatial data is in ESRI shapefile format and the attribute table is in csv fomat.</p>
-<section id="import-shapefile-into-r-environment" class="level2" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="import-shapefile-into-r-environment">
+<p>In this section, you will learn how to bring a geospatial data and its associated attribute table into R environment. The geospatial data is in ESRI shapefile format and the attribute table is in csv format.</p>
+<section id="import-shapefile-into-r-environment" class="level2 panel_tabset" data-number="3.1"><h2 data-number="3.1" class="anchored" data-anchor-id="import-shapefile-into-r-environment">
 <span class="header-section-number">3.1</span> Import shapefile into r environment</h2>
+<div style="font-size: 1.20em">
 <p>The code chunk below uses st_read() of sf package to import Hunan shapefile into R. The imported shapefile will be simple features Object of sf.</p>
 <div class="cell">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span>dsn <span class="op">=</span> <span class="st">"data/geospatial"</span>, </span>
-<span>                 layer <span class="op">=</span> <span class="st">"Hunan"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span>dsn <span class="op">=</span> <span class="st">"data/geospatial"</span>, layer <span class="op">=</span> <span class="st">"Hunan"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Reading layer `Hunan' from data source 
   `D:\ngoclinhnguyen-2806\ISSS626-GAA\Hands-on_Ex\Hands-on_Ex04\data\geospatial' 
@@ -355,22 +311,25 @@ Bounding box:  xmin: 108.7831 ymin: 24.6342 xmax: 114.2544 ymax: 30.12812
 Geodetic CRS:  WGS 84</code></pre>
 </div>
 </div>
-</section><section id="import-csv-file-into-r-environment" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="import-csv-file-into-r-environment">
+<section id="import-csv-file-into-r-environment" class="level2" data-number="3.2"><h2 data-number="3.2" class="anchored" data-anchor-id="import-csv-file-into-r-environment">
 <span class="header-section-number">3.2</span> Import csv file into r environment</h2>
-<p>Next, we will import Hunan_2012.csv into R by using read_csv() of readr package. The output is R dataframe class.</p>
+<div style="font-size: 1.20em">
+<p>Next, we will import Hunan_2012.csv into R by using <code>read_csv()</code> of readr package. The output is R dataframe class.</p>
 <div class="cell">
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan2012</span> <span class="op">&lt;-</span> <span class="fu">read_csv</span><span class="op">(</span><span class="st">"data/aspatial/Hunan_2012.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section><section id="performing-relational-join" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="performing-relational-join">
+<section id="performing-relational-join" class="level2" data-number="3.3"><h2 data-number="3.3" class="anchored" data-anchor-id="performing-relational-join">
 <span class="header-section-number">3.3</span> Performing relational join</h2>
-<p>The code chunk below will be used to update the attribute table of hunan’s SpatialPolygonsDataFrame with the attribute fields of hunan2012 dataframe. This is performed by using left_join() of dplyr package.</p>
+<div style="font-size: 1.20em">
+<p>The code chunk below will be used to update the attribute table of hunan’s SpatialPolygonsDataFrame with the attribute fields of hunan2012 dataframe. This is performed by using <code>left_join()</code> of <code>dplyr</code> package.</p>
 <div class="cell">
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan</span> <span class="op">&lt;-</span> <span class="fu">left_join</span><span class="op">(</span><span class="va">hunan</span>,<span class="va">hunan2012</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">hunan</span> <span class="op">&lt;-</span> <span class="fu">left_join</span><span class="op">(</span><span class="va">hunan</span>,<span class="va">hunan2012</span><span class="op">)</span> <span class="op">%&gt;%</span> <span class="co"># Join by County, but no need to explicitly mention because both datasets have this column</span></span>
 <span>  <span class="fu">select</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">7</span>, <span class="fl">15</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="visualising-regional-development-indicator" class="level1" data-number="4"><h1 data-number="4">
+</div>
+</section><section id="visualising-regional-development-indicator" class="level1" data-number="4"><h1 data-number="4">
 <span class="header-section-number">4</span> Visualising Regional Development Indicator</h1>
-<p>Now, we are going to prepare a basemap and a choropleth map showing the distribution of GDPPC 2012 by using qtm() of tmap package.</p>
+<p>Now, we are going to prepare a basemap and a choropleth map showing the distribution of GDPPC 2012 by using <code>qtm()</code> of <code>tmap</code> package.</p>
 <div class="cell">
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">basemap</span> <span class="op">&lt;-</span> <span class="fu">tm_shape</span><span class="op">(</span><span class="va">hunan</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu">tm_polygons</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
@@ -2872,7 +2831,11 @@ B 88 7744 536 1072 14160</code></pre>
 <p><a href="https://cran.r-project.org/web/packages/spdep/vignettes/nb_sf.html">Creating Neighbours using sf objects</a></p>
 
 
-</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+</section>
+</div>
+</section>
+</div>
+</section></section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     const icon = "";
     const anchorJS = new window.AnchorJS();

@@ -30,7 +30,7 @@ Geovisualisation, on the other hand, is the process of using visual representati
 The following data sources will be used in this exercise:
 
 | Dataset | Source | Description | Format |
-|------------------|------------------|--------------------|------------------|
+|----|----|----|----|
 | **Master Plan 2019 Subzone Boundary (Web) (**`MasterPlan2019SubzoneBoundaryNoSeaKML.kml`**)** | [data.gov.sg](https://www.data.gov.sg/) | Geographical boundary of Singapore at the planning subzone level. The data is based on URA Master Plan 2019. | KML |
 | **Singapore Residents by Planning Area / Subzone, Age Group, Sex and Type of Dwelling, June 2024 (**`respopagesextod2024.csv`**)** | [Department of Statistics, Singapore](https://www.singstat.gov.sg/) | Aspatial data containingPA and SZ fields, which can be used as unique identifiers to georeference to Master Plan 2019 Subzone Boundary | CSV |
 
@@ -39,7 +39,7 @@ The following data sources will be used in this exercise:
 The following R packages will be used in this exercise:
 
 | Package | Purpose | Use Case in Exercise |
-|------------------|-----------------------------|-------------------------|
+|----|----|----|
 | **tmap** | Thematic mapping for visualizing geospatial data. | Creating and customizing thematic maps. |
 | **sf** | Handling geospatial data in simple features format. | Importing, managing, and processing geospatial data. |
 | **readr** | Importing delimited text files (part of `tidyverse`). | Loading CSV data files. |
