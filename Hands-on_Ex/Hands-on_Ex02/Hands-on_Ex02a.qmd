@@ -48,7 +48,7 @@ The specific questions we would like to answer are as follows:
 | Dataset | Description | Source | Format |
 |------------------|------------------|------------------|------------------|
 | **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
-| **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
+| **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2019 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
 
 ### Installing and Loading the R Packages
 

@@ -48,7 +48,7 @@ This hands-on exercise continues from [Hands-on Exercise 2A](/hands-on_ex/hands-
 ### The Data
 
 | Dataset | Description | Source | Format |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **ChildCareServices** | Point data containing location and attributes of childcare centers. | Data.gov.sg | GeoJSON |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2014 Master Plan Planning Subzone boundaries. | Data.gov.sg | KML |
 
@@ -57,7 +57,7 @@ This hands-on exercise continues from [Hands-on Exercise 2A](/hands-on_ex/hands-
 The following R packages will be used in this exercise:
 
 | Package | Purpose | Use Case in Exercise |
-|----|----|----|
+|------------------------|------------------------|------------------------|
 | **sf** | Imports, manages, and processes vector-based geospatial data. | Handling vector geospatial data in R. |
 | **spatstat** | Provides tools for point pattern analysis. | Performing 1st- and 2nd-order spatial point pattern analysis and deriving kernel density estimation (KDE). |
 | **tmap** | Creates static and interactive thematic maps using cartographic quality elements. | Plotting cartographic quality static point patterns maps or interactive maps by using [**leaflet**](https://leafletjs.com/) API. |
