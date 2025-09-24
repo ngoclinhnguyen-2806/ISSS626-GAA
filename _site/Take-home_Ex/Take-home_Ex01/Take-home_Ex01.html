@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.33">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Linh Nguyen">
+<meta name="dcterms.date" content="2025-09-13">
+<title>Take-home Exercise 1 | Geospatial Analytics for Public Good – ISSS626-GAA</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-ea385d0e468b0dd5ea5bf0780b1290d9.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-941d7e14017e1a43777b60853515243b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light"><script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script><script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script><link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+<link rel="stylesheet" href="../../styles.css">
+</head>
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg " data-bs-theme="dark"><div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">ISSS626-GAA</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+<li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-hands-on-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Hands-on Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-hands-on-exercise">
+<li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01a.html">
+ <span class="dropdown-text">Hands-on Exercise 1a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex01/Hands-on_Ex01b.html">
+ <span class="dropdown-text">Hands-on Exercise 1b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02a.html">
+ <span class="dropdown-text">Hands-on Exercise 2a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex02/Hands-on_Ex02b.html">
+ <span class="dropdown-text">Hands-on Exercise 2b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex03/Hands-on_Ex03.html">
+ <span class="dropdown-text">Hands-on Exercise 3</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../Hands-on_Ex/Hands-on_Ex04/Hands-on_Ex04.html">
+ <span class="dropdown-text">Hands-on Exercise 4</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-in-class-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">In-class Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-in-class-exercise">
+<li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03a.html">
+ <span class="dropdown-text">In-class Exercise 3a</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex03/In-class_Ex03b.html">
+ <span class="dropdown-text">In-class Exercise 3b</span></a>
+  </li>  
+        <li>
+    <a class="dropdown-item" href="../../In-class_Ex/In-class_Ex04/In-class_Ex04.html">
+ <span class="dropdown-text">In-class Exercise 4</span></a>
+  </li>  
+    </ul>
+</li>
+  <li class="nav-item dropdown ">
+    <a class="nav-link dropdown-toggle" href="#" id="nav-menu-take-home-exercise" role="link" data-bs-toggle="dropdown" aria-expanded="false">
+ <span class="menu-text">Take-home Exercise</span>
+    </a>
+    <ul class="dropdown-menu" aria-labelledby="nav-menu-take-home-exercise">
+<li>
+    <a class="dropdown-item" href="../../Take-home_Ex/Take-home_Ex01/Take-home_Ex01.html">
+ <span class="dropdown-text">Take-home Exercise 1</span></a>
+  </li>  
+    </ul>
+</li>
+</ul>
+<ul class="navbar-nav navbar-nav-scroll ms-auto">
+<li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html"> 
+<span class="menu-text">About Me</span></a>
+  </li>  
+</ul>
+</div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav></header><!-- content --><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">On this page</h2>
+   
+  <ul>
+<li>
+<a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview"><span class="header-section-number">1</span> Overview</a>
+  <ul class="collapse">
+<li><a href="#setting-the-scene" id="toc-setting-the-scene" class="nav-link" data-scroll-target="#setting-the-scene"><span class="header-section-number">1.1</span> Setting The Scene</a></li>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link" data-scroll-target="#objectives"><span class="header-section-number">1.2</span> Objectives</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#analysis-questions" id="toc-analysis-questions" class="nav-link" data-scroll-target="#analysis-questions"><span class="header-section-number">2</span> Analysis Questions</a>
+  <ul class="collapse">
+<li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data"><span class="header-section-number">2.1</span> The Data</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#set-up-r-environment" id="toc-set-up-r-environment" class="nav-link" data-scroll-target="#set-up-r-environment"><span class="header-section-number">3</span> Set up R environment</a>
+  <ul class="collapse">
+<li><a href="#import-r-packages" id="toc-import-r-packages" class="nav-link" data-scroll-target="#import-r-packages"><span class="header-section-number">3.1</span> Import R Packages</a></li>
+  <li><a href="#set-seed" id="toc-set-seed" class="nav-link" data-scroll-target="#set-seed"><span class="header-section-number">3.2</span> Set Seed</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#data-import-preparation" id="toc-data-import-preparation" class="nav-link" data-scroll-target="#data-import-preparation"><span class="header-section-number">4</span> Data Import &amp; Preparation</a>
+  <ul class="collapse">
+<li><a href="#acra-data" id="toc-acra-data" class="nav-link" data-scroll-target="#acra-data"><span class="header-section-number">4.1</span> ACRA Data</a></li>
+  <li><a href="#ssic-data" id="toc-ssic-data" class="nav-link" data-scroll-target="#ssic-data"><span class="header-section-number">4.2</span> SSIC Data</a></li>
+  <li><a href="#geospatial-data" id="toc-geospatial-data" class="nav-link" data-scroll-target="#geospatial-data"><span class="header-section-number">4.3</span> Geospatial data</a></li>
+  <li><a href="#geocoding-the-data" id="toc-geocoding-the-data" class="nav-link" data-scroll-target="#geocoding-the-data"><span class="header-section-number">4.4</span> Geocoding the data</a></li>
+  <li><a href="#appending-the-location-information" id="toc-appending-the-location-information" class="nav-link" data-scroll-target="#appending-the-location-information"><span class="header-section-number">4.5</span> Appending the location information</a></li>
+  <li><a href="#create-separate-datasets-for-each-business-type" id="toc-create-separate-datasets-for-each-business-type" class="nav-link" data-scroll-target="#create-separate-datasets-for-each-business-type"><span class="header-section-number">4.6</span> Create separate datasets for each business type</a></li>
+  <li><a href="#converting-into-simple-point-features---sf-data-frame" id="toc-converting-into-simple-point-features---sf-data-frame" class="nav-link" data-scroll-target="#converting-into-simple-point-features---sf-data-frame"><span class="header-section-number">4.7</span> Converting into simple point features - SF data frame</a></li>
+  <li><a href="#verify-the-point-features" id="toc-verify-the-point-features" class="nav-link" data-scroll-target="#verify-the-point-features"><span class="header-section-number">4.8</span> Verify the point features</a></li>
+  </ul>
+</li>
+  <li><a href="#exploratory-data-analysis" id="toc-exploratory-data-analysis" class="nav-link" data-scroll-target="#exploratory-data-analysis"><span class="header-section-number">5</span> Exploratory Data Analysis</a></li>
+  <li>
+<a href="#core-spatial-analysis---layer-1-registration-intent-analysis" id="toc-core-spatial-analysis---layer-1-registration-intent-analysis" class="nav-link" data-scroll-target="#core-spatial-analysis---layer-1-registration-intent-analysis"><span class="header-section-number">6</span> CORE SPATIAL ANALYSIS - LAYER 1: REGISTRATION INTENT ANALYSIS</a>
+  <ul class="collapse">
+<li><a href="#spatial-kde-analysis" id="toc-spatial-kde-analysis" class="nav-link" data-scroll-target="#spatial-kde-analysis"><span class="header-section-number">6.1</span> Spatial KDE Analysis</a></li>
+  <li><a href="#spatio-temporal-kde-analysis" id="toc-spatio-temporal-kde-analysis" class="nav-link" data-scroll-target="#spatio-temporal-kde-analysis"><span class="header-section-number">6.2</span> Spatio-Temporal KDE Analysis</a></li>
+  </ul>
+</li>
+  <li><a href="#second-order-spatial-point-patterns-analysis" id="toc-second-order-spatial-point-patterns-analysis" class="nav-link" data-scroll-target="#second-order-spatial-point-patterns-analysis"><span class="header-section-number">7</span> Second Order Spatial Point Patterns Analysis</a></li>
+  <li><a href="#conclusions-and-future-improvements" id="toc-conclusions-and-future-improvements" class="nav-link" data-scroll-target="#conclusions-and-future-improvements"><span class="header-section-number">8</span> Conclusions and Future Improvements</a></li>
+  </ul></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<h1 class="title">Take-home Exercise 1 | Geospatial Analytics for Public Good</h1>
+<p class="subtitle lead">In this take-home exercise, we are interested to investigate the spatial and spatio-temporal patterns of new businesses and firms established in Singapore for the first six months of 2025.</p>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Linh Nguyen </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">September 13, 2025</p>
+    </div>
+  </div>
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">September 25, 2025</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header><section id="overview" class="level2" data-number="1"><h2 data-number="1" class="anchored" data-anchor-id="overview">
+<span class="header-section-number">1</span> Overview</h2>
+<section id="setting-the-scene" class="level3" data-number="1.1"><h3 data-number="1.1" class="anchored" data-anchor-id="setting-the-scene">
+<span class="header-section-number">1.1</span> Setting The Scene</h3>
+<p>Where businesses choose to locate plays a huge role in how Singapore continues to grow and develop as a city-state. Smart locations give companies advantages like easier access to skilled workers and excellent infrastructure, while also shaping different districts like the Central Business District, Jurong Innovation District, or Punggol Digital District, and making it easier for goods to move through our efficient transport networks and for employees to commute via MRT and buses.</p>
+<p>Studying how businesses spread out across Singapore and change over time is crucial for urban planning by agencies like URA and JTC. This research helps planners understand how economic activity and our urban landscape develop together, enabling them to design better integrated developments, plan for future growth in areas like the Greater Southern Waterfront, use our limited land resources efficiently, and build infrastructure that supports both business competitiveness and residents’ quality of life in our compact island nation.</p>
+</section><section id="objectives" class="level3" data-number="1.2"><h3 data-number="1.2" class="anchored" data-anchor-id="objectives">
+<span class="header-section-number">1.2</span> Objectives</h3>
+<ul>
+<li><p>To identify where and when new businesses are established in Singapore, revealing clusters, patterns, and trends that help inform urban planning, resource allocation, and economic development decisions.</p></li>
+<li><p>To uncover complex relationships in how new businesses are distributed across the island - such as how related industries cluster together, how past business locations influence future ones, and how commercial districts develop structurally over time. These insights are essential for evidence-based urban planning and policy-making.</p></li>
+</ul>
+<p>By understanding business locations and how their distribution evolves, Singapore’s urban planners and agencies can gain valuable spatial insights, optimize city operations, and develop effective strategies to attract investment and promote sustainable growth across our city-state.</p>
+</section></section><section id="analysis-questions" class="level2" data-number="2"><h2 data-number="2" class="anchored" data-anchor-id="analysis-questions">
+<span class="header-section-number">2</span> Analysis Questions</h2>
+<ul>
+<li>What spatial distribution patterns do different business types exhibit across Singapore?</li>
+<li>How do survival rates vary between business categories and specific SSIC codes?</li>
+<li>Which business types show clustering behavior versus random spatial distribution?</li>
+<li>What factors influence business location density and geographic concentration patterns?</li>
+</ul>
+<section id="the-data" class="level3" data-number="2.1"><h3 data-number="2.1" class="anchored" data-anchor-id="the-data">
+<span class="header-section-number">2.1</span> The Data</h3>
+<table class="caption-top table">
+<thead><tr class="header">
+<th>Dataset</th>
+<th>Description</th>
+<th>Source</th>
+<th>Format</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><strong>ACRA Information on Corporate Entities</strong></td>
+<td>Information of registered entities in Singapore, including location data</td>
+<td><a href="https://data.gov.sg/datasets?query=ACRA+Information+on+Corporate+Entities&amp;page=1&amp;resultId=2">data.gov.sg</a></td>
+<td>CSV</td>
+</tr>
+<tr class="even">
+<td><strong>SSIC: Singapore Standard Industrial Classification 2020</strong></td>
+<td>List of codes represented economic activity of business establishments in Singapore, 2020 version.</td>
+<td><a href="https://classification.codes/classifications/industry/ssic-singapore">SSIC: Singapore Standard Industrial Classification</a></td>
+<td>Excel</td>
+</tr>
+<tr class="odd">
+<td><strong>MasterPlan2019SubzoneBoundaryNoSeaKML</strong></td>
+<td>Polygon data with URA 2019 Master Plan Planning Subzone boundaries</td>
+<td><a href="https://data.gov.sg/datasets?query=Master+Plan+Planning+Subzone+boundaries&amp;page=1&amp;resultId=d_6c6d7361dd826d97b91bac914ca6b2ac">data.gov.sg</a></td>
+<td>KML</td>
+</tr>
+</tbody>
+</table></section></section><section id="set-up-r-environment" class="level2" data-number="3"><h2 data-number="3" class="anchored" data-anchor-id="set-up-r-environment">
+<span class="header-section-number">3</span> Set up R environment</h2>
+<section id="import-r-packages" class="level3" data-number="3.1"><h3 data-number="3.1" class="anchored" data-anchor-id="import-r-packages">
+<span class="header-section-number">3.1</span> Import R Packages</h3>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">pacman</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/pacman/man/p_load.html">p_load</a></span><span class="op">(</span><span class="va">tidyverse</span>, <span class="va">sf</span>, <span class="va">tmap</span>, <span class="va">httr</span>, <span class="va">readxl</span>, <span class="va">dplyr</span>, <span class="va">stringr</span>, <span class="va">rvest</span>, <span class="va">knitr</span>, <span class="va">spatstat</span>, <span class="va">terra</span>, <span class="va">raster</span>, <span class="va">sparr</span>, <span class="va">tidyr</span>, <span class="va">kableExtra</span>, <span class="va">ggplot2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="set-seed" class="level3" data-number="3.2"><h3 data-number="3.2" class="anchored" data-anchor-id="set-seed">
+<span class="header-section-number">3.2</span> Set Seed</h3>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">1234</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="data-import-preparation" class="level2" data-number="4"><h2 data-number="4" class="anchored" data-anchor-id="data-import-preparation">
+<span class="header-section-number">4</span> Data Import &amp; Preparation</h2>
+<section id="acra-data" class="level3" data-number="4.1"><h3 data-number="4.1" class="anchored" data-anchor-id="acra-data">
+<span class="header-section-number">4.1</span> ACRA Data</h3>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">folder_path</span> <span class="op">&lt;-</span> <span class="st">"data/aspatial/ACRA"</span></span>
+<span><span class="va">file_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">folder_path</span>, </span>
+<span>                        pattern <span class="op">=</span> <span class="st">"^ACRA*.*\\.csv$"</span>, </span>
+<span>                        full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">acra_data</span> <span class="op">&lt;-</span> <span class="va">file_list</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">map_dfr</span><span class="op">(</span><span class="va">read_csv</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="extracting-data-of-chosen-business-types" class="level4" data-number="4.1.1"><h4 data-number="4.1.1" class="anchored" data-anchor-id="extracting-data-of-chosen-business-types">
+<span class="header-section-number">4.1.1</span> Extracting data of chosen business types</h4>
+<p>The chosen business types are as the following table:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 6%">
+<col style="width: 16%">
+<col style="width: 7%">
+<col style="width: 17%">
+<col style="width: 51%">
+</colgroup>
+<thead><tr class="header">
+<th>SSIC 3-digit prefix</th>
+<th>Description</th>
+<th>Alias for this analysis</th>
+<th>SSIC 4-digit sub-types</th>
+<th>SSIC 5-digit sub-types</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>471</td>
+<td>Retail Sale in Non-Specialised Stores</td>
+<td><strong>Retail</strong></td>
+<td>4710: Retail Sale in Non-Specialised Stores</td>
+<td>
+<p>47101: Supermarkets and hypermarkets</p>
+<p>47102: Mini-marts, convenience stores and provision shops</p>
+<p>47103: Department stores</p>
+<p>47104: Retail sale in other non-specialised stores n.e.c.</p>
+</td>
+</tr>
+<tr class="even">
+<td>561</td>
+<td>Restaurants, Cafes, Food Courts, Food Kiosks And Bars</td>
+<td><strong>Food &amp; Beverage</strong></td>
+<td>
+<p>5611: Restaurants and Cafes</p>
+<p>5612: Fast Food Outlets, Food Courts and Food Kiosks</p>
+<p>5613: Pubs</p>
+<p>5614: Stalls Selling Cooked Food and Prepared Drinks</p>
+</td>
+<td>
+<p>56111: Restaurants</p>
+<p>56112: Cafes</p>
+<p>–</p>
+<p>56121: Fast food outlets</p>
+<p>56122: Food courts, coffee shops and canteens (with mainly food and beverage income)</p>
+<p>56123: Food kiosks mainly for takeaway and delivery</p>
+<p>–</p>
+<p>56130: Pubs</p>
+<p>–</p>
+<p>56140: Stalls Selling Cooked Food and Prepared Drinks</p>
+</td>
+</tr>
+<tr class="odd">
+<td>681</td>
+<td>Real Estate Activities With Own Or Leased Property</td>
+<td><strong>Real Estate</strong></td>
+<td>6810: Real Estate Activities With Own Or Leased Property</td>
+<td>
+<p>68101: Real estate developers</p>
+<p>68102: Operating of serviced apartments</p>
+<p>68103: Letting of self-owned or leased real estate property except food courts, coffee shops and canteens (e.g.&nbsp;office/exhibition space, shopping mall, self-storage facilities)</p>
+<p>68104: Letting and operating of self-owned or leased food courts, coffee shops and canteens (with mainly rental income)</p>
+<p>68105: Collective portfolio investment funds with rental income</p>
+<p>68106: Management of self-owned strata titled property (i.e.&nbsp;Management Corporation Strata Title)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Read the files you just wrote</span></span>
+<span><span class="co">#| echo: false</span></span>
+<span><span class="co">#| eval: false</span></span>
+<span><span class="va">biz_selected</span> <span class="op">&lt;-</span> <span class="fu">read_rds</span><span class="op">(</span><span class="st">"data/rds/biz_selected.rds"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section></section><section id="ssic-data" class="level3" data-number="4.2"><h3 data-number="4.2" class="anchored" data-anchor-id="ssic-data">
+<span class="header-section-number">4.2</span> SSIC Data</h3>
+<div class="cell">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Read the Excel file</span></span>
+<span><span class="va">ssic_data</span> <span class="op">&lt;-</span> <span class="fu">read_excel</span><span class="op">(</span><span class="st">"data/ssic2020-classification-structure.xlsx"</span>, </span>
+<span>                        sheet <span class="op">=</span> <span class="st">"SSIC 2020 Structure"</span>,</span>
+<span>                        skip <span class="op">=</span> <span class="fl">4</span><span class="op">)</span>  <span class="co"># Skip the header rows</span></span>
+<span></span>
+<span><span class="co"># Clean the data - remove any rows where SSIC 2020 is NA</span></span>
+<span><span class="va">ssic_data</span> <span class="op">&lt;-</span> <span class="va">ssic_data</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">`SSIC 2020`</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Filter to get only level 5 codes (5-character codes)</span></span>
+<span><span class="va">level5_data</span> <span class="op">&lt;-</span> <span class="va">ssic_data</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_length</span><span class="op">(</span><span class="va">`SSIC 2020`</span><span class="op">)</span> <span class="op">==</span> <span class="fl">5</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Create the hierarchy columns</span></span>
+<span><span class="va">ssic_hierarchy</span> <span class="op">&lt;-</span> <span class="va">level5_data</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    <span class="co"># Level 2: First 2 characters (2-digit number)</span></span>
+<span>    level_2 <span class="op">=</span> <span class="fu">str_sub</span><span class="op">(</span><span class="va">`SSIC 2020`</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>,</span>
+<span>    </span>
+<span>    <span class="co"># Level 3: First 3 characters (3-digit number)</span></span>
+<span>    level_3 <span class="op">=</span> <span class="fu">str_sub</span><span class="op">(</span><span class="va">`SSIC 2020`</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span>,</span>
+<span>    </span>
+<span>    <span class="co"># Level 4: First 4 characters (4-digit number)</span></span>
+<span>    level_4 <span class="op">=</span> <span class="fu">str_sub</span><span class="op">(</span><span class="va">`SSIC 2020`</span>, <span class="fl">1</span>, <span class="fl">4</span><span class="op">)</span>,</span>
+<span>    </span>
+<span>    <span class="co"># Level 5: Full 5-character code</span></span>
+<span>    level_5 <span class="op">=</span> <span class="va">`SSIC 2020`</span>,</span>
+<span>    </span>
+<span>    <span class="co"># Keep the title for reference</span></span>
+<span>    level_5_description <span class="op">=</span> <span class="va">`SSIC 2020 Title`</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">level_2</span>, <span class="va">level_3</span>, <span class="va">level_4</span>, <span class="va">level_5</span>, <span class="va">level_5_description</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Add the descriptions for each level by joining with the original data</span></span>
+<span><span class="co"># Create lookup tables for each level</span></span>
+<span><span class="va">level_2_lookup</span> <span class="op">&lt;-</span> <span class="va">ssic_data</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_length</span><span class="op">(</span><span class="va">`SSIC 2020`</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>level_2 <span class="op">=</span> <span class="va">`SSIC 2020`</span>, level_2_description <span class="op">=</span> <span class="va">`SSIC 2020 Title`</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">level_3_lookup</span> <span class="op">&lt;-</span> <span class="va">ssic_data</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_length</span><span class="op">(</span><span class="va">`SSIC 2020`</span><span class="op">)</span> <span class="op">==</span> <span class="fl">3</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>level_3 <span class="op">=</span> <span class="va">`SSIC 2020`</span>, level_3_description <span class="op">=</span> <span class="va">`SSIC 2020 Title`</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">level_4_lookup</span> <span class="op">&lt;-</span> <span class="va">ssic_data</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_length</span><span class="op">(</span><span class="va">`SSIC 2020`</span><span class="op">)</span> <span class="op">==</span> <span class="fl">4</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>level_4 <span class="op">=</span> <span class="va">`SSIC 2020`</span>, level_4_description <span class="op">=</span> <span class="va">`SSIC 2020 Title`</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Join all the descriptions</span></span>
+<span><span class="va">ssic_final</span> <span class="op">&lt;-</span> <span class="va">ssic_hierarchy</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">level_2_lookup</span>, by <span class="op">=</span> <span class="st">"level_2"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">level_3_lookup</span>, by <span class="op">=</span> <span class="st">"level_3"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">level_4_lookup</span>, by <span class="op">=</span> <span class="st">"level_4"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">level_2</span>, <span class="va">level_2_description</span>, </span>
+<span>         <span class="va">level_3</span>, <span class="va">level_3_description</span>,</span>
+<span>         <span class="va">level_4</span>, <span class="va">level_4_description</span>,</span>
+<span>         <span class="va">level_5</span>, <span class="va">level_5_description</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display the structure</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Final dataset structure:\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Final dataset structure:</code></pre>
+</div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">ssic_final</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>tibble [1,023 × 8] (S3: tbl_df/tbl/data.frame)
+ $ level_2            : chr [1:1023] "01" "01" "01" "01" ...
+ $ level_2_description: chr [1:1023] "AGRICULTURE AND RELATED SERVICE ACTIVITIES" "AGRICULTURE AND RELATED SERVICE ACTIVITIES" "AGRICULTURE AND RELATED SERVICE ACTIVITIES" "AGRICULTURE AND RELATED SERVICE ACTIVITIES" ...
+ $ level_3            : chr [1:1023] "011" "011" "011" "011" ...
+ $ level_3_description: chr [1:1023] "GROWING OF CROPS, MARKET GARDENING AND HORTICULTURE" "GROWING OF CROPS, MARKET GARDENING AND HORTICULTURE" "GROWING OF CROPS, MARKET GARDENING AND HORTICULTURE" "GROWING OF CROPS, MARKET GARDENING AND HORTICULTURE" ...
+ $ level_4            : chr [1:1023] "0111" "0111" "0111" "0111" ...
+ $ level_4_description: chr [1:1023] "Growing of Food Crops (Non-Hydroponics)" "Growing of Food Crops (Non-Hydroponics)" "Growing of Food Crops (Non-Hydroponics)" "Growing of Food Crops (Non-Hydroponics)" ...
+ $ level_5            : chr [1:1023] "01111" "01112" "01113" "01119" ...
+ $ level_5_description: chr [1:1023] "Growing of leafy and fruit vegetables" "Growing of mushrooms" "Growing of root crops" "Growing of food crops (non-hydroponics) n.e.c." ...</code></pre>
+</div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"\nFirst few rows:\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+First few rows:</code></pre>
+</div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">ssic_final</span>, <span class="fl">10</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+   level_2 level_2_description               level_3 level_3_description level_4
+   &lt;chr&gt;   &lt;chr&gt;                             &lt;chr&gt;   &lt;chr&gt;               &lt;chr&gt;  
+ 1 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0111   
+ 2 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0111   
+ 3 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0111   
+ 4 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0111   
+ 5 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0112   
+ 6 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0113   
+ 7 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0114   
+ 8 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0114   
+ 9 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0114   
+10 01      AGRICULTURE AND RELATED SERVICE … 011     GROWING OF CROPS, … 0119   
+# ℹ 3 more variables: level_4_description &lt;chr&gt;, level_5 &lt;chr&gt;,
+#   level_5_description &lt;chr&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"\nSummary:\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Summary:</code></pre>
+</div>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Total level 5 business types:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">ssic_final</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total level 5 business types: 1023 </code></pre>
+</div>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Number of level 2 categories:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">ssic_final</span><span class="op">$</span><span class="va">level_2</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of level 2 categories: 81 </code></pre>
+</div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Number of level 3 categories:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">ssic_final</span><span class="op">$</span><span class="va">level_3</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of level 3 categories: 204 </code></pre>
+</div>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Number of level 4 categories:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">ssic_final</span><span class="op">$</span><span class="va">level_4</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of level 4 categories: 382 </code></pre>
+</div>
+</div>
+<section id="join-acra-and-ssic-data" class="level4" data-number="4.2.1"><h4 data-number="4.2.1" class="anchored" data-anchor-id="join-acra-and-ssic-data">
+<span class="header-section-number">4.2.1</span> Join ACRA and SSIC Data</h4>
+<div class="cell">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Left join ssic_final to biz_selected</span></span>
+<span><span class="co"># Convert primary_ssic_code to character and pad with leading zeros if needed</span></span>
+<span><span class="va">biz_with_hierarchy</span> <span class="op">&lt;-</span> <span class="va">biz_selected</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span>primary_ssic_code <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"%05d"</span>, <span class="va">primary_ssic_code</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>  <span class="co"># Ensures 5-digit format</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">ssic_final</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"primary_ssic_code"</span> <span class="op">=</span> <span class="st">"level_5"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Check the result</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">biz_with_hierarchy</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">biz_with_hierarchy</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Read the files you just wrote</span></span>
+<span><span class="co">#| echo: false</span></span>
+<span><span class="va">biz_with_hierarchy</span> <span class="op">&lt;-</span> <span class="fu">read_rds</span><span class="op">(</span><span class="st">"data/rds/biz_with_hierarchy.rds"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">##| eval: false</span></span>
+<span><span class="co">#| echo: false</span></span>
+<span><span class="co"># Check for any unmatched records</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Records in biz_selected:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">biz_selected</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Records in biz_selected: 8023 </code></pre>
+</div>
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Records after join:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">biz_with_hierarchy</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Records after join: 8023 </code></pre>
+</div>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Records with no SSIC match:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">biz_with_hierarchy</span><span class="op">$</span><span class="va">level_5_description</span><span class="op">)</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Records with no SSIC match: 0 </code></pre>
+</div>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># View some examples of the joined data</span></span>
+<span><span class="va">biz_with_hierarchy</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="va">level_2</span>, <span class="va">level_2_description</span>, </span>
+<span>         <span class="va">level_3</span>, <span class="va">level_3_description</span>, <span class="va">level_4</span>, <span class="va">level_4_description</span>, </span>
+<span>         <span class="va">level_5_description</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 10 × 8
+   primary_ssic_code level_2 level_2_description     level_3 level_3_description
+   &lt;chr&gt;             &lt;chr&gt;   &lt;chr&gt;                   &lt;chr&gt;   &lt;chr&gt;              
+ 1 68103             68      REAL ESTATE ACTIVITIES  681     REAL ESTATE ACTIVI…
+ 2 56122             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+ 3 56111             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+ 4 56111             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+ 5 56140             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+ 6 56140             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+ 7 68101             68      REAL ESTATE ACTIVITIES  681     REAL ESTATE ACTIVI…
+ 8 56111             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+ 9 47102             47      RETAIL TRADE            471     RETAIL SALE IN NON…
+10 56122             56      FOOD AND BEVERAGE SERV… 561     RESTAURANTS, CAFES…
+# ℹ 3 more variables: level_4 &lt;chr&gt;, level_4_description &lt;chr&gt;,
+#   level_5_description &lt;chr&gt;</code></pre>
+</div>
+</div>
+</section></section><section id="geospatial-data" class="level3" data-number="4.3"><h3 data-number="4.3" class="anchored" data-anchor-id="geospatial-data">
+<span class="header-section-number">4.3</span> Geospatial data</h3>
+<p>The Master Plan 2019 Boundary (No Sea) (KML) was downloaded from data.gov.sg that consists of the geographical boundary of Singapore at the planning subzone level. The data is based on URA Master Plan 2019. We will use this to plot the boundaries of the subzones.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true">Import data</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false">Tidy data</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mpsz</span> <span class="op">&lt;-</span> <span class="fu">st_read</span><span class="op">(</span><span class="st">"data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">st_zm</span><span class="op">(</span>drop <span class="op">=</span> <span class="cn">TRUE</span>, what <span class="op">=</span> <span class="st">"ZM"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">st_transform</span><span class="op">(</span>crs <span class="op">=</span> <span class="fl">3414</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">extract_kml_field</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">html_text</span>, <span class="va">field_name</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">html_text</span><span class="op">)</span> <span class="op">||</span> <span class="va">html_text</span> <span class="op">==</span> <span class="st">""</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="cn">NA_character_</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">page</span> <span class="op">&lt;-</span> <span class="fu">read_html</span><span class="op">(</span><span class="va">html_text</span><span class="op">)</span></span>
+<span>  <span class="va">rows</span> <span class="op">&lt;-</span> <span class="va">page</span> <span class="op">%&gt;%</span> <span class="fu">html_elements</span><span class="op">(</span><span class="st">"tr"</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">value</span> <span class="op">&lt;-</span> <span class="va">rows</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">keep</span><span class="op">(</span><span class="op">~</span> <span class="fu">html_text2</span><span class="op">(</span><span class="fu">html_element</span><span class="op">(</span><span class="va">.x</span>, <span class="st">"th"</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="va">field_name</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">html_element</span><span class="op">(</span><span class="st">"td"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu">html_text2</span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">value</span><span class="op">)</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="cn">NA_character_</span> <span class="kw">else</span> <span class="va">value</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">mpsz</span> <span class="op">&lt;-</span> <span class="va">mpsz</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    REGION_N <span class="op">=</span> <span class="fu">map_chr</span><span class="op">(</span><span class="va">Description</span>, <span class="va">extract_kml_field</span>, <span class="st">"REGION_N"</span><span class="op">)</span>,</span>
+<span>    PLN_AREA_N <span class="op">=</span> <span class="fu">map_chr</span><span class="op">(</span><span class="va">Description</span>, <span class="va">extract_kml_field</span>, <span class="st">"PLN_AREA_N"</span><span class="op">)</span>,</span>
+<span>    SUBZONE_N <span class="op">=</span> <span class="fu">map_chr</span><span class="op">(</span><span class="va">Description</span>, <span class="va">extract_kml_field</span>, <span class="st">"SUBZONE_N"</span><span class="op">)</span>,</span>
+<span>    SUBZONE_C <span class="op">=</span> <span class="fu">map_chr</span><span class="op">(</span><span class="va">Description</span>, <span class="va">extract_kml_field</span>, <span class="st">"SUBZONE_C"</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">Name</span>, <span class="op">-</span><span class="va">Description</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">relocate</span><span class="op">(</span><span class="va">geometry</span>, .after <span class="op">=</span> <span class="fu">last_col</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mpsz_cl</span> <span class="op">&lt;-</span> <span class="va">mpsz</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">SUBZONE_N</span> <span class="op">!=</span> <span class="st">"SOUTHERN GROUP"</span>,</span>
+<span>         <span class="va">PLN_AREA_N</span> <span class="op">!=</span> <span class="st">"WESTERN ISLANDS"</span>,</span>
+<span>         <span class="va">PLN_AREA_N</span> <span class="op">!=</span> <span class="st">"NORTH-EASTERN ISLANDS"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section><section id="geocoding-the-data" class="level3" data-number="4.4"><h3 data-number="4.4" class="anchored" data-anchor-id="geocoding-the-data">
+<span class="header-section-number">4.4</span> Geocoding the data</h3>
+<div class="cell">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Initiate 2 empty data frames</span></span>
+<span><span class="va">found</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span><span class="op">)</span> <span class="co"># to store Postal codes that were successfully geocoded with their coordinates</span></span>
+<span><span class="va">not_found</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>postcode <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html">character</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="co"># to store postal codes that couldn't be matched</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">postcodes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html">unique</a></span><span class="op">(</span><span class="va">biz_selected</span><span class="op">$</span><span class="va">postal_code</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">url</span> <span class="op">&lt;-</span> <span class="st">"https://onemap.gov.sg/api/common/elastic/search"</span></span>
+<span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">pc</span> <span class="kw">in</span> <span class="va">postcodes</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">query</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>    searchVal <span class="op">=</span> <span class="va">pc</span>,</span>
+<span>    returnGeom <span class="op">=</span> <span class="st">"Y"</span>,</span>
+<span>    getAddrDetails <span class="op">=</span> <span class="st">"Y"</span>,</span>
+<span>    pageNum <span class="op">=</span> <span class="st">"1"</span></span>
+<span>  <span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">GET</span><span class="op">(</span><span class="va">url</span>, query <span class="op">=</span> <span class="va">query</span><span class="op">)</span></span>
+<span>  <span class="va">json</span> <span class="op">&lt;-</span> <span class="fu">content</span><span class="op">(</span><span class="va">res</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">json</span><span class="op">$</span><span class="va">found</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html">as.data.frame</a></span><span class="op">(</span><span class="va">json</span><span class="op">$</span><span class="va">results</span>, stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span>    <span class="va">df</span><span class="op">$</span><span class="va">input_postcode</span> <span class="op">&lt;-</span> <span class="va">pc</span></span>
+<span>    <span class="va">found</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">found</span>, <span class="va">df</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>    <span class="va">not_found</span> <span class="op">&lt;-</span> <span class="fu">bind_rows</span><span class="op">(</span><span class="va">not_found</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span><span class="op">(</span>postcode <span class="op">=</span> <span class="va">pc</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Tidying the geocoded data</span></span>
+<span><span class="va">found</span> <span class="op">&lt;-</span> <span class="va">found</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="appending-the-location-information" class="level3" data-number="4.5"><h3 data-number="4.5" class="anchored" data-anchor-id="appending-the-location-information">
+<span class="header-section-number">4.5</span> Appending the location information</h3>
+<div class="cell">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">biz_selected_geocoded</span> <span class="op">=</span> <span class="va">biz_with_hierarchy</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">found</span>, </span>
+<span>            by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">'postal_code'</span> <span class="op">=</span> <span class="st">'POSTAL'</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="create-separate-datasets-for-each-business-type" class="level3" data-number="4.6"><h3 data-number="4.6" class="anchored" data-anchor-id="create-separate-datasets-for-each-business-type">
+<span class="header-section-number">4.6</span> Create separate datasets for each business type</h3>
+<div class="cell">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create separate datasets for each business type to count each type</span></span>
+<span><span class="va">biz_restaurant_cafe</span> <span class="op">&lt;-</span> <span class="va">biz_with_hierarchy</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="st">"^561"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">biz_retail_nonspec</span> <span class="op">&lt;-</span> <span class="va">biz_with_hierarchy</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="st">"^471"</span><span class="op">)</span><span class="op">)</span>    </span>
+<span><span class="va">biz_real_estate</span> <span class="op">&lt;-</span> <span class="va">biz_with_hierarchy</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="st">"^681"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Check the counts for each category</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Total selected businesses:"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">biz_selected</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total selected businesses: 8023 </code></pre>
+</div>
+<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Restaurants, Cafes, Food Courts, Food Kiosks And Bars (561xx):"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">biz_restaurant_cafe</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Restaurants, Cafes, Food Courts, Food Kiosks And Bars (561xx): 5542 </code></pre>
+</div>
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Retail Sale in Non-Specialised Stores (471xx):"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">biz_retail_nonspec</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Retail Sale in Non-Specialised Stores (471xx): 1403 </code></pre>
+</div>
+<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html">cat</a></span><span class="op">(</span><span class="st">"Retail Sale of Food, Beverage, and Tobacco in Specialised Store (681xx):"</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">biz_real_estate</span><span class="op">)</span>, <span class="st">"\n"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Retail Sale of Food, Beverage, and Tobacco in Specialised Store (681xx): 1078 </code></pre>
+</div>
+</div>
+</section><section id="converting-into-simple-point-features---sf-data-frame" class="level3" data-number="4.7"><h3 data-number="4.7" class="anchored" data-anchor-id="converting-into-simple-point-features---sf-data-frame">
+<span class="header-section-number">4.7</span> Converting into simple point features - SF data frame</h3>
+<p>Before applying the <code>st_as_sf</code> function to convert the data into simple point features, we check for missing values first and remove such records.</p>
+<div class="cell">
+<div class="sourceCode" id="cb50"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">biz_with_coords</span> <span class="op">&lt;-</span> <span class="va">biz_selected_geocoded</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Remove records without coordinates</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="co"># Convert LATITUDE and LONGITUDE to numeric if they're character</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    LATITUDE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">X</span><span class="op">)</span>,</span>
+<span>    LONGITUDE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html">as.numeric</a></span><span class="op">(</span><span class="va">Y</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">biz_sf</span> <span class="op">&lt;-</span> <span class="fu">st_as_sf</span><span class="op">(</span><span class="va">biz_with_coords</span>, </span>
+<span>                   coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"X"</span>,<span class="st">"Y"</span><span class="op">)</span>, </span>
+<span>                   crs<span class="op">=</span><span class="fl">3414</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create separate datasets for each business type for later individual analysis</span></span>
+<span><span class="va">biz_restaurant_cafe_sf</span> <span class="op">&lt;-</span> <span class="va">biz_sf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="st">"^561"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">biz_retail_nonspec_sf</span> <span class="op">&lt;-</span> <span class="va">biz_sf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="st">"^471"</span><span class="op">)</span><span class="op">)</span>    </span>
+<span><span class="va">biz_real_estate_sf</span> <span class="op">&lt;-</span> <span class="va">biz_sf</span> <span class="op">%&gt;%</span> <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="fu">str_detect</span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="st">"^681"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `biz_sf' from data source 
+  `D:\ngoclinhnguyen-2806\ISSS626-GAA\Take-home_Ex\Take-home_Ex01\data\sf\biz_sf.gpkg' 
+  using driver `GPKG'
+Simple feature collection with 8021 features and 41 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 4670.11 ymin: 24787.05 xmax: 53085.99 ymax: 50103.6
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `biz_restaurant_cafe_sf' from data source 
+  `D:\ngoclinhnguyen-2806\ISSS626-GAA\Take-home_Ex\Take-home_Ex01\data\sf\biz_restaurant_cafe_sf.gpkg' 
+  using driver `GPKG'
+Simple feature collection with 5540 features and 41 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 4721.057 ymin: 25169.34 xmax: 53085.99 ymax: 50103.6
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `biz_retail_nonspec_sf' from data source 
+  `D:\ngoclinhnguyen-2806\ISSS626-GAA\Take-home_Ex\Take-home_Ex01\data\sf\biz_retail_nonspec_sf.gpkg' 
+  using driver `GPKG'
+Simple feature collection with 1403 features and 41 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 4670.11 ymin: 24787.05 xmax: 46829.34 ymax: 49401.78
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `biz_real_estate_sf' from data source 
+  `D:\ngoclinhnguyen-2806\ISSS626-GAA\Take-home_Ex\Take-home_Ex01\data\sf\biz_real_estate_sf.gpkg' 
+  using driver `GPKG'
+Simple feature collection with 1078 features and 41 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 6525.701 ymin: 27485.42 xmax: 43885.35 ymax: 49669.39
+Projected CRS: SVY21 / Singapore TM</code></pre>
+</div>
+</div>
+</section><section id="verify-the-point-features" class="level3" data-number="4.8"><h3 data-number="4.8" class="anchored" data-anchor-id="verify-the-point-features">
+<span class="header-section-number">4.8</span> Verify the point features</h3>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-2-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-1" role="tab" aria-controls="tabset-2-1" aria-selected="true">471xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-2" role="tab" aria-controls="tabset-2-2" aria-selected="false">561xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-2-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-2-3" role="tab" aria-controls="tabset-2-3" aria-selected="false">681xx</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-2-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-2-1-tab">
+<div class="cell">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">biz_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     uen            issuance_agency_id entity_name       
+ Length:8021        Length:8021        Length:8021       
+ Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character  
+                                                         
+                                                         
+                                                         
+ entity_type_description business_constitution_description
+ Length:8021             Length:8021                      
+ Class :character        Class :character                 
+ Mode  :character        Mode  :character                 
+                                                          
+                                                          
+                                                          
+ company_type_description paf_constitution_description
+ Length:8021              Length:8021                 
+ Class :character         Class :character            
+ Mode  :character         Mode  :character            
+                                                      
+                                                      
+                                                      
+ entity_status_description      date            uen_issue_date      
+ Length:8021               Min.   :2024-01-01   Min.   :2024-01-01  
+ Class :character          1st Qu.:2024-05-15   1st Qu.:2024-05-15  
+ Mode  :character          Median :2024-09-23   Median :2024-09-23  
+                           Mean   :2024-09-30   Mean   :2024-09-30  
+                           3rd Qu.:2025-02-20   3rd Qu.:2025-02-20  
+                           Max.   :2025-06-30   Max.   :2025-06-30  
+ address_type          block           street_name          level_no        
+ Length:8021        Length:8021        Length:8021        Length:8021       
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+   unit_no          building_name      postal_code        other_address_line1
+ Length:8021        Length:8021        Length:8021        Length:8021        
+ Class :character   Class :character   Class :character   Class :character   
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character   
+                                                                             
+                                                                             
+                                                                             
+ other_address_line2 account_due_date   annual_return_date primary_ssic_code 
+ Length:8021         Length:8021        Length:8021        Length:8021       
+ Class :character    Class :character   Class :character   Class :character  
+ Mode  :character    Mode  :character   Mode  :character   Mode  :character  
+                                                                             
+                                                                             
+                                                                             
+ primary_ssic_description primary_user_described_activity      YEAR     
+ Length:8021              Length:8021                     Min.   :2024  
+ Class :character         Class :character                1st Qu.:2024  
+ Mode  :character         Mode  :character                Median :2024  
+                                                          Mean   :2024  
+                                                          3rd Qu.:2025  
+                                                          Max.   :2025  
+   MONTH_NUM       MONTH_ABBR          level_2          level_2_description
+ Min.   : 1.000   Length:8021        Length:8021        Length:8021        
+ 1st Qu.: 3.000   Class :character   Class :character   Class :character   
+ Median : 5.000   Mode  :character   Mode  :character   Mode  :character   
+ Mean   : 5.441                                                            
+ 3rd Qu.: 8.000                                                            
+ Max.   :12.000                                                            
+   level_3          level_3_description   level_4          level_4_description
+ Length:8021        Length:8021         Length:8021        Length:8021        
+ Class :character   Class :character    Class :character   Class :character   
+ Mode  :character   Mode  :character    Mode  :character   Mode  :character   
+                                                                              
+                                                                              
+                                                                              
+ level_5_description  SEARCHVAL            BLK_NO           ROAD_NAME        
+ Length:8021         Length:8021        Length:8021        Length:8021       
+ Class :character    Class :character   Class :character   Class :character  
+ Mode  :character    Mode  :character   Mode  :character   Mode  :character  
+                                                                             
+                                                                             
+                                                                             
+   BUILDING           ADDRESS             LATITUDE       LONGITUDE    
+ Length:8021        Length:8021        Min.   : 4670   Min.   :24787  
+ Class :character   Class :character   1st Qu.:25838   1st Qu.:32093  
+ Mode  :character   Mode  :character   Median :29795   Median :35000  
+                                       Mean   :29299   Mean   :36060  
+                                       3rd Qu.:33925   3rd Qu.:39356  
+                                       Max.   :53086   Max.   :50104  
+            geom     
+ POINT        :8021  
+ epsg:3414    :   0  
+ +proj=tmer...:   0  
+                     
+                     
+                     </code></pre>
+</div>
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu">st_geometry</span><span class="op">(</span><span class="va">biz_retail_nonspec_sf</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"Business Point Features"</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-2-tab">
+<div class="cell">
+<div class="sourceCode" id="cb60"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">biz_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     uen            issuance_agency_id entity_name       
+ Length:8021        Length:8021        Length:8021       
+ Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character  
+                                                         
+                                                         
+                                                         
+ entity_type_description business_constitution_description
+ Length:8021             Length:8021                      
+ Class :character        Class :character                 
+ Mode  :character        Mode  :character                 
+                                                          
+                                                          
+                                                          
+ company_type_description paf_constitution_description
+ Length:8021              Length:8021                 
+ Class :character         Class :character            
+ Mode  :character         Mode  :character            
+                                                      
+                                                      
+                                                      
+ entity_status_description      date            uen_issue_date      
+ Length:8021               Min.   :2024-01-01   Min.   :2024-01-01  
+ Class :character          1st Qu.:2024-05-15   1st Qu.:2024-05-15  
+ Mode  :character          Median :2024-09-23   Median :2024-09-23  
+                           Mean   :2024-09-30   Mean   :2024-09-30  
+                           3rd Qu.:2025-02-20   3rd Qu.:2025-02-20  
+                           Max.   :2025-06-30   Max.   :2025-06-30  
+ address_type          block           street_name          level_no        
+ Length:8021        Length:8021        Length:8021        Length:8021       
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+   unit_no          building_name      postal_code        other_address_line1
+ Length:8021        Length:8021        Length:8021        Length:8021        
+ Class :character   Class :character   Class :character   Class :character   
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character   
+                                                                             
+                                                                             
+                                                                             
+ other_address_line2 account_due_date   annual_return_date primary_ssic_code 
+ Length:8021         Length:8021        Length:8021        Length:8021       
+ Class :character    Class :character   Class :character   Class :character  
+ Mode  :character    Mode  :character   Mode  :character   Mode  :character  
+                                                                             
+                                                                             
+                                                                             
+ primary_ssic_description primary_user_described_activity      YEAR     
+ Length:8021              Length:8021                     Min.   :2024  
+ Class :character         Class :character                1st Qu.:2024  
+ Mode  :character         Mode  :character                Median :2024  
+                                                          Mean   :2024  
+                                                          3rd Qu.:2025  
+                                                          Max.   :2025  
+   MONTH_NUM       MONTH_ABBR          level_2          level_2_description
+ Min.   : 1.000   Length:8021        Length:8021        Length:8021        
+ 1st Qu.: 3.000   Class :character   Class :character   Class :character   
+ Median : 5.000   Mode  :character   Mode  :character   Mode  :character   
+ Mean   : 5.441                                                            
+ 3rd Qu.: 8.000                                                            
+ Max.   :12.000                                                            
+   level_3          level_3_description   level_4          level_4_description
+ Length:8021        Length:8021         Length:8021        Length:8021        
+ Class :character   Class :character    Class :character   Class :character   
+ Mode  :character   Mode  :character    Mode  :character   Mode  :character   
+                                                                              
+                                                                              
+                                                                              
+ level_5_description  SEARCHVAL            BLK_NO           ROAD_NAME        
+ Length:8021         Length:8021        Length:8021        Length:8021       
+ Class :character    Class :character   Class :character   Class :character  
+ Mode  :character    Mode  :character   Mode  :character   Mode  :character  
+                                                                             
+                                                                             
+                                                                             
+   BUILDING           ADDRESS             LATITUDE       LONGITUDE    
+ Length:8021        Length:8021        Min.   : 4670   Min.   :24787  
+ Class :character   Class :character   1st Qu.:25838   1st Qu.:32093  
+ Mode  :character   Mode  :character   Median :29795   Median :35000  
+                                       Mean   :29299   Mean   :36060  
+                                       3rd Qu.:33925   3rd Qu.:39356  
+                                       Max.   :53086   Max.   :50104  
+            geom     
+ POINT        :8021  
+ epsg:3414    :   0  
+ +proj=tmer...:   0  
+                     
+                     
+                     </code></pre>
+</div>
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu">st_geometry</span><span class="op">(</span><span class="va">biz_restaurant_cafe_sf</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"Business Point Features"</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-2-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-2-3-tab">
+<div class="cell">
+<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="va">biz_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     uen            issuance_agency_id entity_name       
+ Length:8021        Length:8021        Length:8021       
+ Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character  
+                                                         
+                                                         
+                                                         
+ entity_type_description business_constitution_description
+ Length:8021             Length:8021                      
+ Class :character        Class :character                 
+ Mode  :character        Mode  :character                 
+                                                          
+                                                          
+                                                          
+ company_type_description paf_constitution_description
+ Length:8021              Length:8021                 
+ Class :character         Class :character            
+ Mode  :character         Mode  :character            
+                                                      
+                                                      
+                                                      
+ entity_status_description      date            uen_issue_date      
+ Length:8021               Min.   :2024-01-01   Min.   :2024-01-01  
+ Class :character          1st Qu.:2024-05-15   1st Qu.:2024-05-15  
+ Mode  :character          Median :2024-09-23   Median :2024-09-23  
+                           Mean   :2024-09-30   Mean   :2024-09-30  
+                           3rd Qu.:2025-02-20   3rd Qu.:2025-02-20  
+                           Max.   :2025-06-30   Max.   :2025-06-30  
+ address_type          block           street_name          level_no        
+ Length:8021        Length:8021        Length:8021        Length:8021       
+ Class :character   Class :character   Class :character   Class :character  
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character  
+                                                                            
+                                                                            
+                                                                            
+   unit_no          building_name      postal_code        other_address_line1
+ Length:8021        Length:8021        Length:8021        Length:8021        
+ Class :character   Class :character   Class :character   Class :character   
+ Mode  :character   Mode  :character   Mode  :character   Mode  :character   
+                                                                             
+                                                                             
+                                                                             
+ other_address_line2 account_due_date   annual_return_date primary_ssic_code 
+ Length:8021         Length:8021        Length:8021        Length:8021       
+ Class :character    Class :character   Class :character   Class :character  
+ Mode  :character    Mode  :character   Mode  :character   Mode  :character  
+                                                                             
+                                                                             
+                                                                             
+ primary_ssic_description primary_user_described_activity      YEAR     
+ Length:8021              Length:8021                     Min.   :2024  
+ Class :character         Class :character                1st Qu.:2024  
+ Mode  :character         Mode  :character                Median :2024  
+                                                          Mean   :2024  
+                                                          3rd Qu.:2025  
+                                                          Max.   :2025  
+   MONTH_NUM       MONTH_ABBR          level_2          level_2_description
+ Min.   : 1.000   Length:8021        Length:8021        Length:8021        
+ 1st Qu.: 3.000   Class :character   Class :character   Class :character   
+ Median : 5.000   Mode  :character   Mode  :character   Mode  :character   
+ Mean   : 5.441                                                            
+ 3rd Qu.: 8.000                                                            
+ Max.   :12.000                                                            
+   level_3          level_3_description   level_4          level_4_description
+ Length:8021        Length:8021         Length:8021        Length:8021        
+ Class :character   Class :character    Class :character   Class :character   
+ Mode  :character   Mode  :character    Mode  :character   Mode  :character   
+                                                                              
+                                                                              
+                                                                              
+ level_5_description  SEARCHVAL            BLK_NO           ROAD_NAME        
+ Length:8021         Length:8021        Length:8021        Length:8021       
+ Class :character    Class :character   Class :character   Class :character  
+ Mode  :character    Mode  :character   Mode  :character   Mode  :character  
+                                                                             
+                                                                             
+                                                                             
+   BUILDING           ADDRESS             LATITUDE       LONGITUDE    
+ Length:8021        Length:8021        Min.   : 4670   Min.   :24787  
+ Class :character   Class :character   1st Qu.:25838   1st Qu.:32093  
+ Mode  :character   Mode  :character   Median :29795   Median :35000  
+                                       Mean   :29299   Mean   :36060  
+                                       3rd Qu.:33925   3rd Qu.:39356  
+                                       Max.   :53086   Max.   :50104  
+            geom     
+ POINT        :8021  
+ epsg:3414    :   0  
+ +proj=tmer...:   0  
+                     
+                     
+                     </code></pre>
+</div>
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="fu">st_geometry</span><span class="op">(</span><span class="va">biz_real_estate_sf</span><span class="op">)</span>, main <span class="op">=</span> <span class="st">"Business Point Features"</span>, pch <span class="op">=</span> <span class="fl">16</span>, cex <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-36-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section></section><section id="exploratory-data-analysis" class="level2" data-number="5"><h2 data-number="5" class="anchored" data-anchor-id="exploratory-data-analysis">
+<span class="header-section-number">5</span> Exploratory Data Analysis</h2>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-3-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-1" role="tab" aria-controls="tabset-3-1" aria-selected="true">Summary on the chosen business types</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-3-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-3-2" role="tab" aria-controls="tabset-3-2" aria-selected="false">Plotting business points on Singapore boundary</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-3-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-3-1-tab">
+<div class="cell">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Step 1: Create summary table from biz_with_hierarchy with both total and live counts</span></span>
+<span><span class="va">biz_summary</span> <span class="op">&lt;-</span> <span class="va">biz_with_hierarchy</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">group_by</span><span class="op">(</span><span class="va">primary_ssic_code</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">summarise</span><span class="op">(</span></span>
+<span>    business_count <span class="op">=</span> <span class="fu">n</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    live_business_count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">entity_status_description</span> <span class="op">==</span> <span class="st">"Live"</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>    live_percentage <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html">round</a></span><span class="op">(</span><span class="va">live_business_count</span> <span class="op">/</span> <span class="va">business_count</span> <span class="op">*</span> <span class="fl">100</span>, <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    .groups <span class="op">=</span> <span class="st">'drop'</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">primary_ssic_code</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 2: Join with ssic_final on primary_ssic_code = level_5</span></span>
+<span><span class="va">biz_hierarchy_summary</span> <span class="op">&lt;-</span> <span class="va">biz_summary</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">left_join</span><span class="op">(</span><span class="va">ssic_final</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"primary_ssic_code"</span> <span class="op">=</span> <span class="st">"level_5"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 3: Create concatenated descriptions</span></span>
+<span><span class="va">biz_pivot_table</span> <span class="op">&lt;-</span> <span class="va">biz_hierarchy_summary</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">mutate</span><span class="op">(</span></span>
+<span>    level_3_concat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">level_3</span>, <span class="va">level_3_description</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span>,</span>
+<span>    level_4_concat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">level_4</span>, <span class="va">level_4_description</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span>,</span>
+<span>    level_5_concat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="va">primary_ssic_code</span>, <span class="va">level_5_description</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">arrange</span><span class="op">(</span><span class="va">level_3_concat</span>, <span class="va">level_4_concat</span>, <span class="va">level_5_concat</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Step 4: Keep only the columns we need</span></span>
+<span><span class="va">biz_pivot_table</span> <span class="op">&lt;-</span> <span class="va">biz_pivot_table</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"level_3_concat"</span>, <span class="st">"level_4_concat"</span>, <span class="st">"level_5_concat"</span>, </span>
+<span>                                       <span class="st">"business_count"</span>, <span class="st">"live_business_count"</span>, <span class="st">"live_percentage"</span><span class="op">)</span><span class="op">]</span></span>
+<span></span>
+<span><span class="co"># Step 5: Display with kable including the new column</span></span>
+<span><span class="va">biz_pivot_table</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kable</span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"Business Distribution by SSIC Hierarchy"</span>,</span>
+<span>        col.names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Level 3"</span>, <span class="st">"Level 4"</span>, <span class="st">"Level 5"</span>, <span class="st">"Total"</span>, <span class="st">"Live"</span>, <span class="st">"Live %"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">kable_styling</span><span class="op">(</span>bootstrap_options <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"striped"</span>, <span class="st">"hover"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">column_spec</span><span class="op">(</span><span class="fl">4</span><span class="op">:</span><span class="fl">6</span>, bold <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">pack_rows</span><span class="op">(</span>index <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html">table</a></span><span class="op">(</span><span class="va">biz_pivot_table</span><span class="op">$</span><span class="va">level_3_concat</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">scroll_box</span><span class="op">(</span>height <span class="op">=</span> <span class="st">"500px"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; ">
+<table class="table table-striped table-hover caption-top table-sm small" data-quarto-postprocess="true">
+<caption>Business Distribution by SSIC Hierarchy</caption>
+<thead><tr class="header">
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">Level 3</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">Level 4</th>
+<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;">Level 5</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">Total</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">Live</th>
+<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">Live %</th>
+</tr></thead>
+<tbody>
+<tr class="odd" data-grouplength="4">
+<td colspan="6" style="border-bottom: 1px solid"><strong>471 - RETAIL SALE IN NON-SPECIALISED STORES</strong></td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">471 - RETAIL SALE IN NON-SPECIALISED STORES</td>
+<td style="text-align: left;">4710 - Retail Sale in Non-Specialised Stores</td>
+<td style="text-align: left;">47101 - Supermarkets and hypermarkets</td>
+<td style="text-align: right; font-weight: bold;">65</td>
+<td style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right; font-weight: bold;">13.8</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">471 - RETAIL SALE IN NON-SPECIALISED STORES</td>
+<td style="text-align: left;">4710 - Retail Sale in Non-Specialised Stores</td>
+<td style="text-align: left;">47102 - Mini-marts, convenience stores and provision shops</td>
+<td style="text-align: right; font-weight: bold;">657</td>
+<td style="text-align: right; font-weight: bold;">101</td>
+<td style="text-align: right; font-weight: bold;">15.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">471 - RETAIL SALE IN NON-SPECIALISED STORES</td>
+<td style="text-align: left;">4710 - Retail Sale in Non-Specialised Stores</td>
+<td style="text-align: left;">47103 - Department stores</td>
+<td style="text-align: right; font-weight: bold;">30</td>
+<td style="text-align: right; font-weight: bold;">13</td>
+<td style="text-align: right; font-weight: bold;">43.3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">471 - RETAIL SALE IN NON-SPECIALISED STORES</td>
+<td style="text-align: left;">4710 - Retail Sale in Non-Specialised Stores</td>
+<td style="text-align: left;">47109 - Retail sale in other non-specialised stores n.e.c.</td>
+<td style="text-align: right; font-weight: bold;">651</td>
+<td style="text-align: right; font-weight: bold;">241</td>
+<td style="text-align: right; font-weight: bold;">37.0</td>
+</tr>
+<tr class="even" data-grouplength="7">
+<td colspan="6" style="border-bottom: 1px solid"><strong>561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5611 - Restaurants and Cafes</td>
+<td style="text-align: left;">56111 - Restaurants</td>
+<td style="text-align: right; font-weight: bold;">1901</td>
+<td style="text-align: right; font-weight: bold;">152</td>
+<td style="text-align: right; font-weight: bold;">8.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5611 - Restaurants and Cafes</td>
+<td style="text-align: left;">56112 - Cafes</td>
+<td style="text-align: right; font-weight: bold;">519</td>
+<td style="text-align: right; font-weight: bold;">107</td>
+<td style="text-align: right; font-weight: bold;">20.6</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5612 - Fast Food Outlets, Food Courts and Food Kiosks</td>
+<td style="text-align: left;">56121 - Fast food outlets</td>
+<td style="text-align: right; font-weight: bold;">102</td>
+<td style="text-align: right; font-weight: bold;">9</td>
+<td style="text-align: right; font-weight: bold;">8.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5612 - Fast Food Outlets, Food Courts and Food Kiosks</td>
+<td style="text-align: left;">56122 - Food courts, coffee shops and canteens (with mainly food and beverage income)</td>
+<td style="text-align: right; font-weight: bold;">1062</td>
+<td style="text-align: right; font-weight: bold;">275</td>
+<td style="text-align: right; font-weight: bold;">25.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5612 - Fast Food Outlets, Food Courts and Food Kiosks</td>
+<td style="text-align: left;">56123 - Food kiosks mainly for takeaway and delivery</td>
+<td style="text-align: right; font-weight: bold;">484</td>
+<td style="text-align: right; font-weight: bold;">216</td>
+<td style="text-align: right; font-weight: bold;">44.6</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5613 - Pubs</td>
+<td style="text-align: left;">56130 - Pubs</td>
+<td style="text-align: right; font-weight: bold;">119</td>
+<td style="text-align: right; font-weight: bold;">51</td>
+<td style="text-align: right; font-weight: bold;">42.9</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">561 - RESTAURANTS, CAFES, FOOD COURTS, FOOD KIOSKS AND BARS</td>
+<td style="text-align: left;">5614 - Stalls Selling Cooked Food and Prepared Drinks</td>
+<td style="text-align: left;">56140 - Stalls selling cooked food and prepared drinks (including stalls at food courts and mobile food hawkers)</td>
+<td style="text-align: right; font-weight: bold;">1355</td>
+<td style="text-align: right; font-weight: bold;">708</td>
+<td style="text-align: right; font-weight: bold;">52.3</td>
+</tr>
+<tr class="even" data-grouplength="6">
+<td colspan="6" style="border-bottom: 1px solid"><strong>681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</strong></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</td>
+<td style="text-align: left;">6810 - Real Estate Activities with Own or Leased Property</td>
+<td style="text-align: left;">68101 - Real estate developers</td>
+<td style="text-align: right; font-weight: bold;">248</td>
+<td style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right; font-weight: bold;">2.8</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</td>
+<td style="text-align: left;">6810 - Real Estate Activities with Own or Leased Property</td>
+<td style="text-align: left;">68102 - Operating of serviced apartments</td>
+<td style="text-align: right; font-weight: bold;">24</td>
+<td style="text-align: right; font-weight: bold;">4</td>
+<td style="text-align: right; font-weight: bold;">16.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</td>
+<td style="text-align: left;">6810 - Real Estate Activities with Own or Leased Property</td>
+<td style="text-align: left;">68103 - Letting of self-owned or leased real estate property except food courts, coffee shops and canteens (e.g. office/exhibition space, shopping mall, self-storage facilities)</td>
+<td style="text-align: right; font-weight: bold;">658</td>
+<td style="text-align: right; font-weight: bold;">42</td>
+<td style="text-align: right; font-weight: bold;">6.4</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</td>
+<td style="text-align: left;">6810 - Real Estate Activities with Own or Leased Property</td>
+<td style="text-align: left;">68104 - Letting and operating of self-owned or leased food courts, coffee shops and canteens (with mainly rental income)</td>
+<td style="text-align: right; font-weight: bold;">79</td>
+<td style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right; font-weight: bold;">12.7</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</td>
+<td style="text-align: left;">6810 - Real Estate Activities with Own or Leased Property</td>
+<td style="text-align: left;">68105 - Collective portfolio investment funds with rental income</td>
+<td style="text-align: right; font-weight: bold;">59</td>
+<td style="text-align: right; font-weight: bold;">7</td>
+<td style="text-align: right; font-weight: bold;">11.9</td>
+</tr>
+<tr class="even">
+<td style="text-align: left; padding-left: 2em;" data-indentlevel="1">681 - REAL ESTATE ACTIVITIES WITH OWN OR LEASED PROPERTY</td>
+<td style="text-align: left;">6810 - Real Estate Activities with Own or Leased Property</td>
+<td style="text-align: left;">68106 - Management of self-owned strata titled property (i.e. Management Corporation Strata Title)</td>
+<td style="text-align: right; font-weight: bold;">10</td>
+<td style="text-align: right; font-weight: bold;">2</td>
+<td style="text-align: right; font-weight: bold;">20.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Based on the business summary above, we can draw some key insights about business types and survival rates:</p>
+<ul>
+<li>Food &amp; Beverage dominates with 5,542 businesses (69.1% of total), reflecting Singapore’s vibrant food scene but challenging market conditions with 27.4% survival rate</li>
+<li>Traditional food stalls excel (52.3% survival) vs.&nbsp;restaurants struggle (8% survival), suggesting lower overhead and established customer bases favor traditional formats</li>
+<li>Real estate sector shows poor resilience with only 6.7% survival rate, likely due to high capital requirements and market volatility affecting property investments</li>
+<li>Retail stores perform moderately (25.9% survival) with department stores outperforming (43.3%) supermarkets (13.8%), indicating differentiated positioning beats commodity retail</li>
+<li>Overall 24.4% survival rate suggests high business turnover in Singapore, reflecting competitive market dynamics and regulatory compliance challenges across sectors</li>
+</ul>
+<p><strong>Key insight:</strong> Asset-light, established food formats and specialized retail show better survival than capital-intensive businesses.</p>
+</div>
+<div id="tabset-3-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-3-2-tab">
+<p>As the number of business points per business type is large itself, plotting all of them on <code>mpsz</code> - Singapore boundary will be too packed and we will not be able to extract any pattern out of it. Therefore, it is a good idea to plot them separately as below.</p>
+<div class="cell">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_sf</span><span class="op">(</span>data <span class="op">=</span> <span class="va">mpsz_cl</span>, fill <span class="op">=</span> <span class="st">"lightgray"</span>, color <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_sf</span><span class="op">(</span>data <span class="op">=</span> <span class="va">biz_sf</span>, <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html">as.factor</a></span><span class="op">(</span><span class="va">primary_ssic_code</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>          size <span class="op">=</span> <span class="fl">0.3</span>, alpha <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="va">primary_ssic_code</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Remove scales = "free"</span></span>
+<span>  <span class="fu">theme_minimal</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>axis.text <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        axis.ticks <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        panel.grid <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        legend.position <span class="op">=</span> <span class="st">"none"</span><span class="op">)</span> <span class="op">+</span>  <span class="co"># Hide legend since facets show the codes</span></span>
+<span>  <span class="fu">labs</span><span class="op">(</span>title <span class="op">=</span> <span class="st">"Business Locations by SSIC Code"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Based on the business location plots, here are key observations about spatial density patterns:</p>
+<p><strong>Food &amp; Beverage Sector (561xx):</strong></p>
+<ul>
+<li>56111 (Restaurants) and 56140 (Food stalls) show the highest density and widest distribution across Singapore, indicating ubiquitous presence in residential and commercial areas</li>
+<li>56122 (Food courts/coffee shops) displays concentrated clusters, likely in HDB estates and commercial centers where these establishments serve local communities</li>
+<li>56123 (Food kiosks) shows moderate density with scattered distribution, reflecting their mobile/flexible nature</li>
+<li>56112 (Cafes) and 56130 (Pubs) are more selectively located, probably in trendy districts and entertainment areas</li>
+</ul>
+<p><strong>Retail Sector (471xx):</strong></p>
+<ul>
+<li>47109 (Other non-specialised stores) shows broad distribution but lower density than food businesses</li>
+<li>47101-47103 display very sparse, clustered patterns, suggesting these larger retail formats locate in specific commercial zones</li>
+</ul>
+<p><strong>Real Estate Sector (681xx):</strong></p>
+<ul>
+<li>68103 (Property letting) shows moderate clustering in business districts Other real estate activities (68101, 68102, 68104-68106) are extremely sparse, reflecting their specialized, capital-intensive nature</li>
+</ul>
+</div>
+</div>
+</div>
+</section><section id="core-spatial-analysis---layer-1-registration-intent-analysis" class="level2" data-number="6"><h2 data-number="6" class="anchored" data-anchor-id="core-spatial-analysis---layer-1-registration-intent-analysis">
+<span class="header-section-number">6</span> CORE SPATIAL ANALYSIS - LAYER 1: REGISTRATION INTENT ANALYSIS</h2>
+<section id="spatial-kde-analysis" class="level3" data-number="6.1"><h3 data-number="6.1" class="anchored" data-anchor-id="spatial-kde-analysis">
+<span class="header-section-number">6.1</span> Spatial KDE Analysis</h3>
+<section id="individual-density-surfaces" class="level4" data-number="6.1.1"><h4 data-number="6.1.1" class="anchored" data-anchor-id="individual-density-surfaces">
+<span class="header-section-number">6.1.1</span> Individual Density Surfaces</h4>
+<p><strong>Create Owin object</strong></p>
+<div class="cell">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">sg_owin</span> <span class="op">&lt;-</span> <span class="fu">as.owin</span><span class="op">(</span><span class="va">mpsz_cl</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Convert sf data frames to ppp class</strong></p>
+<div class="cell">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">ppp_retail_all</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">biz_retail_nonspec_sf</span><span class="op">)</span></span>
+<span><span class="va">ppp_retail_all</span> <span class="op">=</span> <span class="va">ppp_retail_all</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">ppp_restaurants_all</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">biz_restaurant_cafe_sf</span><span class="op">)</span></span>
+<span><span class="va">ppp_restaurants_all</span> <span class="op">=</span> <span class="va">ppp_restaurants_all</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span></span>
+<span></span>
+<span><span class="va">ppp_realestate_all</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">biz_real_estate_sf</span><span class="op">)</span></span>
+<span><span class="va">ppp_realestate_all</span> <span class="op">=</span> <span class="va">ppp_realestate_all</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Calculate KDE using spatstat (Prof's approach)</span></span>
+<span><span class="va">kde_retail_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">ppp_retail_all</span>,</span>
+<span>                         sigma <span class="op">=</span> <span class="va">bw.diggle</span>,</span>
+<span>                         edge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                         kernel<span class="op">=</span><span class="st">"gaussian"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">kde_restaurants_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">ppp_restaurants_all</span>, </span>
+<span>                              sigma <span class="op">=</span> <span class="va">bw.diggle</span>,  <span class="co"># Automatic bandwidth selection</span></span>
+<span>                              edge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                              kernel<span class="op">=</span><span class="st">"gaussian"</span><span class="op">)</span>        <span class="co"># Edge correction</span></span>
+<span></span>
+<span><span class="va">kde_realestate_all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">ppp_realestate_all</span>,</span>
+<span>                             sigma <span class="op">=</span> <span class="va">bw.diggle</span>,</span>
+<span>                             edge <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>                             kernel<span class="op">=</span><span class="st">"gaussian"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb71"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">kde_retail_all</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-42-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb72"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">kde_restaurants_all</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-42-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">kde_realestate_all</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-42-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section><section id="clark-evans-test" class="level4" data-number="6.1.2"><h4 data-number="6.1.2" class="anchored" data-anchor-id="clark-evans-test">
+<span class="header-section-number">6.1.2</span> Clark-Evans test</h4>
+<p>In this section, we will perform Clark-Evans tests for the 3 business entities separately, to quantify whether a point pattern is clustered, random, or uniformly spaced. The result will help us understand the underlying spatial patterns of each business type. This will inform our interpretation of the subsequent KDE analysis.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-4-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-1" role="tab" aria-controls="tabset-4-1" aria-selected="true">561xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-2" role="tab" aria-controls="tabset-4-2" aria-selected="false">471xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-4-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-4-3" role="tab" aria-controls="tabset-4-3" aria-selected="false">681xx</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-4-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-4-1-tab">
+<p>The test hypotheses are: Ho = The distribution of 561xx are randomly distributed. H1 = The distribution of 561xx are not randomly distributed. The 95% confident interval will be used.</p>
+<div class="cell">
+<div class="sourceCode" id="cb74"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">clarkevans.test</span><span class="op">(</span><span class="va">ppp_restaurants_all</span>,</span>
+<span>                correction<span class="op">=</span><span class="st">"none"</span>,</span>
+<span>                clipregion<span class="op">=</span><span class="st">"sg_owin"</span>,</span>
+<span>                alternative<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"clustered"</span><span class="op">)</span>,</span>
+<span>                method<span class="op">=</span><span class="st">"MonteCarlo"</span>,</span>
+<span>                nsim<span class="op">=</span><span class="fl">999</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Clark-Evans test
+    No edge correction
+    Monte Carlo test based on 999 simulations of CSR with fixed n
+
+data:  ppp_restaurants_all
+R = 0.35908, p-value = 0.001
+alternative hypothesis: clustered (R &lt; 1)</code></pre>
+</div>
+</div>
+<p>The Clark-Evans test reveals that restaurants and cafes (SSIC 561xx) in the study area exhibit a significantly clustered spatial distribution (R = 0.35908, p &lt; 0.05). This strong clustering pattern suggests that food service establishments tend to co-locate rather than distribute randomly across the landscape. The clustering likely reflects agglomeration benefits where restaurants benefit from proximity to competitors through shared customer traffic, as well as urban planning policies that concentrate commercial activities in designated zones. This spatial concentration creates identifiable dining districts and food hubs within the study area, which has important implications for business location strategy and urban commercial planning.</p>
+</div>
+<div id="tabset-4-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-2-tab">
+<p>The test hypotheses are: Ho = The distribution of 471xx are randomly distributed. H1 = The distribution of 471xx are not randomly distributed. The 95% confident interval will be used.</p>
+<div class="cell">
+<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">clarkevans.test</span><span class="op">(</span><span class="va">ppp_retail_all</span>,</span>
+<span>                correction<span class="op">=</span><span class="st">"none"</span>,</span>
+<span>                clipregion<span class="op">=</span><span class="st">"sg_owin"</span>,</span>
+<span>                alternative<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"clustered"</span><span class="op">)</span>,</span>
+<span>                method<span class="op">=</span><span class="st">"MonteCarlo"</span>,</span>
+<span>                nsim<span class="op">=</span><span class="fl">999</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Clark-Evans test
+    No edge correction
+    Monte Carlo test based on 999 simulations of CSR with fixed n
+
+data:  ppp_retail_all
+R = 0.45778, p-value = 0.001
+alternative hypothesis: clustered (R &lt; 1)</code></pre>
+</div>
+</div>
+<p>The Clark-Evans test indicates that non-specialised retail stores (SSIC 471xx) exhibit a significantly clustered spatial distribution (R = 0.46, p &lt; 0.001). While still showing clustering behavior, these retail establishments are somewhat more dispersed than restaurants and cafes, reflecting their need to serve broader geographic markets while still benefiting from commercial agglomeration in shopping districts and retail centers.</p>
+</div>
+<div id="tabset-4-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-4-3-tab">
+<p>The test hypotheses are: Ho = The distribution of 681xx are randomly distributed. H1 = The distribution of 681xx are not randomly distributed. The 95% confident interval will be used.</p>
+<div class="cell">
+<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">clarkevans.test</span><span class="op">(</span><span class="va">ppp_realestate_all</span>,</span>
+<span>                correction<span class="op">=</span><span class="st">"none"</span>,</span>
+<span>                clipregion<span class="op">=</span><span class="st">"sg_owin"</span>,</span>
+<span>                alternative<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"clustered"</span><span class="op">)</span>,</span>
+<span>                method<span class="op">=</span><span class="st">"MonteCarlo"</span>,</span>
+<span>                nsim<span class="op">=</span><span class="fl">999</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Clark-Evans test
+    No edge correction
+    Monte Carlo test based on 999 simulations of CSR with fixed n
+
+data:  ppp_realestate_all
+R = 0.44849, p-value = 0.001
+alternative hypothesis: clustered (R &lt; 1)</code></pre>
+</div>
+</div>
+<p>The Clark-Evans test shows that real estate businesses (SSIC 681xx) exhibit a significantly clustered spatial distribution (R = 0.45, p &lt; 0.001). This clustering pattern suggests that real estate agencies tend to co-locate in commercial districts and business centers, likely benefiting from proximity to financial services, legal offices, and high foot traffic areas where property transactions commonly occur.</p>
+</div>
+</div>
+</div>
+</section><section id="hotspot-identification-using-spatstat-quantile-method" class="level4" data-number="6.1.3"><h4 data-number="6.1.3" class="anchored" data-anchor-id="hotspot-identification-using-spatstat-quantile-method">
+<span class="header-section-number">6.1.3</span> Hotspot Identification using spatstat quantile method</h4>
+<div class="cell">
+<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Extract quantile-based hotspots</span></span>
+<span><span class="va">hotspot_threshold</span> <span class="op">&lt;-</span> <span class="fl">0.95</span>  <span class="co"># Top 5%</span></span>
+<span></span>
+<span><span class="co"># For restaurants</span></span>
+<span><span class="va">restaurants_quantile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">kde_restaurants_all</span>, probs <span class="op">=</span> <span class="va">hotspot_threshold</span><span class="op">)</span></span>
+<span><span class="va">hotspots_restaurants_mask</span> <span class="op">&lt;-</span> <span class="va">kde_restaurants_all</span> <span class="op">&gt;=</span> <span class="va">restaurants_quantile</span></span>
+<span></span>
+<span><span class="co"># For retail  </span></span>
+<span><span class="va">retail_quantile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">kde_retail_all</span>, probs <span class="op">=</span> <span class="va">hotspot_threshold</span><span class="op">)</span></span>
+<span><span class="va">hotspots_retail_mask</span> <span class="op">&lt;-</span> <span class="va">kde_retail_all</span> <span class="op">&gt;=</span> <span class="va">retail_quantile</span></span>
+<span></span>
+<span><span class="co"># For real estate</span></span>
+<span><span class="va">realestate_quantile</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/quantile.html">quantile</a></span><span class="op">(</span><span class="va">kde_realestate_all</span>, probs <span class="op">=</span> <span class="va">hotspot_threshold</span><span class="op">)</span></span>
+<span><span class="va">hotspots_realestate_mask</span> <span class="op">&lt;-</span> <span class="va">kde_realestate_all</span> <span class="op">&gt;=</span> <span class="va">realestate_quantile</span></span>
+<span></span>
+<span><span class="co"># Plot hotspots overlay</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">kde_restaurants_all</span>, main <span class="op">=</span> <span class="st">"Registration Intent Hotspots"</span>, ribbon <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/contour.html">contour</a></span><span class="op">(</span><span class="va">hotspots_restaurants_mask</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"red"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/contour.html">contour</a></span><span class="op">(</span><span class="va">hotspots_retail_mask</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"yellow"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> </span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/contour.html">contour</a></span><span class="op">(</span><span class="va">hotspots_realestate_mask</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"green"</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span><span class="op">(</span><span class="st">"topright"</span>, </span>
+<span>       legend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"Restaurants"</span>, <span class="st">"Retail"</span>, <span class="st">"Real Estate"</span><span class="op">)</span>,</span>
+<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"red"</span>, <span class="st">"yellow"</span>, <span class="st">"green"</span><span class="op">)</span>,</span>
+<span>       lty <span class="op">=</span> <span class="fl">1</span>, lwd <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section></section><section id="spatio-temporal-kde-analysis" class="level3" data-number="6.2"><h3 data-number="6.2" class="anchored" data-anchor-id="spatio-temporal-kde-analysis">
+<span class="header-section-number">6.2</span> Spatio-Temporal KDE Analysis</h3>
+<section id="monthly-progression" class="level4" data-number="6.2.1"><h4 data-number="6.2.1" class="anchored" data-anchor-id="monthly-progression">
+<span class="header-section-number">6.2.1</span> 2025 Monthly Progression</h4>
+<div class="cell">
+<div class="sourceCode" id="cb81"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Function to create monthly ppp objects and KDE</span></span>
+<span><span class="va">create_monthly_ppp_kde</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_sf</span>, <span class="va">year_filter</span> <span class="op">=</span> <span class="fl">2025</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">monthly_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">month</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># Filter sf object by year and month</span></span>
+<span>    <span class="va">monthly_data_sf</span> <span class="op">&lt;-</span> <span class="va">data_sf</span> <span class="op">%&gt;%</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">YEAR</span> <span class="op">==</span> <span class="va">year_filter</span>, <span class="va">MONTH_NUM</span> <span class="op">==</span> <span class="va">month</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">monthly_data_sf</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span>  <span class="co"># Minimum sample size</span></span>
+<span>      <span class="co"># Create ppp object from sf (your method)</span></span>
+<span>      <span class="va">monthly_ppp</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">monthly_data_sf</span><span class="op">)</span></span>
+<span>      <span class="va">monthly_ppp</span> <span class="op">&lt;-</span> <span class="va">monthly_ppp</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span>  </span>
+<span>      </span>
+<span>      <span class="co"># Calculate KDE using spatstat</span></span>
+<span>      <span class="va">monthly_kde</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">monthly_ppp</span>, sigma <span class="op">=</span> <span class="va">bw.diggle</span>, edge <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span>      </span>
+<span>      <span class="va">monthly_results</span><span class="op">[[</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"month_"</span>, <span class="va">month</span><span class="op">)</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>        ppp <span class="op">=</span> <span class="va">monthly_ppp</span>,</span>
+<span>        kde <span class="op">=</span> <span class="va">monthly_kde</span>,</span>
+<span>        count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">monthly_data_sf</span><span class="op">)</span></span>
+<span>      <span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">monthly_results</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb82"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Function to plot monthly progression</span></span>
+<span><span class="va">plot_monthly_kde</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">monthly_list</span>, <span class="va">title</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="kw">for</span><span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">month_name</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"month_"</span>, <span class="va">i</span><span class="op">)</span></span>
+<span>    <span class="kw">if</span><span class="op">(</span><span class="va">month_name</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="va">monthly_list</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">monthly_list</span><span class="op">[[</span><span class="va">month_name</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">kde</span>, </span>
+<span>           main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">title</span>, <span class="st">"\nMonth "</span>, <span class="va">i</span>, <span class="st">" (n="</span>, <span class="va">monthly_list</span><span class="op">[[</span><span class="va">month_name</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">count</span>, <span class="st">")"</span><span class="op">)</span>,</span>
+<span>           ribbon <span class="op">=</span> <span class="cn">FALSE</span>, cex.main <span class="op">=</span> <span class="fl">0.8</span><span class="op">)</span> </span>
+<span>    <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/graphics/frame.html">plot.new</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>      <span class="fu"><a href="https://rdrr.io/r/graphics/text.html">text</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste</a></span><span class="op">(</span><span class="st">"Month"</span>, <span class="va">i</span>, <span class="st">"\nInsufficient data"</span><span class="op">)</span>, </span>
+<span>           cex <span class="op">=</span> <span class="fl">1.2</span>, adj <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">0.5</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="op">}</span></span>
+<span>  <span class="op">}</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb83"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create monthly analysis for each business type</span></span>
+<span><span class="va">monthly_retail</span> <span class="op">&lt;-</span> <span class="fu">create_monthly_ppp_kde</span><span class="op">(</span><span class="va">biz_retail_nonspec_sf</span><span class="op">)</span></span>
+<span><span class="va">monthly_restaurants</span> <span class="op">&lt;-</span> <span class="fu">create_monthly_ppp_kde</span><span class="op">(</span><span class="va">biz_restaurant_cafe_sf</span><span class="op">)</span></span>
+<span><span class="va">monthly_realestate</span> <span class="op">&lt;-</span> <span class="fu">create_monthly_ppp_kde</span><span class="op">(</span><span class="va">biz_real_estate_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-5-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-1" role="tab" aria-controls="tabset-5-1" aria-selected="true">471xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-2" role="tab" aria-controls="tabset-5-2" aria-selected="false">561xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-5-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-5-3" role="tab" aria-controls="tabset-5-3" aria-selected="false">681xx</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-5-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-5-1-tab">
+<div class="cell">
+<div class="sourceCode" id="cb84"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">plot_monthly_kde</span><span class="op">(</span><span class="va">monthly_retail</span>, <span class="st">"Retail Business Registration"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-50-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Retail registrations fluctuate between 57-92 establishments monthly in early 2025, showing more variation than restaurants. Primary hotspot concentrates in central Singapore’s CBD and Orchard Road commercial belt, with strong secondary clusters in northeastern areas likely Tampines/Bedok and northwestern regions around Jurong. This dispersed pattern reflects retail’s need to serve residential populations across multiple regional commercial centers.</p>
+</div>
+<div id="tabset-5-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-2-tab">
+<div class="cell">
+<div class="sourceCode" id="cb85"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">plot_monthly_kde</span><span class="op">(</span><span class="va">monthly_restaurants</span>, <span class="st">"Restaurant Registration"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-51-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The visualization above represents restaurant registrations in the first half of 2025, which show stable patterns with 283-344 monthly establishments consistently concentrating in the CBD and central urban core. Spatial distribution remains unchanged across months, indicating established downtown commercial districts maintain attractiveness for new ventures with minimal geographic diversification into outer residential areas.</p>
+</div>
+<div id="tabset-5-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-5-3-tab">
+<div class="cell">
+<div class="sourceCode" id="cb86"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">plot_monthly_kde</span><span class="op">(</span><span class="va">monthly_realestate</span>, <span class="st">"Real Estate Business Registration"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-52-1.png" class="img-fluid figure-img" width="1152"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Real estate registrations vary between 61-74 establishments monthly across the first half of 2025. Activity concentrates heavily in the central business district and downtown core, with prominent hotspots in the CBD area and Marina Bay region. Secondary clusters appear in northern Singapore, likely Woodlands/Yishun areas, indicating diversified real estate development beyond traditional commercial centers.</p>
+</div>
+</div>
+</div>
+</section><section id="vs-2025-year-over-year-comparison" class="level4" data-number="6.2.2"><h4 data-number="6.2.2" class="anchored" data-anchor-id="vs-2025-year-over-year-comparison">
+<span class="header-section-number">6.2.2</span> 2024 vs 2025 Year-over-Year Comparison</h4>
+<div class="cell">
+<div class="sourceCode" id="cb87"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create year comparison function</span></span>
+<span><span class="va">create_annual_ppp_comparison</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data_sf</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="va">annual_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># 2024 data (first half)</span></span>
+<span>  <span class="va">data_2024_h1_sf</span> <span class="op">&lt;-</span> <span class="va">data_sf</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">YEAR</span> <span class="op">==</span> <span class="fl">2024</span>, <span class="va">MONTH_NUM</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="co"># 2025 data (first half)</span></span>
+<span>  <span class="va">data_2025_h1_sf</span> <span class="op">&lt;-</span> <span class="va">data_sf</span> <span class="op">%&gt;%</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/stats/filter.html">filter</a></span><span class="op">(</span><span class="va">YEAR</span> <span class="op">==</span> <span class="fl">2025</span>, <span class="va">MONTH_NUM</span> <span class="op"><a href="https://rdrr.io/r/base/match.html">%in%</a></span> <span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">data_2024_h1_sf</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">ppp_2024</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">data_2024_h1_sf</span><span class="op">)</span></span>
+<span>    <span class="va">ppp_2024</span> <span class="op">&lt;-</span> <span class="va">ppp_2024</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span>  <span class="co"># Apply Singapore window</span></span>
+<span>    </span>
+<span>    <span class="va">annual_results</span><span class="op">$</span><span class="va">year_2024</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>      ppp <span class="op">=</span> <span class="va">ppp_2024</span>,</span>
+<span>      kde <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">ppp_2024</span>, sigma <span class="op">=</span> <span class="va">bw.diggle</span>, edge <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>      count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">data_2024_h1_sf</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">data_2025_h1_sf</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">10</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">ppp_2025</span> <span class="op">&lt;-</span> <span class="fu">as.ppp</span><span class="op">(</span><span class="va">data_2025_h1_sf</span><span class="op">)</span></span>
+<span>    <span class="va">ppp_2025</span> <span class="op">&lt;-</span> <span class="va">ppp_2025</span><span class="op">[</span><span class="va">sg_owin</span><span class="op">]</span>  <span class="co"># Apply Singapore window</span></span>
+<span>    </span>
+<span>    <span class="va">annual_results</span><span class="op">$</span><span class="va">year_2025</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span></span>
+<span>      ppp <span class="op">=</span> <span class="va">ppp_2025</span>,</span>
+<span>      kde <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/density.html">density</a></span><span class="op">(</span><span class="va">ppp_2025</span>, sigma <span class="op">=</span> <span class="va">bw.diggle</span>, edge <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>      count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">data_2025_h1_sf</span><span class="op">)</span></span>
+<span>    <span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span>  </span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html">return</a></span><span class="op">(</span><span class="va">annual_results</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb88"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create a function to plot year-over-year comparison</span></span>
+<span><span class="va">plot_annual_comparison</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">annual_list</span>, <span class="va">title</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="kw">if</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">annual_list</span><span class="op">)</span> <span class="op">==</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">3</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>    </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">annual_list</span><span class="op">$</span><span class="va">year_2024</span><span class="op">$</span><span class="va">kde</span>, </span>
+<span>         main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">title</span>, <span class="st">"\n2024 H1 (n="</span>, <span class="va">annual_list</span><span class="op">$</span><span class="va">year_2024</span><span class="op">$</span><span class="va">count</span>, <span class="st">")"</span><span class="op">)</span>,</span>
+<span>         ribbon <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>         cex.main <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>         ribargs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cex.axis <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Adjust ribbon text size</span></span>
+<span>    </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">annual_list</span><span class="op">$</span><span class="va">year_2025</span><span class="op">$</span><span class="va">kde</span>,</span>
+<span>         main <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="va">title</span>, <span class="st">"\n2025 H1 (n="</span>, <span class="va">annual_list</span><span class="op">$</span><span class="va">year_2025</span><span class="op">$</span><span class="va">count</span>, <span class="st">")"</span><span class="op">)</span>,</span>
+<span>         ribbon <span class="op">=</span> <span class="cn">TRUE</span>, </span>
+<span>         cex.main <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>         ribargs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>cex.axis <span class="op">=</span> <span class="fl">0.7</span><span class="op">)</span><span class="op">)</span>  <span class="co"># Adjust ribbon text size</span></span>
+<span>    </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/graphics/par.html">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span><span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb89"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Annual comparison for each business type (using sf objects)</span></span>
+<span><span class="va">annual_restaurants</span> <span class="op">&lt;-</span> <span class="fu">create_annual_ppp_comparison</span><span class="op">(</span><span class="va">biz_restaurant_cafe_sf</span><span class="op">)</span></span>
+<span><span class="va">annual_retail</span> <span class="op">&lt;-</span> <span class="fu">create_annual_ppp_comparison</span><span class="op">(</span><span class="va">biz_retail_nonspec_sf</span><span class="op">)</span></span>
+<span><span class="va">annual_realestate</span> <span class="op">&lt;-</span> <span class="fu">create_annual_ppp_comparison</span><span class="op">(</span><span class="va">biz_real_estate_sf</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Based on the visualization below, Year-over-year analysis reveals significant growth and spatial diversification across all three business sectors in H1 2025. More notably, the spatial distribution patterns demonstrate a clear shift from concentrated urban clustering to geographic diversification. The intense density hotspots visible in H1 2024—particularly around the CBD and Marina Bay areas—have diffused considerably in 2025, indicating businesses are expanding into secondary commercial districts and suburban locations. This spatial deconcentration suggests either market saturation in prime central areas driving entrepreneurs to seek opportunities in emerging neighborhoods, or improved infrastructure and zoning policies making previously less attractive areas more viable for business establishment.</p>
+<div class="tabset-margin-container"></div><div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-6-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-1" role="tab" aria-controls="tabset-6-1" aria-selected="true">471xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-2" role="tab" aria-controls="tabset-6-2" aria-selected="false">561xx</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-6-3-tab" data-bs-toggle="tab" data-bs-target="#tabset-6-3" role="tab" aria-controls="tabset-6-3" aria-selected="false">681xx</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-6-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-6-1-tab">
+<div class="cell">
+<div class="sourceCode" id="cb90"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">plot_annual_comparison</span><span class="op">(</span><span class="va">annual_retail</span>, <span class="st">"Retail Registration"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-6-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-2-tab">
+<div class="cell">
+<div class="sourceCode" id="cb91"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">plot_annual_comparison</span><span class="op">(</span><span class="va">annual_restaurants</span>, <span class="st">"Restaurant Registration"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<div id="tabset-6-3" class="tab-pane" role="tabpanel" aria-labelledby="tabset-6-3-tab">
+<div class="cell">
+<div class="sourceCode" id="cb92"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">plot_annual_comparison</span><span class="op">(</span><span class="va">annual_realestate</span>, <span class="st">"Real Estate Registration"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure"><p><img src="Take-home_Ex01_files/figure-html/unnamed-chunk-58-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section></section></section><section id="second-order-spatial-point-patterns-analysis" class="level2" data-number="7"><h2 data-number="7" class="anchored" data-anchor-id="second-order-spatial-point-patterns-analysis">
+<span class="header-section-number">7</span> Second Order Spatial Point Patterns Analysis</h2>
+</section><section id="conclusions-and-future-improvements" class="level2" data-number="8"><h2 data-number="8" class="anchored" data-anchor-id="conclusions-and-future-improvements">
+<span class="header-section-number">8</span> Conclusions and Future Improvements</h2>
+
+
+</section></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+</body></html>
