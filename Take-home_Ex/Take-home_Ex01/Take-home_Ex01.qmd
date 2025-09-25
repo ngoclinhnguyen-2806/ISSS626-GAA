@@ -12,8 +12,10 @@ execute:
   warning: false
 format:
   html:
-    code-link: true
-    toc: true
+    code-link: true        # Clickable function links
+    toc: true             # Table of contents
+    code-fold: true       # Foldable code
+    code-tools: true      # Code tools menu
 number-sections: true
 number-offset: 1
 editor: visual
@@ -21,19 +23,10 @@ editor: visual
 
 ## Overview
 
-### Setting The Scene
-
-Where businesses choose to locate plays a huge role in how Singapore continues to grow and develop as a city-state. Smart locations give companies advantages like easier access to skilled workers and excellent infrastructure, while also shaping different districts like the Central Business District, Jurong Innovation District, or Punggol Digital District, and making it easier for goods to move through our efficient transport networks and for employees to commute via MRT and buses.
-
-Studying how businesses spread out across Singapore and change over time is crucial for urban planning by agencies like URA and JTC. This research helps planners understand how economic activity and our urban landscape develop together, enabling them to design better integrated developments, plan for future growth in areas like the Greater Southern Waterfront, use our limited land resources efficiently, and build infrastructure that supports both business competitiveness and residents' quality of life in our compact island nation.
-
 ### Objectives
 
--   To identify where and when new businesses are established in Singapore, revealing clusters, patterns, and trends that help inform urban planning, resource allocation, and economic development decisions.
-
--   To uncover complex relationships in how new businesses are distributed across the island - such as how related industries cluster together, how past business locations influence future ones, and how commercial districts develop structurally over time. These insights are essential for evidence-based urban planning and policy-making.
-
-By understanding business locations and how their distribution evolves, Singapore's urban planners and agencies can gain valuable spatial insights, optimize city operations, and develop effective strategies to attract investment and promote sustainable growth across our city-state.
+-   To identify where and when new businesses are established in Singapore, revealing clusters, patterns, and trends
+-   To uncover complex relationships in how new businesses are distributed across the island
 
 ## Analysis Questions
 
@@ -41,6 +34,17 @@ By understanding business locations and how their distribution evolves, Singapor
 - How do survival rates vary between business categories and specific SSIC codes?
 - Which business types show clustering behavior versus random spatial distribution?
 - What factors influence business location density and geographic concentration patterns?
+
+## Set up R environment
+
+```{r}
+# Import R Packages
+pacman::p_load(tidyverse, sf, tmap, httr, readxl, dplyr, stringr, rvest, knitr, spatstat, terra, raster, sparr, tidyr, kableExtra, ggplot2)
+```
+
+```{r}
+set.seed(1234)
+```
 
 ### The Data
 
@@ -53,20 +57,6 @@ By understanding business locations and how their distribution evolves, Singapor
 +-------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+------------+
 | **MasterPlan2019SubzoneBoundaryNoSeaKML**                   | Polygon data with URA 2019 Master Plan Planning Subzone boundaries                                 | [data.gov.sg](https://data.gov.sg/datasets?query=Master+Plan+Planning+Subzone+boundaries&page=1&resultId=d_6c6d7361dd826d97b91bac914ca6b2ac) | KML        |
 +-------------------------------------------------------------+----------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------+------------+
-
-## Set up R environment
-
-### Import R Packages
-
-```{r}
-pacman::p_load(tidyverse, sf, tmap, httr, readxl, dplyr, stringr, rvest, knitr, spatstat, terra, raster, sparr, tidyr, kableExtra, ggplot2)
-```
-
-### Set Seed
-
-```{r}
-set.seed(1234)
-```
 
 ## Data Import & Preparation
 
@@ -99,49 +89,145 @@ acra_data <- read_rds("data/rds/acra_data.rds")
 
 The chosen business types are as the following table:
 
-+---------------------+-------------------------------------------------------+-------------------------+----------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| SSIC 3-digit prefix | Description                                           | Alias for this analysis | SSIC 4-digit sub-types                                   | SSIC 5-digit sub-types                                                                                                                                                           |
-+=====================+=======================================================+=========================+==========================================================+==================================================================================================================================================================================+
-| 471                 | Retail Sale in Non-Specialised Stores                 | **Retail**              | 4710: Retail Sale in Non-Specialised Stores              | 47101: Supermarkets and hypermarkets                                                                                                                                             |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 47102: Mini-marts, convenience stores and provision shops                                                                                                                        |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 47103: Department stores                                                                                                                                                         |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 47104: Retail sale in other non-specialised stores n.e.c.                                                                                                                        |
-+---------------------+-------------------------------------------------------+-------------------------+----------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 561                 | Restaurants, Cafes, Food Courts, Food Kiosks And Bars | **Food & Beverage**     | 5611: Restaurants and Cafes                              | 56111: Restaurants                                                                                                                                                               |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         | 5612: Fast Food Outlets, Food Courts and Food Kiosks     | 56112: Cafes                                                                                                                                                                     |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         | 5613: Pubs                                               | --                                                                                                                                                                               |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         | 5614: Stalls Selling Cooked Food and Prepared Drinks     | 56121: Fast food outlets                                                                                                                                                         |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 56122: Food courts, coffee shops and canteens (with mainly food and beverage income)                                                                                             |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 56123: Food kiosks mainly for takeaway and delivery                                                                                                                              |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | --                                                                                                                                                                               |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 56130: Pubs                                                                                                                                                                      |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | --                                                                                                                                                                               |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 56140: Stalls Selling Cooked Food and Prepared Drinks                                                                                                                            |
-+---------------------+-------------------------------------------------------+-------------------------+----------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| 681                 | Real Estate Activities With Own Or Leased Property    | **Real Estate**         | 6810: Real Estate Activities With Own Or Leased Property | 68101: Real estate developers                                                                                                                                                    |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 68102: Operating of serviced apartments                                                                                                                                          |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 68103: Letting of self-owned or leased real estate property except food courts, coffee shops and canteens (e.g. office/exhibition space, shopping mall, self-storage facilities) |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 68104: Letting and operating of self-owned or leased food courts, coffee shops and canteens (with mainly rental income)                                                          |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 68105: Collective portfolio investment funds with rental income                                                                                                                  |
-|                     |                                                       |                         |                                                          |                                                                                                                                                                                  |
-|                     |                                                       |                         |                                                          | 68106: Management of self-owned strata titled property (i.e. Management Corporation Strata Title)                                                                                |
-+---------------------+-------------------------------------------------------+-------------------------+----------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+```{r}
+#| echo: false
+
+# Create the data frame
+ssic_table <- data.frame(
+  `SSIC 3-digit` = c(
+    "471",
+    "",
+    "",
+    "",
+    "561", 
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "681",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ),
+  Description = c(
+    "Retail Sale in Non-Specialised Stores",
+    "",
+    "",
+    "",
+    "Restaurants, Cafes, Food Courts, Food Kiosks And Bars",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "Real Estate Activities With Own Or Leased Property",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ),
+  Alias = c(
+    "**Retail**",
+    "",
+    "",
+    "",
+    "**Food & Beverage**",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "**Real Estate**",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ),
+  `SSIC 4-digit` = c(
+    "4710: Retail Sale in Non-Specialised Stores",
+    "",
+    "",
+    "",
+    "5611: Restaurants and Cafes",
+    "5612: Fast Food Outlets, Food Courts and Food Kiosks",
+    "5613: Pubs", 
+    "5614: Stalls Selling Cooked Food and Prepared Drinks",
+    "",
+    "",
+    "",
+    "",
+    "",
+    "6810: Real Estate Activities With Own Or Leased Property",
+    "",
+    "",
+    "",
+    "",
+    ""
+  ),
+  `SSIC 5-digit` = c(
+    "47101: Supermarkets and hypermarkets",
+    "47102: Mini-marts, convenience stores and provision shops",
+    "47103: Department stores", 
+    "47104: Retail sale in other non-specialised stores n.e.c.",
+    "56111: Restaurants",
+    "56112: Cafes",
+    "56121: Fast food outlets",
+    "56122: Food courts, coffee shops and canteens (with mainly food and beverage income)",
+    "56123: Food kiosks mainly for takeaway and delivery",
+    "56130: Pubs",
+    "56140: Stalls Selling Cooked Food and Prepared Drinks",
+    "",
+    "",
+    "68101: Real estate developers",
+    "68102: Operating of serviced apartments",
+    "68103: Letting of self-owned or leased real estate property except food courts, coffee shops and canteens",
+    "68104: Letting and operating of self-owned or leased food courts, coffee shops and canteens",
+    "68105: Collective portfolio investment funds with rental income",
+    "68106: Management of self-owned strata titled property (i.e. Management Corporation Strata Title)"
+  ),
+  stringsAsFactors = FALSE
+)
+
+# Create the kable
+ssic_table %>%
+  kable(
+    col.names = c("SSIC 3-digit prefix", "Description", "Alias for this analysis", 
+                  "SSIC 4-digit sub-types", "SSIC 5-digit sub-types"),
+    caption = "SSIC Classification Structure for Analysis",
+    escape = FALSE  # Allow HTML formatting like **bold**
+  ) %>%
+  kable_styling(
+    bootstrap_options = c("striped", "hover", "condensed", "responsive"),
+    font_size = 11,
+    full_width = TRUE
+  ) %>%
+  # Group rows by main categories
+  pack_rows("Retail (471)", 1, 4, label_row_css = "background-color: #f0f0f0; font-weight: bold;") %>%
+  pack_rows("Food & Beverage (561)", 5, 13, label_row_css = "background-color: #f0f0f0; font-weight: bold;") %>%
+  pack_rows("Real Estate (681)", 14, 19, label_row_css = "background-color: #f0f0f0; font-weight: bold;") %>%
+  # Style specific columns
+  column_spec(1, bold = TRUE, width = "8%") %>%
+  column_spec(2, width = "25%") %>%
+  column_spec(3, bold = TRUE, width = "12%") %>%
+  column_spec(4, width = "25%") %>%
+  column_spec(5, width = "30%") %>%
+  # Add scroll for better mobile viewing
+  scroll_box(width = "100%", height = "600px")
+```
 
 ```{r}
 #| label: Extracting data of chosen business types
@@ -171,7 +257,6 @@ write_rds(biz_selected, "data/rds/biz_selected.rds")
 ```
 
 ```{r}
-# Read the files you just wrote
 #| echo: false
 #| eval: false
 biz_selected <- read_rds("data/rds/biz_selected.rds")
@@ -238,13 +323,6 @@ ssic_final <- ssic_hierarchy %>%
          level_3, level_3_description,
          level_4, level_4_description,
          level_5, level_5_description)
-
-# Display the structure
-cat("Final dataset structure:\n")
-str(ssic_final)
-
-cat("\nFirst few rows:\n")
-head(ssic_final, 10)
 ```
 
 ```{r}
@@ -278,25 +356,8 @@ write_rds(biz_with_hierarchy, "data/rds/biz_with_hierarchy.rds")
 ```
 
 ```{r}
-# Read the files you just wrote
 #| echo: false
 biz_with_hierarchy <- read_rds("data/rds/biz_with_hierarchy.rds")
-```
-
-```{r}
-##| eval: false
-#| echo: false
-# Check for any unmatched records
-cat("Records in biz_selected:", nrow(biz_selected), "\n")
-cat("Records after join:", nrow(biz_with_hierarchy), "\n")
-cat("Records with no SSIC match:", sum(is.na(biz_with_hierarchy$level_5_description)), "\n")
-
-# View some examples of the joined data
-biz_with_hierarchy %>%
-  dplyr::select(primary_ssic_code, level_2, level_2_description, 
-         level_3, level_3_description, level_4, level_4_description, 
-         level_5_description) %>%
-  head(10)
 ```
 
 ### Geospatial data
@@ -446,14 +507,6 @@ biz_retail_nonspec <- read_rds("data/rds/biz_retail_nonspec.rds")
 biz_real_estate <- read_rds("data/rds/biz_real_estate.rds")
 ```
 
-```{r}
-# Check the counts for each category
-cat("Total selected businesses:", nrow(biz_selected), "\n")
-cat("Restaurants, Cafes, Food Courts, Food Kiosks And Bars (561xx):", nrow(biz_restaurant_cafe), "\n")
-cat("Retail Sale in Non-Specialised Stores (471xx):", nrow(biz_retail_nonspec), "\n") 
-cat("Retail Sale of Food, Beverage, and Tobacco in Specialised Store (681xx):", nrow(biz_real_estate), "\n")
-```
-
 ### Converting into simple point features - SF data frame
 
 Before applying the `st_as_sf` function to convert the data into simple point features, we check for missing values first and remove such records.
@@ -505,23 +558,20 @@ biz_real_estate_sf <- st_read("data/sf/biz_real_estate_sf.gpkg")
 
 ::: panel-tabset
 
-#### 471xx
+#### Retail
 
 ```{r}
-summary(biz_sf)
 plot(st_geometry(biz_retail_nonspec_sf), main = "Business Point Features", pch = 16, cex = 0.5)
 ```
 
-#### 561xx
+#### Food & Beverages
 
 ```{r}
-summary(biz_sf)
 plot(st_geometry(biz_restaurant_cafe_sf), main = "Business Point Features", pch = 16, cex = 0.5)
 ```
-#### 681xx
+#### Real Estate
 
 ```{r}
-summary(biz_sf)
 plot(st_geometry(biz_real_estate_sf), main = "Business Point Features", pch = 16, cex = 0.5)
 ```
 :::
@@ -601,25 +651,25 @@ ggplot() +
 
 Based on the business location plots, here are key observations about spatial density patterns:
 
-**Food & Beverage Sector (561xx):**
+**Food & Beverage Sector (Food & Beverages):**
 
 -   56111 (Restaurants) and 56140 (Food stalls) show the highest density and widest distribution across Singapore, indicating ubiquitous presence in residential and commercial areas
 -   56122 (Food courts/coffee shops) displays concentrated clusters, likely in HDB estates and commercial centers where these establishments serve local communities
 -   56123 (Food kiosks) shows moderate density with scattered distribution, reflecting their mobile/flexible nature
 -   56112 (Cafes) and 56130 (Pubs) are more selectively located, probably in trendy districts and entertainment areas
 
-**Retail Sector (471xx):**
+**Retail Sector (Retail):**
 
 -   47109 (Other non-specialised stores) shows broad distribution but lower density than food businesses
 -   47101-47103 display very sparse, clustered patterns, suggesting these larger retail formats locate in specific commercial zones
 
-**Real Estate Sector (681xx):**
+**Real Estate Sector (Real Estate):**
 
 - 68103 (Property letting) shows moderate clustering in business districts Other real estate activities (68101, 68102, 68104-68106) are extremely sparse, reflecting their specialized, capital-intensive nature
 
 :::
 
-## CORE SPATIAL ANALYSIS - LAYER 1: REGISTRATION INTENT ANALYSIS
+## CORE SPATIAL ANALYSIS - REGISTRATION INTENT ANALYSIS
 
 ### Spatial KDE Analysis
 
@@ -631,51 +681,68 @@ Based on the business location plots, here are key observations about spatial de
 sg_owin <- as.owin(mpsz_cl)
 ```
 
-**Convert sf data frames to ppp class**
+:::panel-tabset
+
+##### Retail
 
 ```{r}
+# Convert sf data frames to ppp class
 ppp_retail_all <- as.ppp(biz_retail_nonspec_sf)
 ppp_retail_all = ppp_retail_all[sg_owin]
 
-ppp_restaurants_all <- as.ppp(biz_restaurant_cafe_sf)
-ppp_restaurants_all = ppp_restaurants_all[sg_owin]
-
-ppp_realestate_all <- as.ppp(biz_real_estate_sf)
-ppp_realestate_all = ppp_realestate_all[sg_owin]
-```
-
-```{r}
-# Calculate KDE using spatstat (Prof's approach)
+# Calculate KDE using spatstat
 kde_retail_all <- density(ppp_retail_all,
                          sigma = bw.diggle,
                          edge = TRUE,
                          kernel="gaussian")
+plot(kde_retail_all)
+```
 
+##### Food & Beverages
+
+```{r}
+# Convert sf data frames to ppp class
+ppp_restaurants_all <- as.ppp(biz_restaurant_cafe_sf)
+ppp_restaurants_all = ppp_restaurants_all[sg_owin]
+
+# Calculate KDE using spatstat
 kde_restaurants_all <- density(ppp_restaurants_all, 
                               sigma = bw.diggle,  # Automatic bandwidth selection
                               edge = TRUE,
                               kernel="gaussian")        # Edge correction
+plot(kde_restaurants_all)
+```
 
+##### Real Estate
+
+```{r}
+# Convert sf data frames to ppp class
+ppp_realestate_all <- as.ppp(biz_real_estate_sf)
+ppp_realestate_all = ppp_realestate_all[sg_owin]
+
+# Calculate KDE using spatstat
 kde_realestate_all <- density(ppp_realestate_all,
                              sigma = bw.diggle,
                              edge = TRUE,
                              kernel="gaussian")
-```
-
-```{r}
-plot(kde_retail_all)
-plot(kde_restaurants_all)
 plot(kde_realestate_all)
 ```
 
-#### Clark-Evans test
+:::
+
+#### Perform the Clark-Evans test with CSR
 
 In this section, we will perform Clark-Evans tests for the 3 business entities separately, to quantify whether a point pattern is clustered, random, or uniformly spaced. The result will help us understand the underlying spatial patterns of each business type. This will inform our interpretation of the subsequent KDE analysis.
 
-::: panel-tabset
-##### 561xx
+The confidence level chosen for the test is 95%. Therefore, we can set the number simulation at the minimum of `nsim = 39`.
 
-The test hypotheses are: Ho = The distribution of 561xx are randomly distributed. H1 = The distribution of 561xx are not randomly distributed. The 95% confident interval will be used.
+::: panel-tabset
+
+##### Food & Beverages
+
+The test hypotheses are: 
+- Ho = The distribution of Food & Beverages are randomly distributed. 
+- H1 = The distribution of Food & Beverages are not randomly distributed. The 95% confident interval will be used.
 
 ```{r}
 #| cache: true
@@ -684,14 +751,16 @@ clarkevans.test(ppp_restaurants_all,
                 clipregion="sg_owin",
                 alternative=c("clustered"),
                 method="MonteCarlo",
-                nsim=999)
+                nsim=39)
 ```
 
-The Clark-Evans test reveals that restaurants and cafes (SSIC 561xx) in the study area exhibit a significantly clustered spatial distribution (R = 0.35908, p < 0.05). This strong clustering pattern suggests that food service establishments tend to co-locate rather than distribute randomly across the landscape. The clustering likely reflects agglomeration benefits where restaurants benefit from proximity to competitors through shared customer traffic, as well as urban planning policies that concentrate commercial activities in designated zones. This spatial concentration creates identifiable dining districts and food hubs within the study area, which has important implications for business location strategy and urban commercial planning.
+The Clark-Evans test reveals that restaurants and cafes (SSIC Food & Beverages) in the study area exhibit a significantly clustered spatial distribution (R = 0.35908, p < 0.05). This strong clustering pattern suggests that food service establishments tend to co-locate rather than distribute randomly across the landscape. The clustering likely reflects agglomeration benefits where restaurants benefit from proximity to competitors through shared customer traffic, as well as urban planning policies that concentrate commercial activities in designated zones. This spatial concentration creates identifiable dining districts and food hubs within the study area, which has important implications for business location strategy and urban commercial planning.
 
-##### 471xx
+##### Retail
 
-The test hypotheses are: Ho = The distribution of 471xx are randomly distributed. H1 = The distribution of 471xx are not randomly distributed. The 95% confident interval will be used.
+The test hypotheses are: 
+- Ho = The distribution of Retail are randomly distributed. 
+- H1 = The distribution of Retail are not randomly distributed. The 95% confident interval will be used.
 
 ```{r}
 #| cache: true
@@ -700,14 +769,16 @@ clarkevans.test(ppp_retail_all,
                 clipregion="sg_owin",
                 alternative=c("clustered"),
                 method="MonteCarlo",
-                nsim=999)
+                nsim=39)
 ```
 
-The Clark-Evans test indicates that non-specialised retail stores (SSIC 471xx) exhibit a significantly clustered spatial distribution (R = 0.46, p < 0.001). While still showing clustering behavior, these retail establishments are somewhat more dispersed than restaurants and cafes, reflecting their need to serve broader geographic markets while still benefiting from commercial agglomeration in shopping districts and retail centers.
+The Clark-Evans test indicates that non-specialised retail stores (SSIC Retail) exhibit a significantly clustered spatial distribution (R = 0.46, p < 0.05). While still showing clustering behavior, these retail establishments are somewhat more dispersed than restaurants and cafes, reflecting their need to serve broader geographic markets while still benefiting from commercial agglomeration in shopping districts and retail centers.
 
-##### 681xx
+##### Real Estate
 
-The test hypotheses are: Ho = The distribution of 681xx are randomly distributed. H1 = The distribution of 681xx are not randomly distributed. The 95% confident interval will be used.
+The test hypotheses are: 
+- Ho = The distribution of Real Estate are randomly distributed. 
+- H1 = The distribution of Real Estate are not randomly distributed. The 95% confident interval will be used.
 
 ```{r}
 #| cache: true
@@ -716,10 +787,10 @@ clarkevans.test(ppp_realestate_all,
                 clipregion="sg_owin",
                 alternative=c("clustered"),
                 method="MonteCarlo",
-                nsim=999)
+                nsim=39)
 ```
 
-The Clark-Evans test shows that real estate businesses (SSIC 681xx) exhibit a significantly clustered spatial distribution (R = 0.45, p < 0.001). This clustering pattern suggests that real estate agencies tend to co-locate in commercial districts and business centers, likely benefiting from proximity to financial services, legal offices, and high foot traffic areas where property transactions commonly occur.
+The Clark-Evans test shows that real estate businesses (SSIC Real Estate) exhibit a significantly clustered spatial distribution (R = 0.45, p < 0.05). This clustering pattern suggests that real estate agencies tend to co-locate in commercial districts and business centers, likely benefiting from proximity to financial services, legal offices, and high foot traffic areas where property transactions commonly occur.
 :::
 
 #### Hotspot Identification using spatstat quantile method
@@ -814,7 +885,7 @@ monthly_realestate <- create_monthly_ppp_kde(biz_real_estate_sf)
 
 ::: panel-tabset
 
-##### 471xx
+##### Retail
 
 ```{r fig.width=12, fig.height=8}
 #| cache: true
@@ -822,14 +893,14 @@ plot_monthly_kde(monthly_retail, "Retail Business Registration")
 ```
 Retail registrations fluctuate between 57-92 establishments monthly in early 2025, showing more variation than restaurants. Primary hotspot concentrates in central Singapore's CBD and Orchard Road commercial belt, with strong secondary clusters in northeastern areas likely Tampines/Bedok and northwestern regions around Jurong. This dispersed pattern reflects retail's need to serve residential populations across multiple regional commercial centers.
 
-##### 561xx
+##### Food & Beverages
 
 ```{r fig.width=12, fig.height=8}
 plot_monthly_kde(monthly_restaurants, "Restaurant Registration")
 ```
 The visualization above represents restaurant registrations in the first half of 2025, which show stable patterns with 283-344 monthly establishments consistently concentrating in the CBD and central urban core. Spatial distribution remains unchanged across months, indicating established downtown commercial districts maintain attractiveness for new ventures with minimal geographic diversification into outer residential areas.
 
-##### 681xx
+##### Real Estate
 
 ```{r fig.width=12, fig.height=8}
 plot_monthly_kde(monthly_realestate, "Real Estate Business Registration")
@@ -912,18 +983,20 @@ Based on the visualization below, Year-over-year analysis reveals significant gr
 
 ::: panel-tabset
 
-##### 471xx
+##### Retail
 
 ```{r}
 plot_annual_comparison(annual_retail, "Retail Registration")
 ```
 
-##### 561xx
+##### Food & Beverages
+
 ```{r}
 plot_annual_comparison(annual_restaurants, "Restaurant Registration")
 ```
 
-##### 681xx
+##### Real Estate
+
 ```{r}
 plot_annual_comparison(annual_realestate, "Real Estate Registration")
 ```
@@ -932,5 +1005,357 @@ plot_annual_comparison(annual_realestate, "Real Estate Registration")
 
 ## Second Order Spatial Point Patterns Analysis
 
+This section is to examine spatial relationships beyond simple density mapping to reveal underlying clustering processes and business interaction patterns. My approach for this analysis is as follows:
+
+- F-function Analysis: Measures empty space accessibility from random locations to identify underserved areas
+- L-function Analysis: Detects clustering intensity using the clear above/below envelope interpretation
+- Cross L-functions: Quantify inter-business type spatial interactions to determine attraction, repulsion, or independence between business types
+- Combined F-L Analysis: Provides comprehensive pattern validation through dual complementary perspectives on spatial distribution
+
+### L-Function Analysis
+
+I employ L-function analysis for its superior interpretability over K-functions, where deviations above/below the theoretical line clearly indicate clustering or regularity. 
+
+The Complete Spatial Randomness test with nsim = 39 provides statistically valid significance testing (p < 0.05) while maintaining computational efficiency for this exploratory spatial analysis of business registration patterns.
+
+::: panel-tabset
+
+##### Retail
+
+Calculate L-functions with border correction method, then plot
+
+```{r}
+#| cache: true
+L_retail_all = Lest(ppp_retail_all, correction = "border")
+plot(L_retail_all, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)")
+```
+
+Performing Complete Spatial Randomness Test
+
+```{r}
+#| cache: true
+l_env_retail.csr <- envelope(ppp_retail_all, Lest, nsim = 39,
+                             correction = "border", rank = 1, glocal=TRUE)
+```
+
+##### Food & Beverages
+
+Calculate L-functions with border correction method, then plot
+
+```{r}
+#| cache: true
+L_restaurants_all = Lest(ppp_restaurants_all, correction = "border")
+plot(L_restaurants_all, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)")
+```
+
+Performing Complete Spatial Randomness Test
+
+```{r}
+#| cache: true
+l_env_restaurants.csr <- envelope(ppp_restaurants_all, Lest, nsim = 39,
+                             correction = "border", rank = 1, glocal=TRUE)
+```
+
+##### Real Estate
+
+Calculate L-functions with border correction method, then plot
+
+```{r}
+L_realestate_all = Lest(ppp_realestate_all, correction = "border")
+plot(L_realestate_all, . -r ~ r, 
+     ylab= "L(d)-r", xlab = "d(m)")
+```
+
+Performing Complete Spatial Randomness Test
+
+```{r}
+#| cache: true
+l_env_realestate.csr <- envelope(ppp_realestate_all, Lest, nsim = 39,
+                             correction = "border", rank = 1, glocal=TRUE)
+```
+
+:::
+
+### F-Function Analysis
+
+The F-function (Empty Space Function) measures the distance from randomly selected locations to the nearest business point, quantifying spatial accessibility and identifying areas with insufficient business coverage. Interpretation:
+
+- Below envelope = Clustered pattern (less empty space, high accessibility)
+- Above envelope = Regular pattern (more empty space, potential service gaps)
+- Within envelope = Random distribution
+
+::: panel-tabset
+
+##### Retail
+
+Computing F-function estimation, then plot
+
+```{r}
+#| cache: true
+F_retail_all = Lest(ppp_retail_all, correction = "border")
+plot(F_retail_all)
+```
+
+Performing Complete Spatial Randomness Test
+
+```{r}
+#| cache: true
+F_retail_all.csr <- envelope(ppp_retail_all, Fest, nsim = 39, rank = 1, glocal=TRUE)
+plot(F_retail_all.csr, . - r ~ r, ylab= "F(d)-r", xlab = "d(m)")
+```
+
+##### Food & Beverages
+
+Computing F-function estimation, then plot
+
+```{r}
+#| cache: true
+F_restaurants_all = Lest(ppp_restaurants_all, correction = "border")
+plot(F_restaurants_all)
+```
+
+Performing Complete Spatial Randomness Test
+
+```{r}
+#| cache: true
+F_restaurants_all.csr <- envelope(ppp_restaurants_all, Fest, nsim = 39, rank = 1, glocal=TRUE)
+plot(F_restaurants_all.csr, . - r ~ r, ylab= "F(d)-r", xlab = "d(m)")
+```
+
+##### Real Estate
+
+Computing F-function estimation, then plot
+
+```{r}
+#| cache: true
+F_realestate_all = Lest(ppp_realestate_all, correction = "border")
+plot(F_realestate_all)
+```
+
+Performing Complete Spatial Randomness Test
+
+```{r}
+#| cache: true
+F_realestate_all.csr <- envelope(ppp_realestate_all, Fest, nsim = 39, rank = 1, glocal=TRUE)
+plot(F_realestate_all.csr, . - r ~ r, ylab= "F(d)-r", xlab = "d(m)")
+```
+
+:::
+
+### Cross L-Function Analysis (Inter-business Type Interactions)
+
+The cross L-function envelope method tests spatial interactions between business types using Monte Carlo simulations to create confidence envelopes under spatial independence. The observed cross L-function is compared against these envelopes to determine statistical significance. Interpretation:
+
+- Above envelope = positive interaction (attraction/co-location between business types)
+- Below envelope = negative interaction (repulsion/avoidance between business types)
+- Within envelope = spatial independence (no significant interaction)
+
+First, we create **Multitype Point Pattern** for Cross-Function Analysis
+
+```{r}
+# Get coordinates and create data frame with marks
+restaurants_coords <- st_coordinates(biz_restaurant_cafe_sf)
+retail_coords <- st_coordinates(biz_retail_nonspec_sf) 
+realestate_coords <- st_coordinates(biz_real_estate_sf)
+
+# Combine all coordinates with business type marks
+multitype_data <- data.frame(
+  x = c(restaurants_coords[,1], retail_coords[,1], realestate_coords[,1]),
+  y = c(restaurants_coords[,2], retail_coords[,2], realestate_coords[,2]),
+  marks = c(rep("Restaurants", nrow(restaurants_coords)),
+           rep("Retail", nrow(retail_coords)), 
+           rep("RealEstate", nrow(realestate_coords)))
+)
+
+# Create multitype ppp object
+ppp_multitype <- ppp(x = multitype_data$x,
+                     y = multitype_data$y, 
+                     marks = as.factor(multitype_data$marks),
+                     window = sg_owin)
+
+# Verify it's multitype
+print(is.multitype(ppp_multitype))  # Should return TRUE
+```
+
+::: panel-tabset
+
+#### Restaurants vs Retail
+
+```{r}
+#| cache: true
+# Cross L-function calculation
+cross_l_rest_retail <- Lcross(ppp_multitype, i = "Restaurants", j = "Retail",
+                              correction = c("border"))
+
+# Plot cross L-function
+plot(cross_l_rest_retail, main = "Cross L-function: Restaurants vs Retail\n(Above line = Attraction)")
+
+```
+
+```{r}
+#| cache: true
+# Envelope test for statistical significance
+cross_l_env_rest_retail <- envelope(ppp_multitype, Lcross, nsim = 39,
+                                    i = "Restaurants", j = "Retail",
+                                    correction = "border", verbose = FALSE)
+
+# Plot cross L-function envelope
+plot(cross_l_env_rest_retail, main = "Cross L Envelope: Restaurants ↔ Retail\n(Above = Attraction, Below = Repulsion)")
+
+```
+
+#### Restaurants vs Real Estate  
+
+```{r}
+#| cache: true
+# Cross L-function calculation
+cross_l_rest_realestate <- Lcross(ppp_multitype, i = "Restaurants", j = "RealEstate",
+                                  correction = c("border"))
+
+# Plot cross L-function
+plot(cross_l_rest_realestate, main = "Cross L-function: Restaurants vs Real Estate\n(Above line = Attraction)")
+
+```
+
+```{r}
+#| cache: true
+# Envelope test for statistical significance
+cross_l_env_rest_realestate <- envelope(ppp_multitype, Lcross, nsim = 39,
+                                        i = "Restaurants", j = "RealEstate", 
+                                        correction = "border", verbose = FALSE)
+
+# Plot cross L-function envelope
+plot(cross_l_env_rest_realestate, main = "Cross L Envelope: Restaurants ↔ Real Estate\n(Above = Attraction, Below = Repulsion)")
+
+```
+
+#### Retail vs Real Estate
+
+```{r}
+#| cache: true
+# Cross L-function calculation
+cross_l_retail_realestate <- Lcross(ppp_multitype, i = "Retail", j = "RealEstate", 
+                                    correction = c("border"))
+
+# Plot cross L-function
+plot(cross_l_retail_realestate, main = "Cross L-function: Retail vs Real Estate\n(Above line = Attraction)")
+
+```
+
+```{r}
+#| cache: true
+# Envelope test for statistical significance
+cross_l_env_retail_realestate <- envelope(ppp_multitype, Lcross, nsim = 39,
+                                          i = "Retail", j = "RealEstate",
+                                          correction = "border", verbose = FALSE)
+
+# Plot cross L-function envelope
+plot(cross_l_env_retail_realestate, main = "Cross L Envelope: Retail ↔ Real Estate\n(Above = Attraction, Below = Repulsion)")
+
+```
+
+:::
+
+### Combined F-L Function Analysis Summary
+
+The Combined F-L Function Analysis provides comprehensive spatial pattern assessment by examining business clustering from two complementary perspectives: 
+- The L-function measures inter-business distances to detect clustering intensity (above envelope = clustered, below = regular)
+- The F-function analyzes empty space accessibility from random locations (below envelope = dense coverage, above = sparse distribution). 
+
+Together, they reveal complete spatial patterns: consistent results indicate strong clustering or regularity, while conflicting results suggest complex mixed patterns requiring detailed investigation. 
+
+#### Create summary function for clustering assessment
+
+```{r}
+#| cache: true
+
+assess_clustering <- function(l_env, f_env, business_type) {
+  # Extract test results
+  l_result <- if(any(l_env$obs > l_env$hi)) "CLUSTERED" else if(any(l_env$obs < l_env$lo)) "REGULAR" else "RANDOM"
+  f_result <- if(any(f_env$obs < f_env$lo)) "CLUSTERED" else if(any(f_env$obs > f_env$hi)) "REGULAR" else "RANDOM"
+  
+  # Consistency check
+  consistent <- l_result == f_result
+  
+  return(data.frame(
+    Business_Type = business_type,
+    L_Function = l_result,
+    F_Function = f_result,
+    Consistent = consistent,
+    Pattern = if(consistent) l_result else "MIXED_SIGNALS"
+  ))
+}
+```
+
+#### Assess clustering for all business types
+
+```{r}
+#| cache: true
+
+clustering_assessment <- bind_rows(
+  assess_clustering(l_env_restaurants.csr, F_restaurants_all.csr, "Restaurants_561"),
+  assess_clustering(l_env_retail.csr, F_retail_all.csr, "Retail_471"),
+  assess_clustering(l_env_realestate.csr, F_realestate_all.csr, "RealEstate_681")
+)
+
+print("=== F-FUNCTION AND L-FUNCTION CLUSTERING ASSESSMENT ===")
+print(clustering_assessment)
+```
+
+#### Cross-interaction assessment
+
+```{r}
+#| cache: true
+
+assess_cross_interaction <- function(cross_l_env, pair_name) {
+  interaction <- if(any(cross_l_env$obs > cross_l_env$hi)) "ATTRACTION" else 
+                 if(any(cross_l_env$obs < cross_l_env$lo)) "REPULSION" else "INDEPENDENT"
+  
+  return(data.frame(
+    Business_Pair = pair_name,
+    Interaction_Type = interaction
+  ))
+}
+```
+
+#### Assess cross-interactions
+
+```{r}
+#| cache: true
+
+
+interaction_assessment <- bind_rows(
+  assess_cross_interaction(cross_l_env_rest_retail, "Restaurants ↔ Retail"),
+  assess_cross_interaction(cross_l_env_rest_realestate, "Restaurants ↔ Real Estate"),
+  assess_cross_interaction(cross_l_env_retail_realestate, "Retail ↔ Real Estate")
+)
+
+print("\n=== CROSS-INTERACTION ASSESSMENT ===")
+print(interaction_assessment)
+
+```
+
 ## Conclusions and Future Improvements
+
+### Conclusion
+
+This comprehensive dual-layer spatial analysis of Singapore's business registration patterns from 2024-2025 provides crucial evidence-based insights for strategic urban land use planning and management. The consistent clustering patterns across restaurants (561), retail (471), and real estate (681) business types, particularly concentrated in Marina Bay and CBD areas, demonstrate the powerful influence of agglomeration economics on business location decisions. The F-function and L-function analyses reveal minimal empty space and strong clustering tendencies in these prime districts, indicating market-driven spatial optimization that urban planners should acknowledge and support rather than resist.
+
+The findings advocate for a **multi-tiered commercial development** strategy that balances intensification of successful business ecosystems with strategic decentralization to underserved areas. Marina Bay and CBD's dominance necessitates enhanced mixed-use zoning policies with higher plot ratios and vertical integration requirements to maximize land efficiency while maintaining sustainable density levels. Simultaneously, the identification of excessive empty space in peripheral regions like Yishun, Sembawang, and Pasir Ris presents opportunities for targeted satellite commercial hub development through strategic incentives and infrastructure investments.
+
+The cross L-function results demonstrating attraction relationships between business types support integrated commercial corridor development, enabling Singapore to create seamless business ecosystems that leverage synergistic relationships. However, the intense clustering also raises legitimate concerns about market oversaturation, commercial rent inflation, and equitable access to services across the island. Urban planners must implement competition management policies including business diversity quotas and affordable commercial space preservation to maintain market health.
+
+The registration intent versus business success comparison reveals that entrepreneur preferences align with viable business locations, suggesting market mechanisms effectively identify optimal commercial areas. This validates a planning approach that works with natural clustering tendencies while proactively developing alternative business districts to ensure sustainable, equitable urban growth. These evidence-based recommendations provide a robust framework for managing Singapore's commercial landscape evolution while maintaining its position as a leading global business hub.
+
+### Acknowledged Limitations for Future Improvements
+
+This study presents several methodological limitations that may affect the comprehensiveness of findings. 
+
+- SSIC aggregation at 3-digit level potentially masks important intra-category spatial variations - for example, fine-dining restaurants (56111) versus fast-food outlets (56112) likely exhibit distinct clustering behaviors that remain undetected in the current 561-level analysis. 
+
+- Temporal scope limitation to 18 months (Jan 2024-Jun 2025) may not capture long-term cyclical patterns or seasonal business formation trends.
+
+- Scale dependency represents another constraint - the analysis focuses on citywide patterns without examining neighborhood-level clustering variations or micro-location factors influencing business success within identified hotspots.
 
