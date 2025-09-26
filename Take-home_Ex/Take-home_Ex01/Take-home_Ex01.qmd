@@ -698,6 +698,8 @@ kde_retail_all <- density(ppp_retail_all,
 plot(kde_retail_all)
 ```
 
+The KDE plot reveals Singapore's retail sector exhibits extreme spatial concentration with very low overall density values (maximum 5e-04). Most areas show near-zero density, indicating retail is strategically clustered in specific commercial zones rather than dispersed. Clear hotspots appear in central regions while peripheral areas remain virtually retail-free. This pattern reflects Singapore's controlled urban planning where retail development concentrates in designated commercial nodes, demonstrating the city-state's planned economy approach to spatial development.
+
 ##### Food & Beverages
 
 ```{r}
@@ -715,6 +717,8 @@ kde_restaurants_all <- density(ppp_restaurants_all,
 plot(kde_restaurants_all)
 ```
 
+The restaurant sector KDE shows significantly higher density values (maximum 0.001) compared to retail (5e-04), indicating roughly double the spatial concentration. Restaurant distribution displays more pronounced central clustering with visible hotspots in what appears to be Singapore's CBD and urban core areas. Unlike retail's extremely sparse pattern, restaurants show moderate density gradients extending from central hotspots. This reflects restaurants' need for high foot traffic and accessibility, leading to denser clustering in commercial and mixed-use districts. The higher overall density suggests restaurants are more ubiquitous across Singapore's urban landscape than retail establishments, likely due to daily dining needs versus less frequent retail shopping patterns.
+
 ##### Real Estate
 
 ```{r}
@@ -731,6 +735,9 @@ kde_realestate_all <- density(ppp_realestate_all,
                              kernel="gaussian")
 plot(kde_realestate_all)
 ```
+
+The real estate KDE displays the lowest density values among all three sectors (maximum 3e-04), indicating the most sparse and selective spatial distribution. Real estate activities show minimal clustering with only faint hotspots visible in central areas, reflecting the capital-intensive nature and specialized zoning requirements of property development. Compared to restaurants (0.001 density) and retail (5e-04 density), real estate demonstrates the most constrained spatial pattern, likely concentrated in designated commercial and mixed-use zones where property development is permitted. This stark contrast highlights how regulatory frameworks and high capital barriers limit real estate activities to specific strategic locations, unlike the more consumer-driven distribution patterns of restaurants and retail establishments.
+
 :::
 
 #### Perform the Clark-Evans test with CSR
