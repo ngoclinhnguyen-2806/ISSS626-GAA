@@ -38,11 +38,12 @@ editor: visual
 ## Set up R environment
 
 ```{r}
-# Import R Packages
+#| code-summary: Import R Packages
 pacman::p_load(tidyverse, sf, tmap, httr, readxl, dplyr, stringr, rvest, knitr, spatstat, terra, raster, sparr, tidyr, kableExtra, ggplot2)
 ```
 
 ```{r}
+#| code-summary: Set seed for Monte Carlo simulations later
 set.seed(1234)
 ```
 
@@ -64,6 +65,7 @@ set.seed(1234)
 
 ```{r}
 #| eval: false
+#| code-summary: Import ACRA data
 folder_path <- "data/aspatial/ACRA"
 file_list <- list.files(path = folder_path, 
                         pattern = "^ACRA*.*\\.csv$", 
@@ -231,7 +233,7 @@ ssic_table %>%
 
 ```{r}
 #| label: Extracting data of chosen business types
-#| echo: false
+#| code-summary: Extracting data of chosen business types
 #| eval: false
 biz_selected <- acra_data %>%
   select(1:24) %>%
@@ -265,7 +267,7 @@ biz_selected <- read_rds("data/rds/biz_selected.rds")
 ### SSIC Data
 
 ```{r}
-# Read the Excel file
+#| code-summary: Read the Excel file
 ssic_data <- read_excel("data/ssic2020-classification-structure.xlsx", 
                         sheet = "SSIC 2020 Structure",
                         skip = 4)  # Skip the header rows
@@ -300,7 +302,8 @@ ssic_hierarchy <- level5_data %>%
 ```
 
 ```{r}
-# Add the descriptions for each level by joining with the original data
+#| code-summary: Add the descriptions for each level by joining with the original data
+
 # Create lookup tables for each level
 level_2_lookup <- ssic_data %>%
   filter(str_length(`SSIC 2020`) == 2) %>%
@@ -334,10 +337,9 @@ cat("Number of level 4 categories:", length(unique(ssic_final$level_4)), "\n")
 ```
 
 
-#### Join ACRA and SSIC Data
-
 ```{r}
 #| eval: false
+#| code-summary: Join ACRA and SSIC Data
 # Left join ssic_final to biz_selected
 # Convert primary_ssic_code to character and pad with leading zeros if needed
 biz_with_hierarchy <- biz_selected %>%
@@ -357,6 +359,7 @@ write_rds(biz_with_hierarchy, "data/rds/biz_with_hierarchy.rds")
 
 ```{r}
 #| echo: false
+#| output: false
 biz_with_hierarchy <- read_rds("data/rds/biz_with_hierarchy.rds")
 ```
 
@@ -364,19 +367,16 @@ biz_with_hierarchy <- read_rds("data/rds/biz_with_hierarchy.rds")
 
 The Master Plan 2019 Boundary (No Sea) (KML) was downloaded from data.gov.sg that consists of the geographical boundary of Singapore at the planning subzone level. The data is based on URA Master Plan 2019. We will use this to plot the boundaries of the subzones.
 
-::: panel-tabset
-#### Import data
-
 ```{r}
+#| code-summary: Import Singapore Master Plan 2019 Subzone Boundary dataset
 #| eval: false
 mpsz <- st_read("data/geospatial/MasterPlan2019SubzoneBoundaryNoSeaKML.kml") %>%
   st_zm(drop = TRUE, what = "ZM") %>%
   st_transform(crs = 3414)
 ```
 
-#### Tidy data
-
 ```{r}
+#| code-summary: Create a function to extract region from KML field
 #| eval: false
 extract_kml_field <- function(html_text, field_name) {
   if (is.na(html_text) || html_text == "") return(NA_character_)
@@ -394,6 +394,7 @@ extract_kml_field <- function(html_text, field_name) {
 ```
 
 ```{r}
+#| code-summary: Extract region from KML field
 #| eval: false
 mpsz <- mpsz %>%
   mutate(
@@ -413,21 +414,15 @@ mpsz_cl <- mpsz %>%
 
 ```{r}
 #| echo: false
+#| output: false
 mpsz_cl <- read_rds("data/rds/mpsz_cl.rds")
 ```
-:::
-
-### Geocoding the data
 
 ```{r}
+#| code-summary: Geocoding the data
 #| eval: false
-# Initiate 2 empty data frames
 found <- data.frame() # to store Postal codes that were successfully geocoded with their coordinates
 not_found <- data.frame(postcode = character()) # to store postal codes that couldn't be matched
-```
-
-```{r}
-#| eval: false
 
 postcodes <- unique(biz_selected$postal_code)
 
@@ -452,19 +447,14 @@ for (pc in postcodes) {
     not_found <- bind_rows(not_found, data.frame(postcode = pc))
   }
 }
-```
-
-```{r}
-#| eval: false
 
 # Tidying the geocoded data
 found <- found %>%
   select(1:10)
 ```
 
-### Appending the location information
-
 ```{r}
+#| code-summary: Appending the location information
 #| eval: false
 biz_selected_geocoded = biz_with_hierarchy %>%
   left_join(found, 
@@ -479,12 +469,14 @@ write_rds(biz_selected_geocoded, "data/rds/biz_selected_geocoded.rds")
 
 ```{r}
 #| echo: false
+#| output: false
 biz_selected_geocoded <- read_rds("data/rds/biz_selected_geocoded.rds")
 ```
 
-### Create separate datasets for each business type
+## Data Wrangling
 
 ```{r}
+#| code-summary: Create separate datasets for each business type
 #| eval: false
 # Create separate datasets for each business type to count each type
 biz_restaurant_cafe <- biz_with_hierarchy %>% filter(str_detect(primary_ssic_code, "^561"))
@@ -502,16 +494,16 @@ write_rds(biz_real_estate, "data/rds/biz_real_estate.rds")
 
 ```{r}
 #| echo: false
+#| output: false
 biz_restaurant_cafe <- read_rds("data/rds/biz_restaurant_cafe.rds")
 biz_retail_nonspec <- read_rds("data/rds/biz_retail_nonspec.rds")
 biz_real_estate <- read_rds("data/rds/biz_real_estate.rds")
 ```
 
-### Converting into simple point features - SF data frame
-
 Before applying the `st_as_sf` function to convert the data into simple point features, we check for missing values first and remove such records.
 
 ```{r}
+#| code-summary: Converting into simple point features - SF data frame
 biz_with_coords <- biz_selected_geocoded %>%
   # Remove records without coordinates
   filter(!is.na(X) & !is.na(Y)) %>%
@@ -520,17 +512,16 @@ biz_with_coords <- biz_selected_geocoded %>%
     LATITUDE = as.numeric(X),
     LONGITUDE = as.numeric(Y)
   )
-```
 
-```{r}
 biz_sf <- st_as_sf(biz_with_coords, 
                    coords = c("X","Y"), 
                    crs=3414)
 ```
 
 ```{r}
+#| code-summary: Create separate datasets for each business type for later individual analysis
 #| eval: false
-# Create separate datasets for each business type for later individual analysis
+
 biz_restaurant_cafe_sf <- biz_sf %>% filter(str_detect(primary_ssic_code, "^561"))
 biz_retail_nonspec_sf <- biz_sf %>% filter(str_detect(primary_ssic_code, "^471"))    
 biz_real_estate_sf <- biz_sf %>% filter(str_detect(primary_ssic_code, "^681"))
@@ -548,6 +539,7 @@ st_write(biz_real_estate_sf, "data/sf/biz_real_estate_sf.gpkg", delete_dsn = TRU
 
 ```{r}
 #| echo: false
+#| output: false
 biz_sf <- st_read("data/sf/biz_sf.gpkg")
 biz_restaurant_cafe_sf <- st_read("data/sf/biz_restaurant_cafe_sf.gpkg")
 biz_retail_nonspec_sf <- st_read("data/sf/biz_retail_nonspec_sf.gpkg")
@@ -561,17 +553,20 @@ biz_real_estate_sf <- st_read("data/sf/biz_real_estate_sf.gpkg")
 #### Retail
 
 ```{r}
+#| code-summary: Plot
 plot(st_geometry(biz_retail_nonspec_sf), main = "Business Point Features", pch = 16, cex = 0.5)
 ```
 
 #### Food & Beverages
 
 ```{r}
+#| code-summary: Plot
 plot(st_geometry(biz_restaurant_cafe_sf), main = "Business Point Features", pch = 16, cex = 0.5)
 ```
 #### Real Estate
 
 ```{r}
+#| code-summary: Plot
 plot(st_geometry(biz_real_estate_sf), main = "Business Point Features", pch = 16, cex = 0.5)
 ```
 :::
@@ -583,6 +578,7 @@ plot(st_geometry(biz_real_estate_sf), main = "Business Point Features", pch = 16
 ### Summary on the chosen business types
 
 ```{r}
+#| code-summary: Create a summary table of all the chosen business types using kable
 # Step 1: Create summary table from biz_with_hierarchy with both total and live counts
 biz_summary <- biz_with_hierarchy %>%
   group_by(primary_ssic_code) %>%
@@ -621,6 +617,7 @@ biz_pivot_table %>%
   scroll_box(height = "500px")
 ```
 
+
 Based on the business summary above, we can draw some key insights about business types and survival rates:
 
 -   Food & Beverage dominates with 5,542 businesses (69.1% of total), reflecting Singapore's vibrant food scene but challenging market conditions with 27.4% survival rate
@@ -636,6 +633,8 @@ Based on the business summary above, we can draw some key insights about busines
 As the number of business points per business type is large itself, plotting all of them on `mpsz` - Singapore boundary will be too packed and we will not be able to extract any pattern out of it. Therefore, it is a good idea to plot them separately as below.
 
 ```{r}
+#| code-summary: Plot
+
 ggplot() +
   geom_sf(data = mpsz_cl, fill = "lightgray", color = "white") +
   geom_sf(data = biz_sf, aes(color = as.factor(primary_ssic_code)), 
@@ -675,9 +674,8 @@ Based on the business location plots, here are key observations about spatial de
 
 #### Individual Density Surfaces
 
-**Create Owin object**
-
 ```{r}
+#| code-summary: Create Owin object
 sg_owin <- as.owin(mpsz_cl)
 ```
 
@@ -686,6 +684,8 @@ sg_owin <- as.owin(mpsz_cl)
 ##### Retail
 
 ```{r}
+#| code-summary: Convert sf data frames to ppp class and calculate KDE
+
 # Convert sf data frames to ppp class
 ppp_retail_all <- as.ppp(biz_retail_nonspec_sf)
 ppp_retail_all = ppp_retail_all[sg_owin]
@@ -701,6 +701,8 @@ plot(kde_retail_all)
 ##### Food & Beverages
 
 ```{r}
+#| code-summary: Convert sf data frames to ppp class and calculate KDE
+
 # Convert sf data frames to ppp class
 ppp_restaurants_all <- as.ppp(biz_restaurant_cafe_sf)
 ppp_restaurants_all = ppp_restaurants_all[sg_owin]
@@ -716,6 +718,8 @@ plot(kde_restaurants_all)
 ##### Real Estate
 
 ```{r}
+#| code-summary: Convert sf data frames to ppp class and calculate KDE
+
 # Convert sf data frames to ppp class
 ppp_realestate_all <- as.ppp(biz_real_estate_sf)
 ppp_realestate_all = ppp_realestate_all[sg_owin]
@@ -821,6 +825,7 @@ legend("topright",
        col = c("red", "yellow", "green"),
        lty = 1, lwd = 2)
 ```
+The spatstat quantile method successfully identifies distinct spatial hotspots for restaurants (red), retail (yellow), and real estate (green) across Singapore's urban landscape. Multiple scattered hotspot areas are visible throughout the territory, demonstrating clear spatial differentiation between business types. While some areas show color overlap indicating potential co-location or mixed-use zones, each sector maintains identifiable clustering patterns. The concentration of hotspots appears predominantly in central urban areas, though peripheral clusters are also evident. However, the overlapping colors make it difficult to determine precise geographic boundaries or assess which business type dominates specific regions. The visualization effectively demonstrates that different business sectors exhibit unique spatial clustering behaviors, with the quantile method capturing these distinct locational preferences across Singapore's commercial landscape.
 
 ### Spatio-Temporal KDE Analysis
 

@@ -78,7 +78,7 @@ The code chunk below will be used to update the attribute table of hunan’s Spa
 hunan <- left_join(hunan,hunan2012) %>% # Join by County, but no need to explicitly mention because both datasets have this column
   select(1:4, 7, 15)
 ```
-::::::
+:::
 
 ## Visualising Regional Development Indicator
 
@@ -609,4 +609,3 @@ Note: For more effective comparison, it is advicible to use the core tmap mappin
 ## References
 
 [Creating Neighbours using sf objects](https://cran.r-project.org/web/packages/spdep/vignettes/nb_sf.html)
-

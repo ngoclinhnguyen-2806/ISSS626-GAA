@@ -1,0 +1,21 @@
+---
+title: "Hands-on Exercise 5a | Global Measures of Spatial Autocorrelation"
+subtitle: "In this hands-on exercise, you will learn how to compute Global Measures of Spatial Autocorrelation (GMSA) by using spdep package"
+date: "Sep 26, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+format:
+  html:
+    code-link: true
+    toc: true
+number-sections: true
+number-offset: 1
+editor: visual
+---
+
