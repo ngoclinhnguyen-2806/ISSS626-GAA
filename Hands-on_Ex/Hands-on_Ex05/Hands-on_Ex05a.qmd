@@ -50,12 +50,10 @@ pacman::p_load(sf, tidyverse, spdep, tmap)
 
 ### The Study Area and Data
 
-Two data sets will be used in this hands-on exercise, they are:
-
--   Hunan province administrative boundary layer at county level: This is a geospatial data set in ESRI shapefile format.
--   Hunan_2012.csv: This csv file contains selected Hunan’s local development indicators in 2012.
-
-We will bring a geospatial data and its associated attribute table into R environment. The geospatial data is in ESRI shapefile format and the attribute table is in csv fomat.
+| Dataset | Description | Format |
+|----------------------|--------------------------------|------------------|
+| Hunan county boundary layer | Hunan county boundary layer | ESRI Shapefile |
+| Hunan_2012 | Containing selected Hunan’s local development indicators in 2012 | csv |
 
 ### Import shapefile into R environment
 
@@ -340,7 +338,6 @@ summary(bperm$res[1:999])
 ```
 
 ```{r}
-par(bg = "#D0DDD0")
 hist(bperm$res, freq=TRUE, 
      breaks=20, xlab="Simulated Geary c",
      col="#FFF1F1")
@@ -378,3 +375,19 @@ abline(h = 0, col = "red", lty = 2, lwd = 2)
 ```
 
 ## Computing Geary’s C correlogram and plot
+
+```{r}
+GC_corr <- sp.correlogram(wm_q, 
+                          hunan$GDPPC, 
+                          order=6, 
+                          method="C", 
+                          style="W")
+plot(GC_corr)
+```
+
+```{r}
+print(GC_corr)
+```
+Geary's C is an inverse measure of spatial autocorrelation compared to Moran's I, hence we see the similar outcome from the Geary's C estimates. 
+
+At Lag 1 and 2, Geary's C < 1, indicating strong positive autocorrelation. At Lag 3 and 4, Geary's C ~ 1, which means there is no significant spatial autocorrelation. At Lag 5 and 6, Geary's C > 1, there is strong negative autocorrelation (dispersion).

@@ -35,7 +35,7 @@ In this hands-on exercise, you will learn how to compute spatial weights using R
 
 | Dataset | Description | Format |
 |----------------------|--------------------------------|------------------|
-| Hunan county boundary layer | Hunan county boundary layer | CSV |
+| Hunan county boundary layer | Hunan county boundary layer | ESRI Shapefile |
 | Hunan_2012 | Containing selected Hunan’s local development indicators in 2012 | Hunan_2012.csv |
 
 ### Install R packages

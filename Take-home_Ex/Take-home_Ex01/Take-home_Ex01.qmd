@@ -38,7 +38,7 @@ editor: visual
 ### The Data
 
 | Dataset | Description | Source | Format |
-|--------------|------------------|---------------------------|--------------|
+|-----------------|-----------------|----------------------|-----------------|
 | **ACRA Information on Corporate Entities** | Information of registered entities in Singapore, including location data | [data.gov.sg](https://data.gov.sg/datasets?query=ACRA+Information+on+Corporate+Entities&page=1&resultId=2) | CSV |
 | **SSIC: Singapore Standard Industrial Classification 2020** | List of codes represented economic activity of business establishments in Singapore, 2020 version. | [SSIC: Singapore Standard Industrial Classification](https://classification.codes/classifications/industry/ssic-singapore) | Excel |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2019 Master Plan Planning Subzone boundaries | [data.gov.sg](https://data.gov.sg/datasets?query=Master+Plan+Planning+Subzone+boundaries&page=1&resultId=d_6c6d7361dd826d97b91bac914ca6b2ac) | KML |
@@ -737,7 +737,6 @@ plot(kde_realestate_all)
 ```
 
 The real estate KDE displays the lowest density values among all three sectors (maximum 3e-04), indicating the most sparse and selective spatial distribution. Real estate activities show minimal clustering with only faint hotspots visible in central areas, reflecting the capital-intensive nature and specialized zoning requirements of property development. Compared to restaurants (0.001 density) and retail (5e-04 density), real estate demonstrates the most constrained spatial pattern, likely concentrated in designated commercial and mixed-use zones where property development is permitted. This stark contrast highlights how regulatory frameworks and high capital barriers limit real estate activities to specific strategic locations, unlike the more consumer-driven distribution patterns of restaurants and retail establishments.
-
 :::
 
 #### Perform the Clark-Evans test with CSR
@@ -749,7 +748,11 @@ The confidence level chosen for the test is 95%. Therefore, we can set the numbe
 ::: panel-tabset
 ##### Food & Beverages
 
-The test hypotheses are: - Ho = The distribution of Food & Beverages are randomly distributed. - H1 = The distribution of Food & Beverages are not randomly distributed. The 95% confident interval will be used.
+The test hypotheses are:
+
+-   Ho = The distribution of Food & Beverages are randomly distributed.
+
+-   H1 = The distribution of Food & Beverages are not randomly distributed. The 95% confident interval will be used.
 
 ```{r}
 #| cache: true
@@ -766,7 +769,11 @@ The Clark-Evans test reveals that restaurants and cafes (SSIC Food & Beverages) 
 
 ##### Retail
 
-The test hypotheses are: - Ho = The distribution of Retail are randomly distributed. - H1 = The distribution of Retail are not randomly distributed. The 95% confident interval will be used.
+The test hypotheses are:
+
+-   Ho = The distribution of Retail are randomly distributed.
+
+-   H1 = The distribution of Retail are not randomly distributed. The 95% confident interval will be used.
 
 ```{r}
 #| cache: true
@@ -783,7 +790,11 @@ The Clark-Evans test indicates that non-specialised retail stores (SSIC Retail) 
 
 ##### Real Estate
 
-The test hypotheses are: - Ho = The distribution of Real Estate are randomly distributed. - H1 = The distribution of Real Estate are not randomly distributed. The 95% confident interval will be used.
+The test hypotheses are:
+
+-   Ho = The distribution of Real Estate are randomly distributed.
+
+-   H1 = The distribution of Real Estate are not randomly distributed. The 95% confident interval will be used.
 
 ```{r}
 #| cache: true
