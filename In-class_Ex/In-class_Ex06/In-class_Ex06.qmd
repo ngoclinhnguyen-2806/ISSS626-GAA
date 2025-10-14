@@ -18,3 +18,151 @@ number-sections: true
 number-offset: 1
 editor: visual
 ---
+
+## Import R packages
+
+```{r}
+#| code-summary: Install and Load R packages
+#| output: false
+
+pacman::p_load(sfdep, tmap, sf, knitr, httr, rvest, tidyverse)
+```
+
+## Data Import
+
+```{r}
+#| code-summary: Import SG boundaries data
+#| output: false
+
+mpsz <- read_rds("data/rds/mpsz_sf.rds")
+```
+
+```{r}
+#| code-summary: Import SG bus stop data
+#| output: false
+
+BusStop = st_read(dsn = "data/geospatial/BusStopLocation_Aug2025",
+                  layer = "BusStop")
+```
+
+```{r}
+#| code-summary: Import SG Bus Trip
+#| output: false
+
+odbus <- read_csv("data/geospatial/origin_destination_bus_202508.csv")
+```
+
+## Plot Bus Stops on SG Boundaries
+
+```{r}
+#| code-summary: Plot BusStop on SG boundaries
+
+tm_shape(mpsz) + tm_polygons() + tm_shape(BusStop) + tm_dots()
+```
+
+We can notice there are 2 bus stops lying outside SG boundaries.
+
+```         
+#| code-summary: Extracting Bus Stops within SG only
+
+# The code below will cause an error:
+# Error in st_geos_binop("within", x, y, sparse = sparse, prepared = prepared, :
+# st_crs(x) == st_crs(y) is not TRUE
+
+BusStop_in_SG <- st_join(
+  BusStop, mpsz,
+  join = st_within,
+  left = FALSE
+)
+```
+
+```{r}
+# Check CRS
+st_crs(mpsz)
+```
+
+```{r}
+st_crs(BusStop)
+```
+
+We notice a mismatch in EPSG, which is the cause of the error.
+
+```{r}
+#| code-summary: Extracting Bus Stops within SG only
+
+# Transform BusStop EPSG to 3414 first so it will align with mpsz
+BusStop <- st_transform(BusStop, crs = 3414)
+
+BusStop_in_SG <- st_join(
+  BusStop, mpsz,
+  join = st_within,
+  left = FALSE
+)
+```
+
+```{r}
+#| code-summary: Plot BusStop on SG boundaries again
+
+tm_shape(mpsz) + tm_polygons() + tm_shape(BusStop_in_SG) + tm_dots()
+```
+
+## Deriving Analytical Hexagon
+
+```{r}
+hexagon <- st_make_grid(mpsz,
+                        cellsize = 700,
+                        what = "polygon",
+                        square = FALSE) %>%
+  st_sf()
+```
+
+## Filtering hexagons with bus stops
+
+```{r}
+hexagon$n_collisions = 
+  length(st_intersects(
+    hexagon, BusStop_in_SG
+  ))
+
+hexagon <- filter(hexagon, n_collisions > 0)
+```
+
+## Assigning ids to each hexagon
+
+```{r}
+hexagon <- hexagon %>%
+  select(, -n_collisions)
+
+hexagon$HEX_ID <- sprintf(
+  "H%04d", seq_len(nrow(hexagon))) %>%
+  as.factor()
+
+kable(head(hexagon))
+```
+
+## Preparing Trip Generation Data
+
+```{r}
+#| code-summary: Cleaning the data
+
+trips <- odbus %>%
+  select(c(ORIGIN_PT_CODE, DAY_TYPE, TIME_PER_HOUR, TOTAL_TRIPS)) %>%
+  rename(BUS_STOP_N = ORIGIN_PT_CODE) %>%
+  rename(HOUR_OF_DAY = TIME_PER_HOUR) %>%
+  rename(TRIPS = TOTAL_TRIPS)
+trips$BUS_STOP_N <- as.factor(trips$BUS_STOP_N)
+kable(head(trips))
+```
+
+```{r}
+bs_hex <- st_intersection(
+  BusStop, hexagon) %>%
+  st_drop_geometry() %>%
+  select(c(BUS_STOP_N, HEX_ID))
+kable(head(bs_hex))
+```
+
+```{r}
+trips <- inner_join(trips, bs_hex)
+kable(head(trips))
+```

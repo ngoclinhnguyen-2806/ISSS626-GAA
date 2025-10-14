@@ -38,7 +38,7 @@ editor: visual
 ### The Data
 
 | Dataset | Description | Source | Format |
-|-----------------|-----------------|----------------------|-----------------|
+|-----------------|-----------------|--------------------|-----------------|
 | **ACRA Information on Corporate Entities** | Information of registered entities in Singapore, including location data | [data.gov.sg](https://data.gov.sg/datasets?query=ACRA+Information+on+Corporate+Entities&page=1&resultId=2) | CSV |
 | **SSIC: Singapore Standard Industrial Classification 2020** | List of codes represented economic activity of business establishments in Singapore, 2020 version. | [SSIC: Singapore Standard Industrial Classification](https://classification.codes/classifications/industry/ssic-singapore) | Excel |
 | **MasterPlan2019SubzoneBoundaryNoSeaKML** | Polygon data with URA 2019 Master Plan Planning Subzone boundaries | [data.gov.sg](https://data.gov.sg/datasets?query=Master+Plan+Planning+Subzone+boundaries&page=1&resultId=d_6c6d7361dd826d97b91bac914ca6b2ac) | KML |
