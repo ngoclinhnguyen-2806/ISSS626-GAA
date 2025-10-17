@@ -32,7 +32,7 @@ We are looking to delineate **Shan State, Myanmmar**, into homogeneous regions b
 ### The Data
 
 | Dataset | Description | Source | Format |
-|----------------------|-------------------------------|---------------------------|------------------|
+|-----------------|---------------------|------------------|-----------------|
 | Myanmar Township Boundary Data | Township boundary information of Myanmar | [Myanmar Information Management Unit (MIMU)](https://myanmar.unfpa.org/en/publications/2014-population-and-housing-census-myanmar-data-sheet) | ESRI Shapefile |
 | Shan-ICT | This is an extract of The 2014 Myanmar Population and Housing Census Myanmar at the township level | [The 2014 Myanmar Population and Housing Census Myanmar](https://myanmar.unfpa.org/en/publications/2014-population-and-housing-census-myanmar-data-sheet) | csv |
 

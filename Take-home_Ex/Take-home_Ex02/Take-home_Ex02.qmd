@@ -111,12 +111,10 @@ tm_shape(mpsz) +
   tm_dots()
 ```
 
-## Deriving Analytical Hexagon
-
-### Creating Hexagonal Grid
+### Deriving Analytical Hexagon
 
 ```{r}
-#| code-summary: Generate hexagonal grid with 375m cell size
+#| code-summary: Create hexagonal grid with 375m cell size
 
 hexagon <- st_make_grid(mpsz,
                         cellsize = 375,
@@ -125,10 +123,8 @@ hexagon <- st_make_grid(mpsz,
   st_sf()
 ```
 
-### Filtering hexagons with bus stops
-
 ```{r}
-#| code-summary: Retain only hexagons containing bus stops
+#| code-summary: Filter for only hexagons containing bus stops
 
 hexagon$n_collisions = 
   length(st_intersects(
@@ -138,10 +134,8 @@ hexagon$n_collisions =
 hexagon <- filter(hexagon, n_collisions > 0)
 ```
 
-### Assigning ids to each hexagon
-
 ```{r}
-#| code-summary: Create unique identifiers for each hexagon
+#| code-summary: Create unique ids for each hexagon
 #| output: false
 
 hexagon <- hexagon %>%
@@ -154,9 +148,7 @@ hexagon$HEX_ID <- sprintf(
 kable(head(hexagon))
 ```
 
-## Preparing Trip Generation Data
-
-### Cleaning Trip Data
+### Preparing Trip Generation Data
 
 ```{r}
 #| code-summary: Select and rename relevant columns
@@ -170,8 +162,6 @@ trips$BUS_STOP_N <- as.factor(trips$BUS_STOP_N)
 
 kable(head(trips))
 ```
-
-### Linking Bus Stops to Hexagons
 
 ```{r}
 #| code-summary: Map bus stops to their corresponding hexagons
@@ -190,13 +180,14 @@ trips <- inner_join(trips, bs_hex)
 kable(head(trips))
 ```
 
-### Aggregating Trips by Time Period
+### Time period classifications
+
+-   Weekday Morning Peak: 6am-9am (hours 6, 7, 8)
+-   Weekday Afternoon Peak: 5pm-8pm (hours 17, 18, 19)
+-   Weekend/Holiday: 11am-8pm (hours 11-19)
 
 ```{r}
 #| code-summary: Define time period classifications
-# Weekday Morning Peak: 6am-9am (hours 6, 7, 8)
-# Weekday Afternoon Peak: 5pm-8pm (hours 17, 18, 19)
-# Weekend/Holiday: 11am-8pm (hours 11-19)
 
 trips <- trips %>%
   mutate(TIME_PERIOD = case_when(
@@ -259,10 +250,18 @@ summary_stats <- trips_hex %>%
 kable(summary_stats)
 ```
 
+The summary statistics reveal relatively similar trip patterns across the three time periods.
+
+-   Weekday morning peak shows the highest maximum value (288,060 trips) and greatest variability (SD = 16,542), indicating more extreme high-volume hexagons.
+-   Weekday afternoon peak records the highest mean (9,769 trips) and median (4,434 trips), suggesting consistently strong activity across hexagons.
+-   Weekend/holiday exhibits lower central tendency (mean = 8,952, median = 3,932) but the highest maximum value (334,516 trips), indicating the presence of exceptional hotspots despite overall lower average demand.
+
+All three periods show substantial standard deviations relative to their means, confirming the right-skewed distributions observed in the histograms. The similar minimum values (1-2 trips) and first quartiles (Q1 ranging 657-1,549) across periods indicate that low-activity hexagons maintain consistently minimal trip generation regardless of time period. The total number of active hexagons is comparable across all periods (2,135-2,152), suggesting stable spatial coverage of bus service demand throughout the week.
+
 ## Exploratory Data Analysis
 
 ```{r}
-#| code-summary: Filter hexagons with trips for analysis
+#| code-summary: Filter hexagons with trips for analysis.
 
 hexagon_trips_filtered <- hexagon_trips %>%
   filter(Weekday_Morning_Peak > 0 | 
@@ -270,33 +269,13 @@ hexagon_trips_filtered <- hexagon_trips %>%
          Weekend_Holiday > 0)
 ```
 
-```{r}
-#| code-summary: Calculate common breaks for all three time periods
-# Calculate common quantile breaks across all three periods
-all_trips <- c(hexagon_trips_filtered$Weekday_Morning_Peak,
-               hexagon_trips_filtered$Weekday_Afternoon_Peak,
-               hexagon_trips_filtered$Weekend_Holiday)
-
-common_breaks <- quantile(all_trips, 
-                          probs = seq(0, 1, length.out = 7), 
-                          na.rm = TRUE)
-
-print("Common breaks for all three periods:")
-print(common_breaks)
-```
+### Distribution of trips in each period
 
 ::: panel-tabset
-
-### Weekday Morning Peak (6am-9am)
-
-```{r}
-#| code-summary: Statistical summary of weekday morning peak trips
-
-summary(hexagon_trips_filtered$Weekday_Morning_Peak)
-```
+#### Weekday Morning Peak
 
 ```{r}
-#| code-summary: Distribution of Weekday Morning Peak time trips
+#| code-summary: Distribution of Weekday Morning Peak time trips (Linear Scale)
 ggplot(data = hexagon_trips_filtered, 
        aes(x = Weekday_Morning_Peak)) +
   geom_histogram(bins = 10, 
@@ -325,35 +304,7 @@ ggplot(data = hexagon_trips_filtered %>% filter(Weekday_Morning_Peak > 0),
 
 The distribution is heavily right-skewed, with most hexagons (approximately 1,800) generating fewer than 50,000 trips during morning peak hours. This reveals significant spatial inequality in demand: while the majority of active hexagons serve moderate passenger volumes, a small number of critical nodes experience exceptionally high boarding activity exceeding 100,000 trips. This concentration suggests opportunities for targeted capacity planning in high-demand corridors.
 
-```{r}
-#| code-summary: Spatial distribution of weekday morning peak trips (common scale)
-
-tm_shape(mpsz) +
-  tm_polygons(col = "lightgrey", border.col = "white") +
-tm_shape(hexagon_trips_filtered) +
-  tm_fill(col = "Weekday_Morning_Peak",
-          palette = "YlOrRd",
-          breaks = common_breaks,
-          title = "Total Trips") +
-  tm_borders(alpha = 0.3) +
-  tm_layout(main.title = "Passenger Trips by Origin - Weekday Morning Peak (6am-9am)",
-            main.title.size = 1,
-            legend.outside = TRUE)
-```
-
-The spatial distribution of weekday morning peak passenger trips reveals distinct clustering patterns across Singapore. High-intensity boarding activity (dark red hexagons) is concentrated in several key areas: the Central Business District (CBD) and surrounding central regions, major residential estates in the north and northeastern areas, and established HDB townships in the western part of Singapore. These patterns reflect typical morning commute behavior, where passengers board buses from residential neighborhoods heading toward employment centers.
-
-Notable spatial heterogeneity is evident, with mid-to-high trip generation hexagons (orange to red) forming contiguous clusters, suggesting neighborhood-level demand patterns rather than isolated hotspots. The eastern and northeastern regions show moderate activity levels, while certain peripheral areas display lower boarding volumes.
-
-The quantile classification reveals that the top 20% of hexagons (darkest red) handle significantly higher passenger volumes (18,337 to 288,060 trips), indicating substantial spatial inequality in bus service demand. This concentration suggests that targeted service planning focusing on these high-demand corridors could efficiently serve a large proportion of morning peak passengers. The spatial continuity of medium-to-high demand areas also indicates potential for effective trunk-and-feeder route optimization.
-
-### Weekday Afternoon Peak (5pm-8pm)
-
-```{r}
-#| code-summary: Statistical summary of weekday afternoon peak trips
-
-summary(hexagon_trips_filtered$Weekday_Afternoon_Peak)
-```
+#### Weekday Afternoon Peak
 
 ```{r}
 #| code-summary: Distribution of Weekday afternoon Peak time trips (Linear Scale)
@@ -385,6 +336,84 @@ ggplot(data = hexagon_trips_filtered %>% filter(Weekday_Afternoon_Peak > 0),
 
 The afternoon peak distribution differs significantly from morning peak. Morning shows a broader, flatter distribution with trip volumes spreading relatively evenly from 1,000 to 10,000+ trips. In contrast, afternoon exhibits a more concentrated, bell-shaped pattern with a sharp peak around 2,000-3,000 trips and a steeper drop-off. The afternoon distribution has fewer hexagons with extremely high trip volumes (10,000+), while morning has a longer right tail indicating more hexagons with very high boarding activity. This suggests more uniformity in afternoon trip generation across hexagons compared to morning's greater variation in activity levels.
 
+#### Weekend/Holiday
+
+```{r}
+#| code-summary: Distribution of weekend/holiday Peak time trips (Linear Scale)
+ggplot(data = hexagon_trips_filtered, 
+       aes(x = Weekend_Holiday)) +
+  geom_histogram(bins = 10, 
+                 fill = "steelblue", 
+                 color = "black") +
+  scale_x_continuous(labels = scales::comma) +
+  labs(title = "Distribution of Passenger Trips - weekend/holiday Peak (Linear Scale)",
+       x = "Total Trips",
+       y = "Number of Hexagons") +
+  theme_minimal()
+```
+
+The linear scale histogram shows extreme right-skew similar to weekday patterns, with approximately 1,900+ hexagons concentrated in the low trip range (0-50,000 trips). Only a small number of hexagons exceed 50,000 trips, with the maximum reaching around 100,000-150,000 trips, lower than weekday morning peak's maximum of nearly 300,000 trips.
+
+```{r}
+#| code-summary: Distribution of weekend/holiday trips (Log Scale)
+ggplot(data = hexagon_trips_filtered %>% filter(Weekend_Holiday > 0), 
+       aes(x = Weekend_Holiday)) +
+  geom_histogram(bins = 30, 
+                 fill = "mediumseagreen", 
+                 color = "black") +
+  scale_x_log10(labels = scales::comma) +
+  labs(title = "Distribution of Passenger Trips - Weekend/Holiday (Log Scale)",
+       x = "Total Trips (log scale)",
+       y = "Number of Hexagons") +
+  theme_minimal()
+```
+
+On log scale, the weekend/holiday distribution displays a bell-shaped pattern with peak around 2,000-4,000 trips. The distribution appears more symmetric and concentrated compared to weekday morning's flatter spread, but similar to weekday afternoon's bell-shaped form. The right tail extends to approximately 100,000 trips, indicating fewer extreme high-volume hexagons than weekday peaks.
+:::
+
+### Spatial distribution of trips in each period
+
+```{r}
+#| code-summary: Calculate common breaks for all three time periods
+# Calculate common quantile breaks across all three periods
+all_trips <- c(hexagon_trips_filtered$Weekday_Morning_Peak,
+               hexagon_trips_filtered$Weekday_Afternoon_Peak,
+               hexagon_trips_filtered$Weekend_Holiday)
+
+common_breaks <- quantile(all_trips, 
+                          probs = seq(0, 1, length.out = 7), 
+                          na.rm = TRUE)
+
+print(common_breaks)
+```
+
+::: panel-tabset
+#### Weekday Morning Peak
+
+```{r}
+#| code-summary: Spatial distribution of weekday morning peak trips (common scale)
+
+tm_shape(mpsz) +
+  tm_polygons(col = "lightgrey", border.col = "white") +
+tm_shape(hexagon_trips_filtered) +
+  tm_fill(col = "Weekday_Morning_Peak",
+          palette = "YlOrRd",
+          breaks = common_breaks,
+          title = "Total Trips") +
+  tm_borders(alpha = 0.3) +
+  tm_layout(main.title = "Passenger Trips by Origin - Weekday Morning Peak (6am-9am)",
+            main.title.size = 1,
+            legend.outside = TRUE)
+```
+
+The spatial distribution of weekday morning peak passenger trips reveals distinct clustering patterns across Singapore. High-intensity boarding activity (dark red hexagons) is concentrated in several key areas: the Central Business District (CBD) and surrounding central regions, major residential estates in the north and northeastern areas, and established HDB townships in the western part of Singapore. These patterns reflect typical morning commute behavior, where passengers board buses from residential neighborhoods heading toward employment centers.
+
+Notable spatial heterogeneity is evident, with mid-to-high trip generation hexagons (orange to red) forming contiguous clusters, suggesting neighborhood-level demand patterns rather than isolated hotspots. The eastern and northeastern regions show moderate activity levels, while certain peripheral areas display lower boarding volumes.
+
+The quantile classification reveals that the top 20% of hexagons (darkest red) handle significantly higher passenger volumes (18,337 to 288,060 trips), indicating substantial spatial inequality in bus service demand. This concentration suggests that targeted service planning focusing on these high-demand corridors could efficiently serve a large proportion of morning peak passengers. The spatial continuity of medium-to-high demand areas also indicates potential for effective trunk-and-feeder route optimization.
+
+#### Weekday Afternoon Peak
+
 ```{r}
 #| code-summary: Spatial distribution of weekday afternoon peak trips (common scale)
 
@@ -405,44 +434,7 @@ The afternoon peak spatial distribution displays high-intensity boarding activit
 
 While the histogram revealed some differences in trip volume distribution between morning and afternoon peaks, the spatial maps show broadly similar geographic patterns. Both periods exhibit high-activity hexagons distributed across various regions rather than concentrated in a single area. The afternoon peak maintains substantial boarding activity across multiple zones, similar to the morning pattern, though the specific intensity levels at individual hexagons may vary between the two periods.
 
-### Weekend/Holiday (11am-8pm)
-
-```{r}
-#| code-summary: Statistical summary of weekend/holiday trips
-
-summary(hexagon_trips_filtered$Weekend_Holiday)
-```
-
-```{r}
-#| code-summary: Distribution of weekend/holiday Peak time trips (Linear Scale)
-ggplot(data = hexagon_trips_filtered, 
-       aes(x = Weekend_Holiday)) +
-  geom_histogram(bins = 10, 
-                 fill = "steelblue", 
-                 color = "black") +
-  scale_x_continuous(labels = scales::comma) +
-  labs(title = "Distribution of Passenger Trips - weekend/holiday Peak (Linear Scale)",
-       x = "Total Trips",
-       y = "Number of Hexagons") +
-  theme_minimal()
-```
-The linear scale histogram shows extreme right-skew similar to weekday patterns, with approximately 1,900+ hexagons concentrated in the low trip range (0-50,000 trips). Only a small number of hexagons exceed 50,000 trips, with the maximum reaching around 100,000-150,000 trips, lower than weekday morning peak's maximum of nearly 300,000 trips.
-
-```{r}
-#| code-summary: Distribution of weekend/holiday trips (Log Scale)
-ggplot(data = hexagon_trips_filtered %>% filter(Weekend_Holiday > 0), 
-       aes(x = Weekend_Holiday)) +
-  geom_histogram(bins = 30, 
-                 fill = "mediumseagreen", 
-                 color = "black") +
-  scale_x_log10(labels = scales::comma) +
-  labs(title = "Distribution of Passenger Trips - Weekend/Holiday (Log Scale)",
-       x = "Total Trips (log scale)",
-       y = "Number of Hexagons") +
-  theme_minimal()
-```
-
-On log scale, the weekend/holiday distribution displays a bell-shaped pattern with peak around 2,000-4,000 trips. The distribution appears more symmetric and concentrated compared to weekday morning's flatter spread, but similar to weekday afternoon's bell-shaped form. The right tail extends to approximately 100,000 trips, indicating fewer extreme high-volume hexagons than weekday peaks.
+#### Weekend/Holiday
 
 ```{r}
 #| code-summary: Spatial distribution of weekend/holiday trips (common scale)
@@ -461,40 +453,9 @@ tm_shape(hexagon_trips_filtered) +
 ```
 
 The weekend/holiday spatial pattern shows high-intensity boarding activity (dark red hexagons) distributed across multiple regions of Singapore, similar to weekday patterns. Red and orange hexagons are visible in central, northern, western, and eastern areas. The overall spatial distribution appears comparable to both weekday morning and afternoon peaks, with moderate-to-high activity spread across developed areas rather than showing a distinctly different geographic pattern.
-
 :::
 
 ### Comparative Analysis
-
-```{r}
-#| code-summary: Compare trip volumes across time periods
-
-trips_comparison <- hexagon_trips_filtered %>%
-  st_drop_geometry() %>%
-  summarise(
-    Weekday_Morning_Total = sum(Weekday_Morning_Peak, na.rm = TRUE),
-    Weekday_Morning_Mean = mean(Weekday_Morning_Peak, na.rm = TRUE),
-    Weekday_Morning_Median = median(Weekday_Morning_Peak, na.rm = TRUE),
-    Weekday_Afternoon_Total = sum(Weekday_Afternoon_Peak, na.rm = TRUE),
-    Weekday_Afternoon_Mean = mean(Weekday_Afternoon_Peak, na.rm = TRUE),
-    Weekday_Afternoon_Median = median(Weekday_Afternoon_Peak, na.rm = TRUE),
-    Weekend_Holiday_Total = sum(Weekend_Holiday, na.rm = TRUE),
-    Weekend_Holiday_Mean = mean(Weekend_Holiday, na.rm = TRUE),
-    Weekend_Holiday_Median = median(Weekend_Holiday, na.rm = TRUE)
-  ) %>%
-  pivot_longer(everything(), 
-               names_to = c("Period", ".value"),
-               names_pattern = "(.+)_(Total|Mean|Median)") %>%
-  mutate(Period = str_replace_all(Period, "_", " "))
-
-kable(trips_comparison, 
-      digits = 0,
-      caption = "Comparison of Trip Volumes Across Time Periods")
-```
-
-The summary statistics reveal similar overall trip volumes across the three time periods. Weekday morning peak records the highest total trips (20,730,768) and mean per hexagon (9,620), followed closely by weekday afternoon peak (20,897,621 total; 9,697 mean). Weekend/holiday shows slightly lower volumes (19,265,664 total; 8,940 mean). 
-
-The median values are notably consistent across all periods (4,159 for morning, 4,314 for afternoon, 3,927 for weekend), suggesting comparable central tendencies despite differences in distribution shapes observed in the histograms.
 
 ```{r}
 #| code-summary: Prepare data for box plot comparison
@@ -528,21 +489,163 @@ ggplot(data = trips_boxplot,
   theme(legend.position = "none",
         axis.text.x = element_text(size = 10))
 ```
-The box plots reveal similar distributions across all three time periods on log scale. All three periods show comparable median values (horizontal lines within boxes around 2,000-4,000 trips) and interquartile ranges (box heights). Each period displays numerous outliers above the upper whisker, with weekday afternoon peak showing the most prominent extreme outliers exceeding 100,000 trips. The weekend/holiday distribution has a slightly lower median and narrower interquartile range compared to weekday peaks. 
+
+The box plots reveal similar distributions across all three time periods on log scale. All three periods show comparable median values (horizontal lines within boxes around 2,000-4,000 trips) and interquartile ranges (box heights). Each period displays numerous outliers above the upper whisker, with weekday afternoon peak showing the most prominent extreme outliers exceeding 100,000 trips. The weekend/holiday distribution has a slightly lower median and narrower interquartile range compared to weekday peaks.
 
 Overall, the three distributions are remarkably similar in shape and spread, with the main differences appearing in the frequency and magnitude of extreme high-value outliers rather than in the typical hexagon's trip volume.
-
-
 
 ## Local Measures of Spatial Association (LMSA)
 
 ### Computing Spatial Weights
 
+Spatial weights are computed using Queen contiguity, where hexagons sharing any edge or vertex are considered neighbors. This approach is appropriate for hexagonal tessellation because:
+
+1.  Hexagons naturally share edges with six adjacent cells, creating a uniform neighborhood structure ideal for spatial analysis;
+
+2.  Queen contiguity captures the continuous nature of bus passenger mobility, where demand patterns can diffuse across adjacent zones regardless of edge versus vertex contact;
+
+3.  The row-standardized weights (style = "W") ensure each neighbor contributes equally to the spatial lag calculation, preventing bias from hexagons with varying numbers of neighbors.
+
+Alternative approaches such as distance-based weights were considered but rejected, as they would introduce arbitrary distance thresholds and create inconsistent neighborhood sizes that could distort spatial autocorrelation measures in our regular hexagonal grid.
+
+```{r}
+#| code-summary: Calculate spatial weights for hexagon grid (handling zero neighbors)
+# Create contiguity-based neighbors (Queen contiguity)
+# Queen contiguity considers hexagons sharing any edge or vertex as neighbors
+wm_q <- hexagon_trips_filtered %>%
+  mutate(
+    nb = st_contiguity(geometry),
+    wt = st_weights(nb, style = "W", allow_zero = TRUE)
+  )
+
+# Check the neighbor structure
+summary(wm_q$nb)
+```
+
+```{r}
+# Check for hexagons with zero neighbors
+zero_neighbors <- which(lengths(wm_q$nb) == 0)
+cat("Number of hexagons with zero neighbors:", length(zero_neighbors), "\n")
+```
+
+### LMSA Functions
+
+```{r}
+#| code-summary: Define functions for LMSA calculations
+
+# Function to calculate Local Moran's I
+calculate_local_morans <- function(data, column_name) {
+  data %>%
+    mutate(
+      local_moran = local_moran(
+        .data[[column_name]], nb, wt,
+        nsim = 99
+      ),
+      # Extract components
+      Ii = local_moran$ii,
+      E_Ii = local_moran$eii,
+      Var_Ii = local_moran$var_ii,
+      Z_Ii = local_moran$z_ii,
+      p_value = local_moran$p_ii,
+      # Classification
+      moran_class = case_when(
+        p_value >= 0.05 ~ "Not Significant",
+        Ii > 0 & local_moran$pysal == "HH" ~ "High-High",
+        Ii > 0 & local_moran$pysal == "LL" ~ "Low-Low",
+        Ii < 0 & local_moran$pysal == "HL" ~ "High-Low",
+        Ii < 0 & local_moran$pysal == "LH" ~ "Low-High",
+        TRUE ~ "Not Significant"
+      )
+    )
+}
+
+# Function to calculate Local Geary's C
+calculate_local_gearys <- function(data, column_name) {
+  data %>%
+    mutate(
+      local_geary = local_c(
+        .data[[column_name]], nb, wt,
+        nsim = 99
+      ),
+      # Extract components
+      Ci = local_geary$ci,
+      E_Ci = local_geary$e_ci,
+      Var_Ci = local_geary$var_ci,
+      Z_Ci = local_geary$z_ci,
+      p_value_geary = local_geary$p_ci,
+      # Classification
+      geary_class = case_when(
+        p_value_geary >= 0.05 ~ "Not Significant",
+        Ci < E_Ci & local_geary$cluster == "High-High" ~ "High-High",
+        Ci < E_Ci & local_geary$cluster == "Low-Low" ~ "Low-Low",
+        Ci > E_Ci & local_geary$cluster == "High-Low" ~ "High-Low",
+        Ci > E_Ci & local_geary$cluster == "Low-High" ~ "Low-High",
+        TRUE ~ "Not Significant"
+      )
+    )
+}
+
+# Function to calculate Getis-Ord Gi*
+calculate_gi_star <- function(data, column_name) {
+  data %>%
+    mutate(
+      gi_star = local_gstar_perm(
+        .data[[column_name]], nb, wt,
+        nsim = 99
+      ),
+      # Extract components
+      Gi_star = gi_star$gi_star,
+      E_Gi = gi_star$e_gi,
+      Var_Gi = gi_star$var_gi,
+      p_value_gi = gi_star$p_sim,
+      # Classification
+      gi_class = case_when(
+        p_value_gi >= 0.05 ~ "Not Significant",
+        Gi_star > 0 ~ "Hot Spot",
+        Gi_star < 0 ~ "Cold Spot",
+        TRUE ~ "Not Significant"
+      )
+    )
+}
+
+# Master function to run all LMSA methods
+run_lmsa_analysis <- function(data, column_name, period_name) {
+  
+  cat(paste("\n=== Running LMSA for", period_name, "===\n"))
+  
+  # Calculate all three LMSA measures
+  result <- data %>%
+    calculate_local_morans(column_name) %>%
+    calculate_local_gearys(column_name) %>%
+    calculate_gi_star(column_name)
+  
+  # Summary statistics
+  cat("\nLocal Moran's I Summary:\n")
+  print(table(result$moran_class))
+  
+  cat("\nLocal Geary's C Summary:\n")
+  print(table(result$geary_class))
+  
+  cat("\nGetis-Ord Gi* Summary:\n")
+  print(table(result$gi_class))
+  
+  return(result)
+}
+```
+
 ### Local Moran's I Analysis
 
-### Local Geary's C Analysis
+```
+#| code-summary: Calculate Local Moran's I for all time periods
+morning_moran <- wm_q %>%
+  calculate_local_morans("Weekday_Morning_Peak")
 
-### Getis-Ord Gi\* Analysis
+afternoon_moran <- wm_q %>%
+  calculate_local_morans("Weekday_Afternoon_Peak")
+
+weekend_moran <- wm_q %>%
+  calculate_local_morans("Weekend_Holiday")
+```
 
 ### Comparative Analysis of LMSA Results
 
