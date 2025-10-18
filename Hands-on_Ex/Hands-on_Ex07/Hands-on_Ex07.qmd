@@ -276,7 +276,10 @@ Finally, we want to reveal the geospatial distribution condominium resale prices
 First, we will turn on the interactive mode of tmap.
 
 ```{r}
-tmap_mode("plot")
+#| cache: true
+#| cache.lazy: false
+
+tmap_mode("view")
 ```
 
 Then, we will create a interactive point symbol map.
@@ -294,11 +297,13 @@ tm_shape(condo_resale.sf) +
   tm_view(set_zoom_limits = c(11,16))
 ```
 
-**Note**
+::: callout-note
 
 -   [`tm_dots()`](https://www.rdocumentation.org/packages/tmap/versions/2.2/topics/tm_symbols) is used instead of `tm_bubbles(), so it's not oversized.`
 
 -   `set_zoom_limits` argument of `tm_view()` sets the minimum and maximum zoom level to 11 and 14 respectively.
+
+:::
 
 **Don't forget to return to the *"plot"* mode.**
 
@@ -327,7 +332,7 @@ The functions `summary()` and `anova()` can be used to obtain and print a summar
 summary(condo.slr)
 ```
 
-::: markgoals-container
+::: callout-note
 The output report reveals that the SELLING_PRICE can be explained by using the formula:
 
 ```         
@@ -620,6 +625,8 @@ The next section models hedonic pricing using both the fixed and adaptive bandwi
 
 ### Building Fixed Bandwidth GWR Model
 
+::: panel-tabset
+
 #### Computing fixed bandwidth
 
 `bw.gwr()` of **GWModel** package is used to determine the optimal fixed bandwidth to use in the model. Notice that the argument adaptive is set to FALSE so that we can compute the fixed bandwidth.
@@ -669,9 +676,13 @@ gwr.fixed
 
 The report shows that the AICc of the gwr is 42263.61 which is significantly smaller than the globel multiple linear regression model of 42967.1.
 
+:::
+
 ### Building Adaptive Bandwidth GWR Model
 
 In this section, we will calibrate the gwr-based hedonic pricing model by using adaptive bandwidth approach.
+
+::: panel-tabset
 
 #### Computing the adaptive bandwidth
 
@@ -722,6 +733,8 @@ gwr.adaptive
 
 The report shows that the AICc the adaptive distance gwr is 41982.22 which is even smaller than the AICc of the fixed distance gwr of 42263.61.
 
+:::
+
 ### Visualising GWR Output
 
 The output includes key diagnostics beyond regression residuals:
@@ -757,6 +770,9 @@ summary(gwr.adaptive$SDF$yhat)
 We create an interactive point symbol map.
 
 ```{r}
+#| cache: true
+#| cache.lazy: false
+
 tmap_mode("view")
 tm_shape(mpsz_svy21)+
   tm_polygons(fill_alpha = 0.1) +
@@ -774,6 +790,9 @@ tmap_mode("plot")
 Creating an interactive point symbol map.
 
 ```{r}
+#| cache: true
+#| cache.lazy: false
+
 tmap_mode("view")
 AREA_SQM_SE <- tm_shape(mpsz_svy21)+
   tm_polygons(alpha = 0.1) +
