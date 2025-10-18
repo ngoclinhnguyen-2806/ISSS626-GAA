@@ -553,7 +553,7 @@ rename(`MLR_RES` = `condo.mlr1.residuals`)
 Next, we will use the **tmap** package to display the distribution of the residuals on an interactive map.
 
 ```{r}
-tmap_mode("view")
+tmap_mode("plot")
 ```
 
 ```{r}
