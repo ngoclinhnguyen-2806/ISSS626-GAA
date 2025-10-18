@@ -1,5 +1,5 @@
 ---
-title: "Take-home Exercise 6 | "
+title: "Take-home Exercise 2 | Analyzing Urban Bus Mobility Patterns in Singapore Using Local Measures of Spatial Association and Emerging Hot Spot Analysis"
 subtitle: "This exercise applies advanced geospatial statistical methods to analyze bus passenger mobility patterns across Singapore. By leveraging Local Measures of Spatial Association (LMSA) and Emerging Hot Spot Analysis (EHSA), we move beyond simple mapping to identify where and how passenger demand clusters evolve over time. These insights can inform more responsive urban planning and public transport service optimization."
 date: "Oct 20, 2025"
 date-modified: "last-modified"
@@ -12,7 +12,7 @@ execute:
   warning: false
 format:
   html:
-    code-link: true        # Clickable function links
+    code-link: true       # Clickable function links
     toc: true             # Table of contents
     code-fold: true       # Foldable code
     code-tools: true      # Code tools menu
@@ -530,74 +530,125 @@ cat("Number of hexagons with zero neighbors:", length(zero_neighbors), "\n")
 
 ### LMSA Functions
 
+#### Define functions for LMSA calculations
+
 ```{r}
-#| code-summary: Define functions for LMSA calculations
+#| code-summary: Function to calculate Local Moran's I
 
-# Function to calculate Local Moran's I
 calculate_local_morans <- function(data, column_name) {
+  
+  # Extract the variable as a vector
+  x <- data[[column_name]]
+  nb_list <- data$nb
+  wt_list <- data$wt
+  
+  # Calculate local moran's I using spdep directly for more control
+  lisa <- spdep::localmoran_perm(
+    x = x,
+    listw = nb2listw(nb_list, wt_list, style = "W", zero.policy = TRUE),
+    nsim = 99,
+    alternative = "two.sided",
+    zero.policy = TRUE
+  )
+  
+  # Get quadrant classification
+  # Standardize the variable
+  x_lag <- lag.listw(nb2listw(nb_list, wt_list, style = "W", zero.policy = TRUE), x, zero.policy = TRUE)
+  x_std <- (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+  x_lag_std <- (x_lag - mean(x_lag, na.rm = TRUE)) / sd(x_lag, na.rm = TRUE)
+  
+  # Classify into quadrants
+  quadrant <- rep("Not Significant", length(x))
+  quadrant[x_std > 0 & x_lag_std > 0] <- "High-High"
+  quadrant[x_std < 0 & x_lag_std < 0] <- "Low-Low"
+  quadrant[x_std > 0 & x_lag_std < 0] <- "High-Low"
+  quadrant[x_std < 0 & x_lag_std > 0] <- "Low-High"
+  
+  # Add results back to data
   data %>%
     mutate(
-      local_moran = local_moran(
-        .data[[column_name]], nb, wt,
-        nsim = 99
-      ),
-      # Extract components
-      Ii = local_moran$ii,
-      E_Ii = local_moran$eii,
-      Var_Ii = local_moran$var_ii,
-      Z_Ii = local_moran$z_ii,
-      p_value = local_moran$p_ii,
-      # Classification
-      moran_class = case_when(
-        p_value >= 0.05 ~ "Not Significant",
-        Ii > 0 & local_moran$pysal == "HH" ~ "High-High",
-        Ii > 0 & local_moran$pysal == "LL" ~ "Low-Low",
-        Ii < 0 & local_moran$pysal == "HL" ~ "High-Low",
-        Ii < 0 & local_moran$pysal == "LH" ~ "Low-High",
-        TRUE ~ "Not Significant"
-      )
+      Ii = lisa[, 1],           # Local Moran's I statistic
+      E_Ii = lisa[, 2],         # Expectation
+      Var_Ii = lisa[, 3],       # Variance
+      Z_Ii = lisa[, 4],         # Z-score
+      p_value = lisa[, 5],      # P-value from permutation
+      # Classification based on significance and quadrant
+      moran_class = if_else(p_value < 0.05, quadrant, "Not Significant")
     )
 }
+```
 
-# Function to calculate Local Geary's C
+```{r}
+#| code-summary: Function to calculate Local Geary's C
+
 calculate_local_gearys <- function(data, column_name) {
+  
+  # Extract the variable as a vector
+  x <- data[[column_name]]
+  nb_list <- data$nb
+  wt_list <- data$wt
+  
+  # Calculate local geary's C using spdep
+  geary_result <- spdep::localC_perm(
+    x = x,
+    listw = nb2listw(nb_list, wt_list, style = "W", zero.policy = TRUE),
+    nsim = 99,
+    zero.policy = TRUE
+  )
+  
+  # Get attributes
+  p_vals <- attr(geary_result, "pseudo-p")
+  
+  # Classify - Low C means similar to neighbors (clustering)
+  # Get spatial lag
+  x_lag <- lag.listw(nb2listw(nb_list, wt_list, style = "W", zero.policy = TRUE), x, zero.policy = TRUE)
+  x_std <- (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
+  x_lag_std <- (x_lag - mean(x_lag, na.rm = TRUE)) / sd(x_lag, na.rm = TRUE)
+  
+  # Classify into quadrants
+  quadrant <- rep("Not Significant", length(x))
+  quadrant[x_std > 0 & x_lag_std > 0] <- "High-High"
+  quadrant[x_std < 0 & x_lag_std < 0] <- "Low-Low"
+  quadrant[x_std > 0 & x_lag_std < 0] <- "High-Low"
+  quadrant[x_std < 0 & x_lag_std > 0] <- "Low-High"
+  
+  # Add results back to data
   data %>%
     mutate(
-      local_geary = local_c(
-        .data[[column_name]], nb, wt,
-        nsim = 99
-      ),
-      # Extract components
-      Ci = local_geary$ci,
-      E_Ci = local_geary$e_ci,
-      Var_Ci = local_geary$var_ci,
-      Z_Ci = local_geary$z_ci,
-      p_value_geary = local_geary$p_ci,
+      Ci = as.vector(geary_result),
+      p_value_geary = p_vals,
       # Classification
-      geary_class = case_when(
-        p_value_geary >= 0.05 ~ "Not Significant",
-        Ci < E_Ci & local_geary$cluster == "High-High" ~ "High-High",
-        Ci < E_Ci & local_geary$cluster == "Low-Low" ~ "Low-Low",
-        Ci > E_Ci & local_geary$cluster == "High-Low" ~ "High-Low",
-        Ci > E_Ci & local_geary$cluster == "Low-High" ~ "Low-High",
-        TRUE ~ "Not Significant"
-      )
+      geary_class = if_else(p_value_geary < 0.05, quadrant, "Not Significant")
     )
 }
+```
 
-# Function to calculate Getis-Ord Gi*
+```{r}
+#| code-summary: Function to calculate Getis-Ord Gi*
+
 calculate_gi_star <- function(data, column_name) {
+  
+  # Extract the variable as a vector
+  x <- data[[column_name]]
+  nb_list <- data$nb
+  wt_list <- data$wt
+  
+  # Calculate Gi* using spdep
+  gi_result <- spdep::localG_perm(
+    x = x,
+    listw = nb2listw(nb_list, wt_list, style = "B", zero.policy = TRUE),  # Binary weights for Gi*
+    nsim = 99,
+    zero.policy = TRUE
+  )
+  
+  # Get p-values
+  p_vals <- attr(gi_result, "pseudo-p")
+  
+  # Add results back to data
   data %>%
     mutate(
-      gi_star = local_gstar_perm(
-        .data[[column_name]], nb, wt,
-        nsim = 99
-      ),
-      # Extract components
-      Gi_star = gi_star$gi_star,
-      E_Gi = gi_star$e_gi,
-      Var_Gi = gi_star$var_gi,
-      p_value_gi = gi_star$p_sim,
+      Gi_star = as.vector(gi_result),
+      p_value_gi = p_vals,
       # Classification
       gi_class = case_when(
         p_value_gi >= 0.05 ~ "Not Significant",
@@ -607,8 +658,11 @@ calculate_gi_star <- function(data, column_name) {
       )
     )
 }
+```
 
-# Master function to run all LMSA methods
+```{r}
+#| code-summary: Master function to run all LMSA methods
+
 run_lmsa_analysis <- function(data, column_name, period_name) {
   
   cat(paste("\n=== Running LMSA for", period_name, "===\n"))
@@ -634,6 +688,14 @@ run_lmsa_analysis <- function(data, column_name, period_name) {
 ```
 
 ### Local Moran's I Analysis
+
+```
+#| code-summary: Helper function to convert nb and wt to listw
+nb2listw <- function(nb, wt, style = "W", zero.policy = TRUE) {
+  # Convert sfdep nb/wt structure to spdep listw structure
+  spdep::nb2listw(nb, glist = wt, style = style, zero.policy = zero.policy)
+}
+```
 
 ```
 #| code-summary: Calculate Local Moran's I for all time periods

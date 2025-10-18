@@ -26,16 +26,16 @@ Geographically weighted regression (GWR) accounts for non-stationary variables (
 ### The Data
 
 | Dataset | Source | Description | Format |
-|------------------|------------------|--------------------|------------------|
+|------------------|------------------|------------------|------------------|
 | **Master Plan 2014 Subzone Boundary (Web)** | [data.gov.sg](https://data.gov.sg/) | Geospatial boundaries for Singapore's planning subzones. | ESRI Shapefile |
-| Condo resale 2015 |  |  | CSV |
+| **Condo resale 2015** |  |  | CSV |
 
 ### Import R Packages
 
 We will be using the following R packages:
 
 | R Package | Description |
-|--------------------------|----------------------------------------------|
+|------------------------------------|------------------------------------|
 | [**olsrr**](https://olsrr.rsquaredacademy.com/) | R package for building OLS and performing diagnostics tests |
 | [**GWmodel**](https://cran.r-project.org/web/packages/GWmodel/index.html) | R package for calibrating geographical weighted family of models |
 | [**corrplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) | R package for multivariate data visualisation and analysis |
@@ -50,7 +50,9 @@ pacman::p_load(olsrr, corrplot, ggpubr, sf, sfdep, GWmodel, tmap, tidyverse, gts
 
 ### About GWmodel
 
-[**GWmodel**](https://www.jstatsoft.org/article/view/v063i17) package provides a collection of localised spatial statistical methods, namely: GW summary statistics, GW principal components analysis, GW discriminant analysis and various forms of GW regression; some of which are provided in basic and robust (outlier resistant) forms. Commonly, outputs or parameters of the GWmodel are mapped to provide a useful exploratory tool, which can often precede (and direct) a more traditional or sophisticated statistical analysis.
+[**GWmodel**](https://www.jstatsoft.org/article/view/v063i17) package provides a collection of localised spatial statistical methods, namely: - GW summary statistics - GW principal components analysis - GW discriminant analysis and various forms of GW regression.
+
+Some of the methods are provided in basic and robust (outlier resistant) forms. Commonly, outputs or parameters of the `GWmodel` are mapped to provide a useful exploratory tool, which can often precede (and direct) a more traditional or sophisticated statistical analysis.
 
 ## Data Wrangling
 
@@ -109,9 +111,9 @@ head(condo_resale$LONGITUDE)
 head(condo_resale$LATITUDE)
 ```
 
-The print above reveals that the values of *LONGITITUDE* and *LATITUDE* fields are in decimal degree. Most probably wgs84 geographic coordinate system is used.
+The print above reveals that the values of `LONGITITUDE` and `LATITUDE` fields are in decimal degree. Most probably wgs84 geographic coordinate system is used.
 
-Next, `summary()` of base R is used to display the summary statistics of *cond_resale* tibble data frame.
+Next, `summary()` of base R is used to display the summary statistics of `cond_resale` tibble data frame.
 
 ```{r}
 summary(condo_resale)
@@ -119,7 +121,7 @@ summary(condo_resale)
 
 #### Convert aspatial data frame into a sf object
 
-Currently, the *condo_resale* tibble data frame is aspatial. We will convert it to a **sf** object. The code chunk below converts condo_resale data frame into a simple feature data frame by using `st_as_sf()` of **sf** packages.
+Currently, the `condo_resale` tibble data frame is aspatial. We will convert it to a `sf` object. The code chunk below converts condo_resale data frame into a simple feature data frame by using `st_as_sf()` of `sf` packages.
 
 ```{r}
 condo_resale.sf <- st_as_sf(condo_resale,
@@ -452,14 +454,14 @@ Regression diagnostics are a set of procedures used to check if a regression mod
 
 In this section, we would like to introduce you a fantastic R package specially programmed for performing OLS regression diagnostics. It is called `olsrr`. It provides a collection of very useful methods for building better multiple linear regression models:
 
-- comprehensive regression output
-- residual diagnostics
-- measures of influence
-- heteroskedasticity tests
-- collinearity diagnostics
-- model fit assessment
-- variable contribution assessment
-- variable selection procedures
+-   comprehensive regression output
+-   residual diagnostics
+-   measures of influence
+-   heteroskedasticity tests
+-   collinearity diagnostics
+-   model fit assessment
+-   variable contribution assessment
+-   variable selection procedures
 
 #### Multicollinearity test
 
@@ -551,7 +553,7 @@ rename(`MLR_RES` = `condo.mlr1.residuals`)
 Next, we will use the **tmap** package to display the distribution of the residuals on an interactive map.
 
 ```{r}
-tmap_mode("plot")
+tmap_mode("view")
 ```
 
 ```{r}
@@ -633,7 +635,7 @@ bw.fixed <- bw.gwr(
     PROX_BUS_STOP   + NO_Of_UNITS + FAMILY_FRIENDLY + 
     FREEHOLD, 
   data=condo_resale.sf, 
-  approach="CV", 
+  approach="CV", # Cross Validation
   kernel="gaussian", 
   adaptive=FALSE, 
   longlat=FALSE)
@@ -795,4 +797,3 @@ tmap_arrange(AREA_SQM_SE, AREA_SQM_TV,
 
 tmap_mode("plot")
 ```
-
