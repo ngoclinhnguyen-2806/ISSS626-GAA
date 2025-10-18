@@ -676,17 +676,15 @@ The result for the AIC approach shows that the recommended bandwidth is 1391.309
 
 :::
 
-#### GWModel method - fixed bandwidth
+#### GWR Model method
+
+We can calibrate the gwr model using fixed bandwidth and gaussian kernel.
 
 ::: panel-tabset
 
 ##### CV approach
 
-We can calibrate the gwr model using fixed bandwidth and gaussian kernel.
-
 ```{r}
-cat("\nCalibrating Fixed Bandwidth GWR model using CV bandwidth...\n")
-
 gwr_fixed_cv <- gwr.basic(
   formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -706,8 +704,6 @@ gwr_fixed_cv
 ##### AIC approach
 
 ```{r}
-cat("\nCalibrating Fixed Bandwidth GWR model using AIC bandwidth...\n")
-
 gwr_fixed_aic <- gwr.basic(
   formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -748,10 +744,6 @@ The code chunk used look very similar to the one used to compute the fixed bandw
 ##### CV approach
 
 ```{r}
-# CV approach
-
-cat("\nComputing optimal adaptive bandwidth using CV approach...\n")
-
 bw_adaptive_cv <- bw.gwr(
   formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -767,13 +759,9 @@ bw_adaptive_cv <- bw.gwr(
 
 The result for the CV approach shows that 30 is the recommended data points to be used.
 
-##### Computing Adaptive Bandwidth using AIC approach
+##### AIC approach
 
 ```{r}
-# AIC approach 
-
-cat("\nComputing optimal adaptive bandwidth using AIC approach...\n")
-
 bw_adaptive_aic <- bw.gwr(
   formula = SELLING_PRICE ~ AREA_SQM + AGE + PROX_CBD + 
     PROX_CHILDCARE + PROX_ELDERLYCARE + PROX_URA_GROWTH_AREA + 
@@ -792,7 +780,7 @@ The result for the AIC approach shows that 27 is the recommended data points to 
 
 :::
 
-#### Constructing the adaptive bandwidth gwr model
+#### GWR Model method
 
 ::: panel-tabset
 
@@ -837,7 +825,7 @@ gwr_adaptive_aic
 ```
 :::
 
-#### Comparison Summary Table
+### Comparison Summary Table
 
 ```{r}
 # Extract key metrics from each model
@@ -886,7 +874,7 @@ print(kable(comparison_df,
 
 ```{r}
 best_model_idx <- which.min(comparison_df$AICc)
-cat("\n** BEST MODEL (Lowest AICc): **", comparison_df$Model[best_model_idx], "\n")
+cat("\nBEST MODEL (Lowest AICc):", comparison_df$Model[best_model_idx], "\n")
 cat("   AICc:", comparison_df$AICc[best_model_idx], "\n")
 cat("   R-squared:", comparison_df$R_squared[best_model_idx], "\n\n")
 ```
