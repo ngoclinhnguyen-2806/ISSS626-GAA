@@ -302,7 +302,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">October 17, 2025</p>
+      <p class="date-modified">October 18, 2025</p>
     </div>
   </div>
     
@@ -2144,7 +2144,7 @@ weekend_moran &lt;- wm_q %&gt;%
 <span id="cb38-333"><a href="#cb38-333" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> hexagon_trips_filtered <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Weekday_Morning_Peak <span class="sc">&gt;</span> <span class="dv">0</span>), </span>
 <span id="cb38-334"><a href="#cb38-334" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Weekday_Morning_Peak)) <span class="sc">+</span></span>
 <span id="cb38-335"><a href="#cb38-335" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, </span>
-<span id="cb38-336"><a href="#cb38-336" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"steelblue"</span>, </span>
+<span id="cb38-336"><a href="#cb38-336" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"coral"</span>, </span>
 <span id="cb38-337"><a href="#cb38-337" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
 <span id="cb38-338"><a href="#cb38-338" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
 <span id="cb38-339"><a href="#cb38-339" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribution of Passenger Trips - Weekday Morning Peak (Log Scale)"</span>,</span>
@@ -2210,7 +2210,7 @@ weekend_moran &lt;- wm_q %&gt;%
 <span id="cb38-407"><a href="#cb38-407" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> hexagon_trips_filtered <span class="sc">%&gt;%</span> <span class="fu">filter</span>(Weekend_Holiday <span class="sc">&gt;</span> <span class="dv">0</span>), </span>
 <span id="cb38-408"><a href="#cb38-408" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> Weekend_Holiday)) <span class="sc">+</span></span>
 <span id="cb38-409"><a href="#cb38-409" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">30</span>, </span>
-<span id="cb38-410"><a href="#cb38-410" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"mediumseagreen"</span>, </span>
+<span id="cb38-410"><a href="#cb38-410" aria-hidden="true" tabindex="-1"></a>                 <span class="at">fill =</span> <span class="st">"coral"</span>, </span>
 <span id="cb38-411"><a href="#cb38-411" aria-hidden="true" tabindex="-1"></a>                 <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
 <span id="cb38-412"><a href="#cb38-412" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> scales<span class="sc">::</span>comma) <span class="sc">+</span></span>
 <span id="cb38-413"><a href="#cb38-413" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Distribution of Passenger Trips - Weekend/Holiday (Log Scale)"</span>,</span>

@@ -293,7 +293,7 @@ ggplot(data = hexagon_trips_filtered,
 ggplot(data = hexagon_trips_filtered %>% filter(Weekday_Morning_Peak > 0), 
        aes(x = Weekday_Morning_Peak)) +
   geom_histogram(bins = 30, 
-                 fill = "steelblue", 
+                 fill = "coral", 
                  color = "black") +
   scale_x_log10(labels = scales::comma) +
   labs(title = "Distribution of Passenger Trips - Weekday Morning Peak (Log Scale)",
@@ -359,7 +359,7 @@ The linear scale histogram shows extreme right-skew similar to weekday patterns,
 ggplot(data = hexagon_trips_filtered %>% filter(Weekend_Holiday > 0), 
        aes(x = Weekend_Holiday)) +
   geom_histogram(bins = 30, 
-                 fill = "mediumseagreen", 
+                 fill = "coral", 
                  color = "black") +
   scale_x_log10(labels = scales::comma) +
   labs(title = "Distribution of Passenger Trips - Weekend/Holiday (Log Scale)",
