@@ -331,7 +331,8 @@ The functions `summary()` and `anova()` can be used to obtain and print a summar
 summary(condo.slr)
 ```
 
-::: callout-learning
+::: callout-note
+
 The output report reveals that the SELLING_PRICE can be explained by using the formula:
 
 ```         
@@ -386,7 +387,7 @@ corrplot(cor(condo_resale[, 5:23]),
          type = "upper")
 ```
 
-::: callout-learning
+::: callout-note
 
 -   Matrix reorder is very important for mining the hiden structure and patter in the matrix. There are four methods in corrplot (parameter order), named “AOE”, “FPC”, “hclust”, “alphabet”. In the code chunk above, **AOE order** is used. It orders the variables by using the *angular order of the eigenvectors* method suggested by [Michael Friendly](https://www.datavis.ca/papers/corrgram.pdf).
 
@@ -558,7 +559,10 @@ rename(`MLR_RES` = `condo.mlr1.residuals`)
 Next, we will use the **tmap** package to display the distribution of the residuals on an interactive map.
 
 ```{r}
-tmap_mode("plot") # set to plot here for fast rendering
+#| cache: true
+#| cache.lazy: false
+
+tmap_mode("view") 
 ```
 
 ```{r}
@@ -631,7 +635,9 @@ The next section models hedonic pricing using both the fixed and adaptive bandwi
 
 There are two possible approaches can be used to determine the stopping rule, they are: CV cross-validation approach and AIC corrected (AICc) approach. We define the stopping rule using **approach** agreement.
 
-##### Computing Fixed Bandwidth using CV approach
+::: panel-tabset
+
+##### CV approach
 
 ```{r}
 # Using CV approach
@@ -650,7 +656,7 @@ bw_fixed_cv <- bw.gwr(
 
 The result for the CV approach shows that the recommended bandwidth is 971.3405 metres.
 
-##### Computing Fixed Bandwidth using AIC approach
+##### AIC approach
 
 ```{r}
 # Using AIC approach
@@ -668,9 +674,13 @@ bw_fixed_aic <- bw.gwr(
 ```
 The result for the AIC approach shows that the recommended bandwidth is 1391.309 metres.
 
+:::
+
 #### GWModel method - fixed bandwidth
 
-##### Calibrate GWR model with Fixed Bandwidth - CV
+::: panel-tabset
+
+##### CV approach
 
 We can calibrate the gwr model using fixed bandwidth and gaussian kernel.
 
@@ -693,7 +703,7 @@ gwr_fixed_cv <- gwr.basic(
 gwr_fixed_cv
 ```
 
-##### Calibrate GWR model with Fixed Bandwidth - AIC
+##### AIC approach
 
 ```{r}
 cat("\nCalibrating Fixed Bandwidth GWR model using AIC bandwidth...\n")
@@ -715,6 +725,7 @@ The output is saved in a list of class “gwrm”. The code below can be used to
 ```{r}
 gwr_fixed_aic
 ```
+:::
 
 The report shows that:
 - When using CV approach, the AICc of the gwr is 42263.61 
@@ -732,7 +743,9 @@ In this section, we will calibrate the gwr-based hedonic pricing model by using 
 
 The code chunk used look very similar to the one used to compute the fixed bandwidth except the `adaptive` argument has changed to **TRUE**. And we also apply both approaches (CV and AIC) then compare later.
 
-##### Computing Adaptive Bandwidth using CV approach
+::: panel-tabset
+
+##### CV approach
 
 ```{r}
 # CV approach
@@ -777,9 +790,13 @@ cat("Optimal Adaptive Bandwidth (AIC):", bw_adaptive_aic, "nearest neighbors\n")
 ```
 The result for the AIC approach shows that 27 is the recommended data points to be used.
 
+:::
+
 #### Constructing the adaptive bandwidth gwr model
 
-##### Calibrate GWR model with Adaptive Bandwidth - CV
+::: panel-tabset
+
+##### CV approach
 
 ```{r}
 gwr_adaptive_cv <- gwr.basic(
@@ -799,7 +816,7 @@ gwr_adaptive_cv <- gwr.basic(
 gwr_adaptive_cv
 ```
 
-##### Calibrate GWR model with Adaptive Bandwidth - AIC
+##### AIC approach
 
 ```{r}
 gwr_adaptive_aic <- gwr.basic(
@@ -818,6 +835,7 @@ gwr_adaptive_aic <- gwr.basic(
 ```{r}
 gwr_adaptive_aic
 ```
+:::
 
 #### Comparison Summary Table
 
@@ -908,6 +926,9 @@ summary(gwr_adaptive_aic$SDF$yhat)
 We create an interactive point symbol map.
 
 ```{r}
+#| cache: true
+#| cache.lazy: false
+
 tmap_mode("view")
 tm_shape(mpsz_svy21)+
   tm_polygons(fill_alpha = 0.1) +
@@ -925,6 +946,9 @@ tmap_mode("plot")
 Creating an interactive point symbol map.
 
 ```{r}
+#| cache: true
+#| cache.lazy: false
+
 tmap_mode("view")
 AREA_SQM_SE <- tm_shape(mpsz_svy21)+
   tm_polygons(alpha = 0.1) +
