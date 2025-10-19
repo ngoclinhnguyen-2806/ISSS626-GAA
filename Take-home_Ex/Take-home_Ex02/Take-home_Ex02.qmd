@@ -59,7 +59,7 @@ Urban mobility patterns reveal how cities function and evolve. This exercise ana
 #| code-summary: Install and Load R packages
 #| output: false
 
-pacman::p_load(sfdep, tmap, sf, knitr, httr, rvest, tidyverse)
+pacman::p_load(sfdep, spdep, tmap, sf, knitr, httr, rvest, tidyverse)
 ```
 
 ## Data Import & Preparation
@@ -410,7 +410,7 @@ The spatial distribution of weekday morning peak passenger trips reveals distinc
 
 Notable spatial heterogeneity is evident, with mid-to-high trip generation hexagons (orange to red) forming contiguous clusters, suggesting neighborhood-level demand patterns rather than isolated hotspots. The eastern and northeastern regions show moderate activity levels, while certain peripheral areas display lower boarding volumes.
 
-The quantile classification reveals that the top 20% of hexagons (darkest red) handle significantly higher passenger volumes (18,337 to 288,060 trips), indicating substantial spatial inequality in bus service demand. This concentration suggests that targeted service planning focusing on these high-demand corridors could efficiently serve a large proportion of morning peak passengers. The spatial continuity of medium-to-high demand areas also indicates potential for effective trunk-and-feeder route optimization.
+The quantile classification reveals that the top 20% of hexagons (darkest red) handle significantly higher passenger volumes (15,153 to 467,963 trips), indicating substantial spatial inequality in bus service demand. This concentration suggests that targeted service planning focusing on these high-demand corridors could efficiently serve a large proportion of morning peak passengers. The spatial continuity of medium-to-high demand areas also indicates potential for effective trunk-and-feeder route optimization.
 
 #### Weekday Afternoon Peak
 
@@ -430,9 +430,11 @@ tm_shape(hexagon_trips_filtered) +
             legend.outside = TRUE)
 ```
 
-The afternoon peak spatial distribution displays high-intensity boarding activity across multiple areas of Singapore, with dark red hexagons visible in the central region and various other locations across the island. The pattern shows widespread moderate-to-high activity (orange to red) across much of the developed area.
+The afternoon peak spatial distribution displays high-intensity boarding activity across multiple areas of Singapore, with dark red hexagons visible in the central region and various other locations across the island. The pattern shows widespread moderate-to-high activity (orange to red) across much of the developed area, similar in overall coverage to the morning peak.
 
-While the histogram revealed some differences in trip volume distribution between morning and afternoon peaks, the spatial maps show broadly similar geographic patterns. Both periods exhibit high-activity hexagons distributed across various regions rather than concentrated in a single area. The afternoon peak maintains substantial boarding activity across multiple zones, similar to the morning pattern, though the specific intensity levels at individual hexagons may vary between the two periods.
+However, a closer comparison between morning and afternoon maps reveals a subtle but notable geographic shift in the concentration of highest-intensity hexagons (darkest red, representing 15,153+ trips). The central region appears to intensify during afternoon peak, with an increased density of dark red hexagons clustering in what appears to be the CBD and downtown commercial districts. Conversely, some peripheral residential areas that showed darker red coloring during morning peak now display lighter red or orange shades, indicating reduced boarding intensity.
+
+This spatial reversal reflects the inverse commuting pattern: during morning hours, passengers board buses predominantly from dispersed residential neighborhoods traveling toward employment centers; during afternoon hours, boarding concentrates in central business districts as workers depart from offices. The moderate activity levels (orange) that remain consistent across both periods likely represent mixed-use areas with stable demand, transit hubs serving bidirectional flows, or commercial zones with both morning and evening activity. The shift supports the hypothesis that afternoon peak captures workers' end-of-day mobility, potentially including intermediate trips for errands or dining before returning home, explaining why some commercial corridors maintain high boarding activity during evening hours.
 
 #### Weekend/Holiday
 
@@ -509,22 +511,42 @@ Spatial weights are computed using Queen contiguity, where hexagons sharing any 
 Alternative approaches such as distance-based weights were considered but rejected, as they would introduce arbitrary distance thresholds and create inconsistent neighborhood sizes that could distort spatial autocorrelation measures in our regular hexagonal grid.
 
 ```{r}
-#| code-summary: Calculate spatial weights for hexagon grid (handling zero neighbors)
-# Create contiguity-based neighbors (Queen contiguity)
-# Queen contiguity considers hexagons sharing any edge or vertex as neighbors
-wm_q <- hexagon_trips_filtered %>%
-  mutate(
-    nb = st_contiguity(geometry),
-    wt = st_weights(nb, style = "W", allow_zero = TRUE)
-  )
+#| code-summary: Rebuild neighbor structure using pure spdep
 
-# Check the neighbor structure
-summary(wm_q$nb)
+# Start fresh from hexagon_trips_filtered
+wm_q_spdep <- hexagon_trips_filtered
+
+# Create neighbors using spdep's poly2nb (not sfdep's st_contiguity)
+nb_spdep <- poly2nb(wm_q_spdep, queen = TRUE)
+
+# Check for regions with no neighbors
+summary(nb_spdep)
+
+# Remove hexagons with no neighbors
+no_neighbors <- which(card(nb_spdep) == 0)
+cat("Hexagons with no neighbors:", length(no_neighbors), "\n")
+
+if(length(no_neighbors) > 0) {
+  wm_q_spdep <- wm_q_spdep[-no_neighbors, ]
+  nb_spdep <- poly2nb(wm_q_spdep, queen = TRUE)
+  cat("After removal, hexagons with no neighbors:", sum(card(nb_spdep) == 0), "\n")
+}
+
+# Create listw object with row-standardized weights
+listw_spdep <- nb2listw(nb_spdep, style = "W", zero.policy = TRUE)
+
+# Store nb in the dataframe for reference
+wm_q_spdep$nb_spdep <- nb_spdep
+
+cat("\nFinal dataset:\n")
+cat("Total hexagons:", nrow(wm_q_spdep), "\n")
+cat("Neighbor structure created successfully!\n")
 ```
+
 
 ```{r}
 # Check for hexagons with zero neighbors
-zero_neighbors <- which(lengths(wm_q$nb) == 0)
+zero_neighbors <- which(lengths(wm_q_spdep$nb) == 0)
 cat("Number of hexagons with zero neighbors:", length(zero_neighbors), "\n")
 ```
 
@@ -532,51 +554,54 @@ cat("Number of hexagons with zero neighbors:", length(zero_neighbors), "\n")
 
 #### Define functions for LMSA calculations
 
+::: panel-tabset
+
+##### Local Moran's I
+
 ```{r}
 #| code-summary: Function to calculate Local Moran's I
 
-calculate_local_morans <- function(data, column_name) {
-  
-  # Extract the variable as a vector
+# using pure spdep
+
+calculate_local_morans <- function(data, listw, column_name) {
+  # Extract variable
   x <- data[[column_name]]
-  nb_list <- data$nb
-  wt_list <- data$wt
   
-  # Calculate local moran's I using spdep directly for more control
-  lisa <- spdep::localmoran_perm(
+  # Calculate Local Moran's I
+  lisa_result <- localmoran_perm(
     x = x,
-    listw = nb2listw(nb_list, wt_list, style = "W", zero.policy = TRUE),
+    listw = listw,
     nsim = 99,
-    alternative = "two.sided",
-    zero.policy = TRUE
+    zero.policy = TRUE,
+    alternative = "two.sided"
   )
   
-  # Get quadrant classification
-  # Standardize the variable
-  x_lag <- lag.listw(nb2listw(nb_list, wt_list, style = "W", zero.policy = TRUE), x, zero.policy = TRUE)
-  x_std <- (x - mean(x, na.rm = TRUE)) / sd(x, na.rm = TRUE)
-  x_lag_std <- (x_lag - mean(x_lag, na.rm = TRUE)) / sd(x_lag, na.rm = TRUE)
+  # Calculate spatial lag for quadrant classification
+  x_lag <- lag.listw(listw, x, zero.policy = TRUE)
+  x_centered <- x - mean(x, na.rm = TRUE)
+  x_lag_centered <- x_lag - mean(x_lag, na.rm = TRUE)
   
-  # Classify into quadrants
-  quadrant <- rep("Not Significant", length(x))
-  quadrant[x_std > 0 & x_lag_std > 0] <- "High-High"
-  quadrant[x_std < 0 & x_lag_std < 0] <- "Low-Low"
-  quadrant[x_std > 0 & x_lag_std < 0] <- "High-Low"
-  quadrant[x_std < 0 & x_lag_std > 0] <- "Low-High"
-  
-  # Add results back to data
+  # Add results to data
   data %>%
     mutate(
-      Ii = lisa[, 1],           # Local Moran's I statistic
-      E_Ii = lisa[, 2],         # Expectation
-      Var_Ii = lisa[, 3],       # Variance
-      Z_Ii = lisa[, 4],         # Z-score
-      p_value = lisa[, 5],      # P-value from permutation
-      # Classification based on significance and quadrant
+      Ii = lisa_result[, 1],
+      E_Ii = lisa_result[, 2],
+      Var_Ii = lisa_result[, 3],
+      Z_Ii = lisa_result[, 4],
+      p_value = lisa_result[, 5],
+      quadrant = case_when(
+        x_centered > 0 & x_lag_centered > 0 ~ "High-High",
+        x_centered < 0 & x_lag_centered < 0 ~ "Low-Low",
+        x_centered > 0 & x_lag_centered < 0 ~ "High-Low",
+        x_centered < 0 & x_lag_centered > 0 ~ "Low-High",
+        TRUE ~ "Undefined"
+      ),
       moran_class = if_else(p_value < 0.05, quadrant, "Not Significant")
     )
 }
 ```
+
+##### Local Geary's C
 
 ```{r}
 #| code-summary: Function to calculate Local Geary's C
@@ -623,6 +648,8 @@ calculate_local_gearys <- function(data, column_name) {
 }
 ```
 
+##### Getis-Ord Gi*
+
 ```{r}
 #| code-summary: Function to calculate Getis-Ord Gi*
 
@@ -660,6 +687,8 @@ calculate_gi_star <- function(data, column_name) {
 }
 ```
 
+##### Master function
+
 ```{r}
 #| code-summary: Master function to run all LMSA methods
 
@@ -687,26 +716,44 @@ run_lmsa_analysis <- function(data, column_name, period_name) {
 }
 ```
 
-### Local Moran's I Analysis
+:::
 
-```
-#| code-summary: Helper function to convert nb and wt to listw
-nb2listw <- function(nb, wt, style = "W", zero.policy = TRUE) {
-  # Convert sfdep nb/wt structure to spdep listw structure
-  spdep::nb2listw(nb, glist = wt, style = style, zero.policy = zero.policy)
-}
-```
+#### Local Moran's I Analysis
 
-```
+```{r}         
 #| code-summary: Calculate Local Moran's I for all time periods
-morning_moran <- wm_q %>%
-  calculate_local_morans("Weekday_Morning_Peak")
 
-afternoon_moran <- wm_q %>%
-  calculate_local_morans("Weekday_Afternoon_Peak")
+morning_moran <- calculate_local_morans(
+  wm_q_spdep, listw_spdep, "Weekday_Morning_Peak"
+)
 
-weekend_moran <- wm_q %>%
-  calculate_local_morans("Weekend_Holiday")
+afternoon_moran <- calculate_local_morans(
+  wm_q_spdep, listw_spdep, "Weekday_Afternoon_Peak"
+)
+
+weekend_moran <- calculate_local_morans(
+  wm_q_spdep, listw_spdep, "Weekend_Holiday"
+)
+
+# Check results
+cat("Weekday Morning Peak:\n")
+print(table(morning_moran$moran_class))
+
+cat("\nWeekday Afternoon Peak:\n")
+print(table(afternoon_moran$moran_class))
+
+cat("\nWeekend/Holiday:\n")
+print(table(weekend_moran$moran_class))
+
+```
+
+```{r}
+#| code-summary: Check for all cluster types
+cat("Weekday Morning Peak - Full breakdown:\n")
+print(table(morning_moran$quadrant, morning_moran$p_value < 0.05))
+
+cat("\nWeekday Morning Peak - Including non-significant quadrants:\n")
+print(table(morning_moran$quadrant))
 ```
 
 ### Comparative Analysis of LMSA Results

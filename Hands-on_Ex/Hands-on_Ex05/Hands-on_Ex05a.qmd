@@ -36,7 +36,7 @@ In this case study, we will use China's data to examine the spatial pattern of a
 We will use the following packages: **spdep, sf, tmap and tidyverse** packages of R.
 
 | Package | Description |
-|-----------------------|------------------------------------------------|
+|------------------------|------------------------------------------------|
 | **sf** | importing and handling geospatial data in R |
 | **tidyverse** | wrangling attribute data in R |
 | **spdep** | computing spatial weights, global and local spatial autocorrelation statistics |
@@ -183,7 +183,7 @@ rswm_q
 We will perform Moran’s I statistics testing by using [`moran.test()`](https://r-spatial.github.io/spdep/reference/moran.test.html) of **spdep**.
 
 :::::::::::: panel-tabset
-## Maron's I test
+## Moran's I test
 
 Below we will performs Moran’s I statistical testing using [`moran.test()`](https://r-spatial.github.io/spdep/reference/moran.test.html) of **spdep**.
 
@@ -284,7 +284,6 @@ ggplot(data.frame(res = bperm$res), aes(x = res)) +
 We will perform Geary’s C statistics testing by using appropriate functions of **spdep** package.
 
 :::::::::::: panel-tabset
-
 ## Geary’s C test
 
 We will perform Geary’s C test for spatial autocorrelation by using [`geary.test()`](https://r-spatial.github.io/spdep/reference/geary.test.html) of **spdep**.
@@ -388,6 +387,7 @@ plot(GC_corr)
 ```{r}
 print(GC_corr)
 ```
-Geary's C is an inverse measure of spatial autocorrelation compared to Moran's I, hence we see the similar outcome from the Geary's C estimates. 
 
-At Lag 1 and 2, Geary's C < 1, indicating strong positive autocorrelation. At Lag 3 and 4, Geary's C ~ 1, which means there is no significant spatial autocorrelation. At Lag 5 and 6, Geary's C > 1, there is strong negative autocorrelation (dispersion).
+Geary's C is an inverse measure of spatial autocorrelation compared to Moran's I, hence we see the similar outcome from the Geary's C estimates.
+
+At Lag 1 and 2, Geary's C \< 1, indicating strong positive autocorrelation. At Lag 3 and 4, Geary's C \~ 1, which means there is no significant spatial autocorrelation. At Lag 5 and 6, Geary's C \> 1, there is strong negative autocorrelation (dispersion).
