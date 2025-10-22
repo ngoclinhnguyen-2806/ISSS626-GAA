@@ -38,7 +38,7 @@ In this case study, we will use China's data to examine the spatial pattern of a
 We will use the following packages: **spdep, sf, tmap and tidyverse** packages of R.
 
 | Package | Description |
-|-----------------------|------------------------------------------------|
+|------------------------|------------------------------------------------|
 | **sf** | importing and handling geospatial data in R |
 | **tidyverse** | wrangling attribute data in R |
 | **spdep** | computing spatial weights, global and local spatial autocorrelation statistics |
@@ -436,18 +436,18 @@ We can conclude that high-high cluster has high local Moran's I value, while low
 
 **Hot spots and cold spots analysis** is a technique used in spatial statistics to identify statistically significant clusters of high values (hot spots) and low values (cold spots) of a geographically referenced attribute (i.e. GDPPC). These analyses help visualise and understand spatial patterns, revealing areas where data points are clustered more densely than would be expected by random chance.
 
-HCSA uses statistical methods, like the Getis-Ord Gi* statistic, to determine if the observed clustering is statistically significant or could have occurred randomly.
+HCSA uses statistical methods, like the Getis-Ord Gi\* statistic, to determine if the observed clustering is statistically significant or could have occurred randomly.
 
 The analysis consists of four steps:
 
 -   Deriving spatial weight matrix
--   Computing Gi* statistics
--   Mapping Gi* statistics
+-   Computing Gi\* statistics
+-   Mapping Gi\* statistics
 -   Communicating the analysis results
 
 ### Deriving distance weight matrix
 
-Whist the spatial autocorrelation considered units which shared borders, for Getis-Ord Gi* statistics, we are defining neighbours based on distance.
+Whist the spatial autocorrelation considered units which shared borders, for Getis-Ord Gi\* statistics, we are defining neighbours based on distance.
 
 There are two type of distance-based proximity matrix, they are:
 
@@ -465,11 +465,12 @@ First, we determine the upper limit for the distance band by looking at the crit
 ct <- critical_threshold(st_geometry(hunan))
 ct
 ```
+
 The summary report shows that the largest first nearest neighbour distance is 60.80 km, so using this as the upper threshold gives certainty that all units will have at least one neighbour.
 
 Using this critical threshold value, we can compute the fixed distance weight.
 
-Note that for Gi* `include_self()` must be used to ensure that $w_{ii}(d) \neq 0$.
+Note that for Gi\* `include_self()` must be used to ensure that $w_{ii}(d) \neq 0$.
 
 ```{r}
 hunan_fdw <- hunan %>% 
@@ -499,9 +500,9 @@ hunan_adw <- hunan %>%
     .before = 1)
 ```
 
-### Computing local Gi*
+### Computing local Gi\*
 
-Local Gi* (pronounced “G-i-star”) is a Getis-Ord statistic used in spatial analysis to identify statistically significant hot spots and cold spots of high or low attribute values within a dataset. It measures the spatial clustering of values by comparing the total value within a specified neighborhood to the global total, producing a Z-score and p-value for each location to determine the likelihood that the observed pattern is not due to random chance.
+Local Gi\* (pronounced “G-i-star”) is a Getis-Ord statistic used in spatial analysis to identify statistically significant hot spots and cold spots of high or low attribute values within a dataset. It measures the spatial clustering of values by comparing the total value within a specified neighborhood to the global total, producing a Z-score and p-value for each location to determine the likelihood that the observed pattern is not due to random chance.
 
 ```{r}
 HCSA_fdw <- hunan_fdw %>%
@@ -514,9 +515,9 @@ HCSA_fdw <- hunan_fdw %>%
 
 ### Preparing and Visualising HCSA Map
 
-#### Mapping Gi* with fix distance weights
+#### Mapping Gi\* with fix distance weights
 
-Thematic mapping functions of tmaps are used to prepare a choropleth map showing the distribution of Gi* values.
+Thematic mapping functions of tmaps are used to prepare a choropleth map showing the distribution of Gi\* values.
 
 ```{r}
 tm_shape(HCSA_fdw) +
@@ -532,7 +533,7 @@ tm_shape(HCSA_fdw) +
   tm_title("Gi* of GDPPC (Fixed Bandwidth d = 60799.91m)")
 ```
 
-#### Mapping local Gi* p-values
+#### Mapping local Gi\* p-values
 
 The choropleth shows there is evidence for both positive and negative Ii values. However, it is useful to consider the p-values for each of these values.
 
@@ -549,9 +550,9 @@ tm_shape(HCSA_fdw) +
   tm_title("p-values of local Gi* of GDPPC (Fixed distance)")
 ```
 
-#### Mapping both Gi* values and p-values
+#### Mapping both Gi\* values and p-values
 
-Gi* values map and p-values map are plotted next to each other for easier interpretation.
+Gi\* values map and p-values map are plotted next to each other for easier interpretation.
 
 ```{r}
 Gi_star_map <- tm_shape(HCSA_fdw) +
@@ -586,7 +587,7 @@ tmap_arrange(Gi_star_map, p_values_map, asp=1, ncol=2)
 
 By default, the HCSA classes are stored in cluster field of *HCSA_fdw* sf data frame. To prepare the HSCA map, we will derive a new field called *HCSA_cluster* from cluster field.
 
-A new class called `Insignificant` has been added for records whereby p_sim > 0.05.
+A new class called `Insignificant` has been added for records whereby p_sim \> 0.05.
 
 ```{r}
 HCSA_fdw <- HCSA_fdw %>%
@@ -623,12 +624,12 @@ HCSA_map <- tm_shape(HCSA_fdw) +
 HCSA_map
 ```
 
-The local Gi* values map and the HCSA map can be plotted next to each other.
+The local Gi\* values map and the HCSA map can be plotted next to each other.
 
 ```{r}
 tmap_arrange(Gi_star_map, HCSA_map, asp=1, ncol=2)
 ```
 
-We can observe that there is a large hotspot in the East, while a smaller hotspot in the West. However the smaller hotspot has lower Gi* values as it is more localised (no neighbours share high GDPPC).
+We can observe that there is a large hotspot in the East, while a smaller hotspot in the West. However the smaller hotspot has lower Gi\* values as it is more localised (no neighbours share high GDPPC).
 
-We can also observe that there are two cold spots in the West and Central areas, but both have lower Gi* values  as they are more localised.
+We can also observe that there are two cold spots in the West and Central areas, but both have lower Gi\* values as they are more localised.
