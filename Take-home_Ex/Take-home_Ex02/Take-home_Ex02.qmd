@@ -1731,44 +1731,6 @@ st_weekend <- create_ehsa_spacetime_cube_period(
 
 Before the Mann-Kendall test can be applied, it is crucial to first calculate the local Gi* statistic for every location (`HEX_ID`) within every time period (month). The Mann-Kendall test is then applied to the resulting time series of Gi* values for each location.
 
-```
-#| code-summary: Step 2: Calculate Getis-Ord Local Gi* Statistics
-
-# Define the critical distance threshold (375 meters for Gi* weights)
-CT_DIST <- 375 
-
-# Define Weights (using fixed distance d = 375m)
-# Activate geometry context
-st_weights_morning <- st_morning %>%
-  activate("geometry") %>%
-  mutate(
-    # Define neighbors based on the critical distance threshold 
-    nb = st_dist_band(geometry, upper = CT_DIST),
-    # Define row-standardized weights (style = "W") 
-    # Removed: zero.policy = TRUE
-    wt = st_weights(nb, style = "W"),
-    .before = 1
-  ) %>%
-  # Copy neighbor and weight columns over to each time-slice 
-  set_nbs("nb") %>%
-  set_wts("wt")
-
-# 2. Compute Gi* Z-scores for each time bin (month)
-# Group by time period
-gi_stars_morning <- st_weights_morning %>%
-  group_by(YEAR_MONTH) %>%
-  mutate(
-    # Calculate local Gi* (using permutation-based method as per source example)
-    gi_star = local_gstar_perm(TOTAL_TRIPS, nb, wt)
-  ) %>%
-  # Unnest the results to retrieve the Gi* Z-scores (often named Gi)
-  tidyr::unnest(gi_star) %>%
-  ungroup()
-
-# The resulting 'gi_stars_morning' data frame contains the time series
-# of Gi* Z-scores (e.g., column 'Gi') for every HEX_ID across all 3 months.
-```
-
 ### EHSA Classification and Visualization
 
 ### Temporal Pattern Interpretation
