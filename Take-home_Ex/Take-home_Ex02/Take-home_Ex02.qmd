@@ -362,9 +362,7 @@ check_for_isolated_hexagons <- function(hex_grid, bus_stops) {
     ))
   }
 }
-```
 
-```{r}
 isolated_results <- check_for_isolated_hexagons(
   hex_grid = hexagon_trips,
   bus_stops = BusStop_in_SG
@@ -405,6 +403,8 @@ ggplot(trips_summary, aes(x = HOUR_OF_DAY, y = total_trips, color = YEAR_MONTH, 
   ) +
   theme_minimal(base_size = 14)
 ```
+
+The total number of trips and the their distributions during the day across 3 months are almost the same.
 
 ### Distribution of trips in each period
 
@@ -603,7 +603,7 @@ tm_shape(hexagon_trips_filtered) +
 The weekend/holiday spatial pattern shows high-intensity boarding activity (dark red hexagons) distributed across multiple regions of Singapore, similar to weekday patterns. Red and orange hexagons are visible in central, northern, western, and eastern areas. The overall spatial distribution appears comparable to both weekday morning and afternoon peaks, with moderate-to-high activity spread across developed areas rather than showing a distinctly different geographic pattern.
 :::
 
-### Comparative Analysis
+### Comparative Analysis for trips distributions among periods
 
 ```{r}
 #| code-summary: Prepare data for box plot comparison
@@ -654,7 +654,7 @@ Spatial weights are computed using Queen contiguity, where hexagons sharing any 
 
 2.  Queen contiguity captures the continuous nature of bus passenger mobility, where demand patterns can diffuse across adjacent zones regardless of edge versus vertex contact;
 
-3.  The row-standardized weights (style = "W") ensure each neighbor contributes equally to the spatial lag calculation, preventing bias from hexagons with varying numbers of neighbors.
+3.  The row-standardized weights (`style = "W"`) ensure each neighbor contributes equally to the spatial lag calculation, preventing bias from hexagons with varying numbers of neighbors.
 
 Alternative approaches such as distance-based weights were considered but rejected, as they would introduce arbitrary distance thresholds and create inconsistent neighborhood sizes that could distort spatial autocorrelation measures in our regular hexagonal grid.
 
@@ -676,18 +676,27 @@ nb_spdep <- poly2nb(wm_q_spdep, queen = TRUE)
 
 # Check for regions with no neighbors
 summary(nb_spdep)
+```
 
-# Remove hexagons with no neighbors
+```{r}
+#| code-summary: Remove hexagons with no neighbors
+
 no_neighbors <- which(card(nb_spdep) == 0)
 cat("Hexagons with no neighbors:", length(no_neighbors), "\n")
+```
+
+```{r}
+#| code-summary: Review after removal
 
 if(length(no_neighbors) > 0) {
   wm_q_spdep <- wm_q_spdep[-no_neighbors, ]
   nb_spdep <- poly2nb(wm_q_spdep, queen = TRUE)
   cat("After removal, hexagons with no neighbors:", sum(card(nb_spdep) == 0), "\n")
 }
+```
 
-# Create listw object with row-standardized weights
+```{r}
+#| code-summary: Create listw object with row-standardized weights
 listw_spdep <- nb2listw(nb_spdep, style = "W", zero.policy = TRUE)
 
 # Store nb in the dataframe for reference
@@ -701,7 +710,7 @@ For convenience, 4 reusable functions are created as below:
 **calculate_local_morans()**
 
 | **Parameter** | **Description** |
-|------------------|------------------------------------------------------|
+|-------------------|-----------------------------------------------------|
 | `data` | `sf` object containing the target numeric column used for Local Moran’s I calculation. |
 | `listw` | `spdep::listw` object representing spatial weights; must have the same row order as `data`. |
 | `column_name` | Character string specifying the name of the variable to analyze. |
@@ -710,13 +719,7 @@ For convenience, 4 reusable functions are created as below:
 | `seed` | Random seed value to ensure reproducible permutation results. |
 | `make_maps` | Logical flag indicating whether to build `tmap` visualization objects (`TRUE` or `FALSE`). |
 
-*Returns*: `data` (enriched `sf` object with LISA results)
-
-**plot_moran_ii** returns Local Moran’s I statistic on the map
-
-**plot_moran_ii_pvalue** returns Local Moran’s I statistics' p-value on the map
-
-**plot_moran_quadrant** returns High-High, Low-Low, Low-High, High-Low clusters on the map
+**Returns**: `data` (enriched `sf` object with LISA results)
 
 ```{r}
 #| code-summary: Compute Local Moran's I + LISA labels (pure spdep)
@@ -772,7 +775,7 @@ calculate_local_moran <- function(data, listw, column_name,
 ```
 
 ```{r}
-#| code-summary: Plot Ii
+#| code-summary: Function to Plot Ii - returning Local Moran’s I statistic on the map
 
 plot_moran_ii <- function(lisa_sf, column_name, midpoint = 0, reverse = TRUE) {
   tm_shape(lisa_sf) +
@@ -790,7 +793,7 @@ plot_moran_ii <- function(lisa_sf, column_name, midpoint = 0, reverse = TRUE) {
 ```
 
 ```{r}
-#| code-summary: Plot p-values
+#| code-summary: Function to plot p-values - returning Local Moran’s I statistics' p-value on the map
 
 plot_moran_ii_pvalue <- function(lisa_sf, column_name, reverse = FALSE) {
   tm_shape(lisa_sf) +
@@ -813,7 +816,7 @@ plot_moran_ii_pvalue <- function(lisa_sf, column_name, reverse = FALSE) {
 ```
 
 ```{r}
-#| code-summary: Plot moran quadrant
+#| code-summary: Function to plot moran quadrant - returning High-High, Low-Low, Low-High, High-Low clusters on the map
 
 plot_moran_quadrant <- function(lisa_sf, column_name, sig = 0.05) {
   # if user supplies a new alpha, relabel significance
@@ -869,18 +872,34 @@ morning_moran <- calculate_local_moran(
   listw = listw_spdep, 
   column_name = "Weekday_Morning_Peak"
 )
+```
+
+The three maps below collectively reveal the spatial structure of morning peak boarding patterns across Singapore.
+
+```{r}
+#| code-summary: Plot Ii
 
 tmap_mode("plot")
 plot_moran_ii(morning_moran, "Weekday_Morning_Peak")
-plot_moran_ii_pvalue(morning_moran, "Weekday_Morning_Peak")
-plot_moran_quadrant(morning_moran, "Weekday_Morning_Peak")
 ```
-
-The three maps collectively reveal the spatial structure of morning peak boarding patterns across Singapore.
 
 The Local Moran's I statistic map shows most hexagons exhibit weak spatial correlation (light blue, 0-5), with concentrated pockets of strong autocorrelation (orange to dark blue, 10-20) in northern, central, and eastern regions.
 
+```{r}
+#| code-summary: Plot p-values
+
+tmap_mode("plot")
+plot_moran_ii_pvalue(morning_moran, "Weekday_Morning_Peak")
+```
+
 The p-value map identifies where these patterns are statistically significant: dark red clusters (p \< 0.001) concentrate in specific zones, while the majority remains white (p ≥ 0.05), indicating random spatial patterns.
+
+```{r}
+#| code-summary: Plot quadrants
+
+tmap_mode("plot")
+plot_moran_quadrant(morning_moran, "Weekday_Morning_Peak")
+```
 
 The LISA clusters map synthesizes these findings into actionable categories. - High-High clusters (dark red, 99 hexagons, 4.6%) represent statistically significant hotspots in residential estates where high boarding activity is surrounded by similarly high values—priority zones for bus capacity planning. - Low-High outliers (light blue, 77 hexagons, 3.6%) indicate locations with lower boarding surrounded by high-activity neighbors, possibly representing parks, industrial zones, or transit-dependent areas worth investigating. - The overwhelming grey coverage (91.8% not significant) confirms that meaningful spatial clustering is highly localized. - The absence of Low-Low coldspots suggests relatively uniform baseline coverage, while missing High-Low patterns indicate demand is geographically coherent without isolated anomalies.
 
@@ -894,18 +913,34 @@ afternoon_moran <- calculate_local_moran(
   listw = listw_spdep, 
   column_name = "Weekday_Afternoon_Peak"
 )
+```
+
+The three maps below shows the afternoon peak spatial analysis revealing a distinctly different clustering pattern compared to morning peak.
+
+```{r}
+#| code-summary: Plot Ii
 
 tmap_mode("plot")
 plot_moran_ii(afternoon_moran, "Weekday_Afternoon_Peak")
-plot_moran_ii_pvalue(afternoon_moran, "Weekday_Afternoon_Peak")
-plot_moran_quadrant(afternoon_moran, "Weekday_Afternoon_Peak")
 ```
-
-The afternoon peak spatial analysis reveals a distinctly different clustering pattern compared to morning peak.
 
 The Local Moran's I statistic map shows more dispersed moderate values (light blue, 0-5) across the island, with fewer intense hotspots (orange, 5-10) scattered rather than concentrated. Notably, the central region displays stronger autocorrelation, reflecting the shift from residential origins (morning) to employment center origins (afternoon).
 
+```{r}
+#| code-summary: Plot p-values
+
+tmap_mode("plot")
+plot_moran_ii_pvalue(afternoon_moran, "Weekday_Afternoon_Peak")
+```
+
 The p-value map identifies significant clusters distributed more evenly across Singapore, with dark red concentrations (p \< 0.001) appearing in central, western, eastern, and northern zones. This wider geographic spread suggests afternoon boarding activity is less concentrated than morning patterns, consistent with workers departing from diverse employment locations rather than clustered residential neighborhoods.
+
+```{r}
+#| code-summary: Plot quadrants
+
+tmap_mode("plot")
+plot_moran_quadrant(afternoon_moran, "Weekday_Afternoon_Peak")
+```
 
 The LISA clusters map reveals:
 
@@ -924,29 +959,45 @@ weekend_moran <- calculate_local_moran(
   listw = listw_spdep, 
   column_name = "Weekend_Holiday"
 )
+```
+
+The weekend/holiday spatial patterns reveal distinct recreational and leisure-oriented clustering compared to weekday commuter flows, details as the three maps below.
+
+```{r}
+#| code-summary: Plot Ii
 
 tmap_mode("plot")
 plot_moran_ii(weekend_moran, "Weekend_Holiday")
-plot_moran_ii_pvalue(weekend_moran, "Weekend_Holiday")
-plot_moran_quadrant(weekend_moran, "Weekend_Holiday")
 ```
-
-The weekend/holiday spatial patterns reveal distinct recreational and leisure-oriented clustering compared to weekday commuter flows.
 
 The Local Moran's I statistic map displays moderate positive autocorrelation (light blue to blue, 0-10) broadly distributed across Singapore, with notable concentrations in central, eastern, and southern regions. The more uniform spread of orange patches (5-10) suggests weekend boarding activity is less polarized between residential and employment zones, reflecting diverse trip purposes including shopping, dining, and recreation.
 
+```{r}
+#| code-summary: Plot p-values
+
+tmap_mode("plot")
+plot_moran_ii_pvalue(weekend_moran, "Weekend_Holiday")
+```
+
 The p-value map shows significant clusters (dark red, p \< 0.001) scattered widely across the island, particularly in central urban areas, eastern residential-commercial zones, and southern regions—likely corresponding to major shopping districts, entertainment precincts, and recreational destinations. This geographic diversity contrasts with weekday patterns' residential-employment dichotomy.
+
+```{r}
+#| code-summary: Plot quadrants
+
+tmap_mode("plot")
+plot_moran_quadrant(weekend_moran, "Weekend_Holiday")
+```
 
 The LISA clusters map identifies: - 84 High-High clusters (3.9%), falling between morning peak (99) and afternoon peak (51), representing mixed-use zones serving weekend activities. - Low-High outliers number 66 (3.1%), the lowest of three periods, suggesting more spatially coherent leisure travel patterns.
 
 The clusters' widespread distribution across residential neighborhoods, commercial centers, and recreational areas reflects Singapore's multi-nodal weekend mobility, where trips originate from and target diverse locations rather than following the concentrated commuter corridors of weekdays.
 :::
 
-#### Getis-Ord Gi*
+#### Getis-Ord Gi\*
 
-Getis-Ord Gi* complements Local Moran's I by focusing exclusively on hotspot and coldspot detection, measuring whether high or low values cluster spatially. Unlike Moran's I which identifies outliers, Gi* concentrates on areas where a location and its neighbors collectively exhibit significantly high (hot spots) or low (cold spots) values. These Gi* statistics are essential for subsequent Emerging Hot Spot Analysis (EHSA).
+Getis-Ord Gi\* complements Local Moran's I by focusing exclusively on hotspot and coldspot detection, measuring whether high or low values cluster spatially. Unlike Moran's I which identifies outliers, Gi\* concentrates on areas where a location and its neighbors collectively exhibit significantly high (hot spots) or low (cold spots) values. These Gi\* statistics are essential for subsequent Emerging Hot Spot Analysis (EHSA).
 
-For Getis-Ord Gi* analysis, fixed distance weights with a 375-meter threshold are computed, and row-standardized weights (style='W') are applied to account for varying neighbor counts across hexagons, ensuring edge locations with fewer neighbors are comparable to interior hexagons with complete neighborhoods.
+For Getis-Ord Gi\* analysis, fixed distance weights with a 375-meter threshold are computed, and row-standardized weights (style='W') are applied to account for varying neighbor counts across hexagons, ensuring edge locations with fewer neighbors are comparable to interior hexagons with complete neighborhoods.
 
 ```{r}
 #| code-summary: Compute fixed distance weights for Gi*
@@ -961,16 +1012,18 @@ wm_q_dist <- wm_q_spdep %>%
     nb_dist = st_dist_band(geometry, upper = ct),
     wt_dist = st_weights(nb_dist, style = "W")  # Row-standardized
   )
+```
 
-# Check neighbor distribution
+```{r}
+#| code-summary: Check neighbor distribution
 cat("Average neighbors (distance-based):", 
     mean(lengths(wm_q_dist$nb_dist)), "\n")
 
 ```
 
-Next, Getis-Ord Gi* is computed using the analytical localG() function from the spdep package. The permutation-based alternative (`local_gstar_perm()` from `sfdep`) encountered technical errors when processing the distance-weighted neighbor structure created from filtered hexagonal data, specifically failing to generate accessible pseudo-p value attributes in the output object. 
+Next, Getis-Ord Gi\* is computed using the analytical `localG()` function from the spdep package. The permutation-based alternative (`local_gstar_perm()` from `sfdep`) encountered technical errors when processing the distance-weighted neighbor structure created from filtered hexagonal data, specifically failing to generate accessible pseudo-p value attributes in the output object.
 
-Meanwhile, the analytical method calculates standardized Gi* statistics as Z-scores under the assumption of normality, with two-tailed p-values derived via `2 * pnorm(-abs(z))`. This approach is theoretically sound for normally-distributed spatial data and computationally efficient for large datasets, yielding hotspot classifications statistically consistent with Monte Carlo permutation tests (typically >95% agreement in comparative studies) while avoiding computational bottlenecks associated with resampling thousands of spatial units across 99 iterations.
+Meanwhile, the analytical method calculates standardized Gi\* statistics as Z-scores under the assumption of normality, with two-tailed p-values derived via `2 * pnorm(-abs(z))`. This approach is theoretically sound for normally-distributed spatial data and computationally efficient for large datasets, yielding hotspot classifications statistically consistent with Monte Carlo permutation tests (typically \>95% agreement in comparative studies) while avoiding computational bottlenecks associated with resampling thousands of spatial units across 99 iterations.
 
 ```{r}
 #| code-summary: Calculate critical threshold
@@ -1139,131 +1192,298 @@ plot_gi_clusters <- function(gi_sf, column_name) {
 ##### Weekday Morning Peak
 
 ```{r}
+#| code-summary: Calculate Gi*
+
 morning_gi <- calculate_gi_star_dist(wm_q_spdep, "Weekday_Morning_Peak", ct)
 cat("Weekday Morning Peak:\n", table(morning_gi$gi_class))
 ```
+
+The three complementary visualizations reveal the spatial structure of morning peak boarding hotspots and coldspots across Singapore.
 
 ```{r}
 #| code-summary: Visualize Gi*
 plot_gi_star(morning_gi, "Weekday Morning Peak", ct)
 ```
 
+The Gi\* statistic map displays positive values (blue, 2-10) concentrated in multiple clusters across northern, central, and eastern regions, with darker blue indicating stronger spatial clustering of high boarding activity. Scattered negative values (orange, -2 to 0) represent areas with low boarding relative to neighbors, though these are less prominent.
+
 ```{r}
 #| code-summary: Visualize p-values
 plot_gi_pvalue(morning_gi, "Weekday Morning Peak", ct)
 ```
 
+The p-value map identifies statistical significance, with dark red clusters (p \< 0.001) appearing in northern residential areas including Woodlands and Yishun, central zones around Bishan and Ang Mo Kio, and eastern regions near Tampines and Bedok. These highly significant clusters indicate robust hotspots where both the location and surrounding neighbors exhibit consistently high morning boarding. Lighter red areas (0.001 \< p \< 0.05) form transition zones around these cores.
+
 ```{r}
 #| code-summary: Visualize significant clusters
 plot_gi_clusters(morning_gi, "Weekday Morning Peak")
 ```
-The three complementary visualizations reveal the spatial structure of morning peak boarding hotspots and coldspots across Singapore. The Gi* statistic map displays positive values (blue, 2-10) concentrated in multiple clusters across northern, central, and eastern regions, with darker blue indicating stronger spatial clustering of high boarding activity. Scattered negative values (orange, -2 to 0) represent areas with low boarding relative to neighbors, though these are less prominent.
-
-The p-value map identifies statistical significance, with dark red clusters (p < 0.001) appearing in northern residential areas including Woodlands and Yishun, central zones around Bishan and Ang Mo Kio, and eastern regions near Tampines and Bedok. These highly significant clusters indicate robust hotspots where both the location and surrounding neighbors exhibit consistently high morning boarding. Lighter red areas (0.001 < p < 0.05) form transition zones around these cores.
 
 The HCSA clusters map synthesizes these patterns into actionable categories. Red hotspots dominate, concentrated in established HDB estates across the north (Woodlands, Sembawang), central corridor (Bishan, Toa Payoh), west (Jurong, Clementi), and east (Tampines, Bedok, Pasir Ris). Notably absent are cold spots (blue), indicating no statistically significant clusters of low boarding activity. This pattern confirms morning peak demand originates predominantly from mature residential towns, with hotspots representing major commuter-generating neighborhoods requiring priority bus capacity and service frequency.
 
 ##### Weekday Afternoon Peak
 
 ```{r}
+#| code-summary: Calculate Gi*
+
 afternoon_gi <- calculate_gi_star_dist(wm_q_spdep, "Weekday_Afternoon_Peak", ct)
 cat("Weekday Afternoon Peak:\n", table(afternoon_gi$gi_class))
 ```
+
+The afternoon peak analysis reveals a distinctly different spatial pattern compared to morning peak, reflecting the shift from residential to employment center origins.
 
 ```{r}
 #| code-summary: Visualize Gi*
 plot_gi_star(afternoon_gi, "Weekday Afternoon Peak", ct)
 ```
 
+The Gi\* statistic map shows more dispersed blue clusters (positive values, 2-10) scattered across the island rather than concentrated in specific zones. Darker blue clusters appear in the central region, likely corresponding to the CBD and downtown commercial districts where workers depart from offices. Western and eastern areas show moderate positive clustering, suggesting distributed employment centers in Jurong industrial estates and Changi business parks.
+
 ```{r}
 #| code-summary: Visualize p-values
 plot_gi_pvalue(afternoon_gi, "Weekday Afternoon Peak", ct)
 ```
 
+The p-value map displays fewer highly significant clusters (dark red, p \< 0.001) compared to morning peak, with notable concentrations in the central business district area, scattered western locations (possibly Jurong East, Clementi), and eastern zones (Tampines, Bedok). The reduced intensity and wider geographic spread indicate afternoon boarding is less concentrated than morning patterns, consistent with Singapore's polycentric employment structure where offices distribute across multiple business hubs.
+
 ```{r}
 #| code-summary: Visualize significant clusters
 plot_gi_clusters(afternoon_gi, "Weekday Afternoon Peak")
 ```
-The afternoon peak analysis reveals a distinctly different spatial pattern compared to morning peak, reflecting the shift from residential to employment center origins. The Gi* statistic map shows more dispersed blue clusters (positive values, 2-10) scattered across the island rather than concentrated in specific zones. Darker blue clusters appear in the central region, likely corresponding to the CBD and downtown commercial districts where workers depart from offices. Western and eastern areas show moderate positive clustering, suggesting distributed employment centers in Jurong industrial estates and Changi business parks.
-
-The p-value map displays fewer highly significant clusters (dark red, p < 0.001) compared to morning peak, with notable concentrations in the central business district area, scattered western locations (possibly Jurong East, Clementi), and eastern zones (Tampines, Bedok). The reduced intensity and wider geographic spread indicate afternoon boarding is less concentrated than morning patterns, consistent with Singapore's polycentric employment structure where offices distribute across multiple business hubs.
 
 The HCSA clusters map shows red hotspots more evenly distributed across northern (Woodlands, Yishun), central (likely Raffles Place, Bugis, City Hall), western (Jurong, Clementi), and eastern regions (Tampines, Bedok). The pattern is notably less cohesive than morning peak, with smaller, more isolated hotspot clusters rather than large contiguous zones. This fragmentation reflects diverse workplace departure points across commercial districts, business parks, and industrial areas, contrasting with morning's concentrated residential origins. Cold spots remain absent, indicating uniform baseline coverage without significant low-activity clusters.
 
 ##### Weekend/Holiday
 
 ```{r}
+#| code-summary: Calculate Gi*
+
 weekend_gi <- calculate_gi_star_dist(wm_q_spdep, "Weekend_Holiday", ct)
 cat("Weekend/Holiday Peak:\n", table(weekend_gi$gi_class))
 ```
+
+The weekend/holiday pattern reveals recreational mobility distinct from weekday commuter flows.
 
 ```{r}
 #| code-summary: Visualize Gi*
 plot_gi_star(weekend_gi, "Weekend/Holiday Peak", ct)
 ```
 
+The Gi\* statistic map shows blue clusters (2-10) broadly distributed across Singapore, with concentrations in central urban areas, eastern coastal regions, and western zones. The uniform spread reflects diverse trip purposes including shopping, dining, and recreation rather than concentrated work-related travel.
+
 ```{r}
 #| code-summary: Visualize p-values
 plot_gi_pvalue(weekend_gi, "Weekend/Holiday Peak", ct)
 ```
 
+The p-value map shows significant clusters (dark red, p \< 0.001) widely scattered, with concentrations in the central region (Orchard Road, Marina Bay), northern zones (Woodlands, Yishun), western areas (Jurong East, Clementi), and eastern regions (Tampines, Bedok, Pasir Ris). This geographic diversity reflects Singapore's multi-nodal weekend activity pattern targeting shopping malls, entertainment precincts, and recreational facilities.
+
 ```{r}
 #| code-summary: Visualize significant clusters
 plot_gi_clusters(weekend_gi, "Weekend/Holiday Peak")
 ```
-The weekend/holiday pattern reveals recreational mobility distinct from weekday commuter flows. The Gi* statistic map shows blue clusters (2-10) broadly distributed across Singapore, with concentrations in central urban areas, eastern coastal regions, and western zones. The uniform spread reflects diverse trip purposes including shopping, dining, and recreation rather than concentrated work-related travel.
-
-The p-value map shows significant clusters (dark red, p < 0.001) widely scattered, with concentrations in the central region (Orchard Road, Marina Bay), northern zones (Woodlands, Yishun), western areas (Jurong East, Clementi), and eastern regions (Tampines, Bedok, Pasir Ris). This geographic diversity reflects Singapore's multi-nodal weekend activity pattern targeting shopping malls, entertainment precincts, and recreational facilities.
 
 The HCSA clusters map shows red hotspots distributed more evenly than weekday patterns, appearing in northern residential-commercial zones, central shopping districts, western regional centers, and eastern mixed-use areas. Hotspots emerge wherever major retail, dining, and recreational attractions cluster, including neighborhood town centers, regional malls, and waterfront destinations. Cold spots remain absent. This pattern confirms weekend mobility is less directional than weekday commutes, with boarding dispersed across multiple activity nodes serving leisure and social functions rather than concentrated residential-employment corridors, requiring balanced service coverage across recreational destinations.
 :::
 
 ### Comparative Analysis of LMSA Results
 
-#### Method Comparison (Moran's I vs Gi*)
+#### Method Comparison (Moran's I vs Gi\*)
+
+Let's perform method comparison between the two LMSA methods to reveal complementary insights into spatial clustering patterns.
 
 ```{r}
-#| code-summary: Compare Local Moran's I and Gi* for Weekday Morning Peak
-
-# Create comparison dataset
-morning_comparison <- morning_moran %>%
-  st_drop_geometry() %>%
-  select(HEX_ID, Weekday_Morning_Peak, moran_class, p_value) %>%
-  left_join(
-    morning_gi %>% st_drop_geometry() %>% 
-      select(HEX_ID, gi_class, p_value_gi),
-    by = "HEX_ID"
-  ) %>%
-  mutate(
-    # Both methods significant?
-    both_significant = (p_value < 0.05 & p_value_gi < 0.05),
-    # Agreement on hotspot?
-    hotspot_agreement = (moran_class == "High-High" & gi_class == "Hot Spot"),
-    # Agreement on coldspot?
-    coldspot_agreement = (moran_class == "Low-Low" & gi_class == "Cold Spot")
+#| code-summary: Function to compare Local Moran's I and Gi* results
+compare_lmsa_methods <- function(moran_sf, gi_sf, period_name) {
+  
+  # Create comparison dataset
+  comparison <- moran_sf %>%
+    st_drop_geometry() %>%
+    select(HEX_ID, moran_class, p_value) %>%
+    left_join(
+      gi_sf %>% st_drop_geometry() %>% 
+        select(HEX_ID, gi_class, p_value_gi),
+      by = "HEX_ID"
+    ) %>%
+    mutate(
+      # Both methods significant?
+      both_significant = (p_value < 0.05 & p_value_gi < 0.05),
+      # Agreement on hotspot?
+      hotspot_agreement = (moran_class == "High-High" & gi_class == "Hot Spot"),
+      # Agreement on coldspot?
+      coldspot_agreement = (moran_class == "Low-Low" & gi_class == "Cold Spot")
+    )
+  
+  # Summary statistics
+  cat(sprintf("=== Method Comparison - %s ===\n\n", period_name))
+  
+  cat("Total hexagons analyzed:", nrow(comparison), "\n")
+  cat("Significant in Moran's I:", sum(moran_sf$p_value < 0.05), "\n")
+  cat("Significant in Gi*:", sum(gi_sf$p_value_gi < 0.05), "\n")
+  cat("Significant in BOTH methods:", sum(comparison$both_significant), "\n\n")
+  
+  cat("Hotspot agreement (High-High = Hot Spot):", 
+      sum(comparison$hotspot_agreement, na.rm = TRUE), "\n")
+  cat("Coldspot agreement (Low-Low = Cold Spot):", 
+      sum(comparison$coldspot_agreement, na.rm = TRUE), "\n\n")
+  
+  # Cross-tabulation
+  cat("Cross-tabulation of classifications:\n")
+  comparison_table <- table(
+    Moran_I = comparison$moran_class,
+    Gi_star = comparison$gi_class
   )
-
-# Summary statistics
-cat("=== Method Comparison - Weekday Morning Peak ===\n\n")
-
-cat("Total hexagons analyzed:", nrow(morning_comparison), "\n")
-cat("Significant in Moran's I:", sum(morning_moran$p_value < 0.05), "\n")
-cat("Significant in Gi*:", sum(morning_gi$p_value_gi < 0.05), "\n")
-cat("Significant in BOTH methods:", sum(morning_comparison$both_significant), "\n\n")
-
-cat("Hotspot agreement (High-High = Hot Spot):", 
-    sum(morning_comparison$hotspot_agreement, na.rm = TRUE), "\n")
-cat("Coldspot agreement (Low-Low = Cold Spot):", 
-    sum(morning_comparison$coldspot_agreement, na.rm = TRUE), "\n\n")
-
-# Cross-tabulation
-cat("Cross-tabulation of classifications:\n")
-comparison_table <- table(
-  Moran_I = morning_comparison$moran_class,
-  Gi_star = morning_comparison$gi_class
-)
-print(comparison_table)
+  print(comparison_table)
+  cat("\n")
+  
+  # Return the comparison data for further use
+  invisible(comparison)
+}
 ```
+
+```{r}
+#| code-summary: Function to create agreement visualization map
+
+plot_lmsa_agreement <- function(moran_sf, gi_sf, period_name) {
+  
+  # Create agreement classification
+  agreement_map <- moran_sf %>%
+    select(-matches("^nb")) %>%  # Remove nb columns
+    left_join(
+      gi_sf %>% st_drop_geometry() %>% 
+        select(HEX_ID, gi_class, p_value_gi),
+      by = "HEX_ID"
+    ) %>%
+    mutate(
+      agreement = case_when(
+        p_value >= 0.05 & p_value_gi >= 0.05 ~ "Both Not Significant",
+        moran_class == "High-High" & gi_class == "Hot Spot" ~ "Strong Hotspot (Both Agree)",
+        moran_class == "Low-Low" & gi_class == "Cold Spot" ~ "Strong Coldspot (Both Agree)",
+        moran_class == "High-High" & gi_class != "Hot Spot" ~ "Moran Only (High-High)",
+        gi_class == "Hot Spot" & moran_class != "High-High" ~ "Gi* Only (Hot Spot)",
+        moran_class %in% c("Low-High", "High-Low") ~ "Spatial Outlier (Moran)",
+        TRUE ~ "Other"
+      ),
+      agreement = factor(agreement, levels = c(
+        "Both Not Significant",
+        "Strong Hotspot (Both Agree)",
+        "Strong Coldspot (Both Agree)",
+        "Moran Only (High-High)",
+        "Gi* Only (Hot Spot)",
+        "Spatial Outlier (Moran)",
+        "Other"
+      ))
+    )
+  
+  # Create map
+  tm_shape(agreement_map) +
+    tm_polygons(
+      fill = "agreement",
+      fill.scale = tm_scale_categorical(
+        values = c(
+          "Both Not Significant" = "grey90",
+          "Strong Hotspot (Both Agree)" = "#d7191c",
+          "Strong Coldspot (Both Agree)" = "#2b83ba",
+          "Moran Only (High-High)" = "#fdae61",
+          "Gi* Only (Hot Spot)" = "#abd9e9",
+          "Spatial Outlier (Moran)" = "#fee08b",
+          "Other" = "grey70"
+        )
+      ),
+      fill.legend = tm_legend(
+        title = "Method Agreement",
+        position = c("right", "top")
+      )
+    ) +
+    tm_borders(lwd = 0.5, col = "white") +
+    tm_layout(
+      main.title = sprintf("LMSA Method Agreement — %s", period_name),
+      main.title.size = 1,
+      legend.outside = TRUE
+    )
+}
+```
+
+::: panel-tabset
+##### Weekday Morning Peak
+
+```{r}
+#| code-summary: Compare LMSA methods
+
+morning_comparison <- compare_lmsa_methods(
+  morning_moran, 
+  morning_gi, 
+  "Weekday Morning Peak"
+)
+```
+
+The comparative analysis reveals strong concordance between Local Moran's I and Getis-Ord Gi\* methods, with 72 hexagons (33.7% of significant cases) classified as strong hotspots where both methods agree (High-High and Hot Spot). This dual confirmation provides high confidence for prioritizing these locations in transport planning. The cross-tabulation shows 176 hexagons significant in Moran's I versus 119 in Gi\* , indicating Moran's I is more sensitive to spatial patterns, while Gi\* applies stricter thresholds for hotspot identification.
+
+```{r}
+#| code-summary: Create agreement maps
+
+plot_lmsa_agreement(morning_moran, morning_gi, "Weekday Morning Peak")
+```
+
+The agreement map displays strong hotspots (dark red) concentrated in established residential corridors across northern zones (Woodlands, Sembawang, Yishun), central regions (Bishan, Ang Mo Kio, Toa Payoh), western areas (Jurong East, Clementi, Bukit Batok), and eastern estates (Tampines, Bedok, Pasir Ris). These represent the most robust evidence of sustained high boarding activity, warranting priority capacity allocation and service frequency optimization.
+
+Orange clusters indicate "Moran Only (High-High)" hexagons—27 locations showing significant spatial clustering in Moran's I but not meeting Gi\*'s stricter hotspot threshold. These represent moderate-intensity clusters still relevant for planning. Yellow patches show 47 "Spatial Outlier (Moran)" hexagons exhibiting Low-High patterns, scattered across various regions, representing locations with lower boarding surrounded by high-activity neighbors—potentially transit-dependent zones, parks, or areas with different land-use characteristics requiring investigation.
+
+Notably absent are blue "Strong Coldspot (Both Agree)" hexagons, confirming no areas exhibit statistically significant low-activity clustering across both methods. The light blue "Gi\* Only (Hot Spot)" category (23 hexagons) identifies locations where Gi\* detected hotspots missed by Moran's I, though these are minimal. The overwhelming grey coverage (91.7% of hexagons) represents areas without significant spatial autocorrelation, confirming that meaningful clustering concentrates in specific corridors rather than distributing uniformly across Singapore.
+
+##### Weekday Afternoon Peak
+
+```{r}
+#| code-summary: Compare LMSA methods
+
+afternoon_comparison <- compare_lmsa_methods(
+  afternoon_moran, 
+  afternoon_gi, 
+  "Weekday Afternoon Peak"
+)
+```
+
+The afternoon peak shows significantly lower method concordance than morning, with only 35 dual-confirmed hotspots (27.0% of significant cases) versus morning's 72, reflecting more dispersed boarding patterns from distributed employment centers. Moran's I identifies 130 significant hexagons while Gi\* applies stricter thresholds, maintaining morning's sensitivity pattern.
+
+```{r}
+#| code-summary: Create agreement maps
+
+plot_lmsa_agreement(afternoon_moran, afternoon_gi, "Weekday Afternoon Peak")
+```
+
+Strong hotspots (dark red) scatter across northern areas (Woodlands, Yishun), central business districts, western zones (Jurong, Clementi), and eastern regions (Tampines, Bedok), representing major employment departure points. However, their smaller clusters and geographic dispersion confirm afternoon mobility lacks morning's spatial cohesion from concentrated residential origins.
+
+Orange "Moran Only" hexagons (16) are fewer than morning, while spatial outliers (28 Low-High, yellow) remain scattered. Light blue "Gi\* Only" hotspots (14) are minimal. The 93.3% grey coverage exceeds morning peak, confirming afternoon hotspots are highly localized rather than forming extensive corridors.
+
+The reduced dual-confirmed hotspots and increased fragmentation suggest afternoon requires distributed service capacity across multiple business hubs—likely CBD, Raffles Place, Jurong Gateway, Tampines Regional Centre—rather than morning's concentrated corridor approach. These 35 strong hotspots warrant focused high-capacity service despite overall dispersed patterns.
+
+##### Weekend/Holiday
+
+```{r}
+#| code-summary: Compare LMSA methods
+
+weekend_comparison <- compare_lmsa_methods(
+  weekend_moran, 
+  weekend_gi, 
+  "Weekend/Holiday"
+)
+```
+
+Weekend/holiday shows intermediate concordance with 59 dual-confirmed hotspots (39.3% of significant cases), between morning's 72 and afternoon's 35. Moran's I identifies 150 significant hexagons—highest across all periods—indicating weekend patterns exhibit broader spatial autocorrelation despite lower trip volumes, while Gi\* maintains conservative thresholds.
+
+```{r}
+#| code-summary: Create agreement maps
+
+# Weekend/Holiday
+plot_lmsa_agreement(weekend_moran, weekend_gi, "Weekend/Holiday")
+```
+
+Strong hotspots (dark red) distribute widely: northern zones (Woodlands, Yishun), central urban areas (Orchard, Marina Bay), central-southern regions (dense cluster likely Geylang/Paya Lebar), western mall districts (Jurong East), and eastern coastal areas (Tampines, Bedok, Pasir Ris). This diversity reflects weekend trips targeting multiple nodes—shopping malls, entertainment precincts, dining destinations, recreational facilities—rather than concentrated commuter corridors.
+
+Orange "Moran Only" hexagons (25) show moderate weekend activity, while spatial outliers (15 Low-High) are fewer than weekdays, suggesting more coherent leisure patterns. Light blue "Gi\* Only" hotspots (14) remain minimal. The 92.3% grey coverage confirms clustering concentrates where attractions cluster.
+
+The 59 dual-confirmed hotspots represent multi-functional centers—regional town malls, waterfront destinations, entertainment districts, mixed-use zones. Unlike weekday directional flows, weekend hotspots emerge wherever attractions concentrate, requiring balanced coverage across recreational nodes rather than focused corridor capacity.
+:::
 
 #### Temporal Comparison (Across Three Periods)
 
@@ -1304,19 +1524,86 @@ temporal_comparison <- morning_gi %>%
   )
 ```
 
-**Temporal Comparison**
-
 ```{r}
+#| code-summary: Temporal Comparison Summary
 
 cat("Persistent hotspots (all three periods):", 
-    sum(temporal_comparison$persistent_hotspot), "\n")
-cat("Morning-only hotspots:", 
-    sum(temporal_comparison$morning_only), "\n")
-cat("Afternoon-only hotspots:", 
-    sum(temporal_comparison$afternoon_only), "\n")
-cat("Weekend-only hotspots:", 
+    sum(temporal_comparison$persistent_hotspot), "\n",
+"Morning-only hotspots:", 
+    sum(temporal_comparison$morning_only), "\n",
+"Afternoon-only hotspots:", 
+    sum(temporal_comparison$afternoon_only), "\n",
+"Weekend-only hotspots:", 
     sum(temporal_comparison$weekend_only), "\n")
 ```
+
+```{r}
+#| code-summary: Map temporal hotspot patterns
+
+temporal_map <- morning_gi %>%
+  select(-matches("^nb"), -matches("^wt")) %>%  # Remove list columns
+  left_join(temporal_comparison, by = "HEX_ID") %>%
+  mutate(
+    temporal_pattern = case_when(
+      persistent_hotspot ~ "Persistent Hotspot (All Periods)",
+      morning_only ~ "Morning Peak Only",
+      afternoon_only ~ "Afternoon Peak Only",
+      weekend_only ~ "Weekend/Holiday Only",
+      morning_class == "Hot Spot" | afternoon_class == "Hot Spot" | 
+        weekend_class == "Hot Spot" ~ "Multiple Periods",
+      TRUE ~ "Not Hotspot"
+    ),
+    temporal_pattern = factor(temporal_pattern, levels = c(
+      "Not Hotspot",
+      "Persistent Hotspot (All Periods)",
+      "Multiple Periods",
+      "Morning Peak Only",
+      "Afternoon Peak Only",
+      "Weekend/Holiday Only"
+    ))
+  )
+
+tm_shape(temporal_map) +
+  tm_polygons(
+    fill = "temporal_pattern",
+    fill.scale = tm_scale_categorical(
+      values = c(
+        "Not Hotspot" = "grey90",
+        "Persistent Hotspot (All Periods)" = "#8c2d04",
+        "Multiple Periods" = "#d7301f",
+        "Morning Peak Only" = "#fc8d59",
+        "Afternoon Peak Only" = "#fdcc8a",
+        "Weekend/Holiday Only" = "#fef0d9"
+      )
+    ),
+    fill.legend = tm_legend(
+      title = "Temporal Pattern",
+      position = c("left", "top")
+    )
+  ) +
+  tm_borders(lwd = 0.5, col = "white") +
+  tm_layout(
+    main.title = "Temporal Hotspot Patterns Across Time Periods",
+    main.title.size = 1,
+    legend.outside = TRUE
+  )
+```
+
+The temporal analysis identifies 71 persistent hotspots (3.3%) maintaining high boarding across all periods, representing Singapore's most critical transit nodes. These darkest red hexagons concentrate in northern zones (Woodlands, Yishun), central corridors (Bishan, Ang Mo Kio), western estates (Jurong, Clementi), and eastern areas (Tampines, Bedok)—mature mixed-use neighborhoods serving both commuter and leisure demands requiring sustained high-capacity service.
+
+Period-specific patterns reveal distinct mobility dynamics. Morning-only hotspots (57 hexagons, orange) dominate numerically, scattered across residential belts, confirming morning peak's residential-origin character. These pure residential neighborhoods generate substantial weekday morning flows but lack afternoon or weekend intensity, indicating areas requiring peak-hour capacity scaling rather than all-day service.
+
+Afternoon-only hotspots (4 hexagons) are minimal, suggesting most employment centers also serve weekend recreational functions or maintain residential populations. Weekend-only hotspots (24 hexagons, pale yellow) scatter near recreational zones, shopping districts, and coastal areas—likely East Coast Park vicinity, entertainment precincts, regional malls—attracting weekend crowds without weekday commuter significance.
+
+"Multiple Periods" hotspots (red) represent locations active in two of three periods—mixed-use neighborhoods, secondary commercial centers, or transport hubs serving partial temporal coverage. The 85% grey coverage confirms significant clustering concentrates in specific corridors.
+
+**Planning Implications:**
+
+-   The 71 persistent hotspots require consistent high-capacity investment
+
+-   The 57 morning-only zones need dynamic peak-hour scaling
+
+-   The 24 weekend-only areas warrant flexible weekend frequency adjustments, enabling targeted resource allocation rather than uniform service distribution.
 
 ## Emerging Hot Spot Analysis (EHSA)
 
