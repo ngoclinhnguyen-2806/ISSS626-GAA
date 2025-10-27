@@ -4933,206 +4933,239 @@ Moran_I           Hot Spot Not Significant
 <span id="cb107-1803"><a href="#cb107-1803" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb107-1804"><a href="#cb107-1804" aria-hidden="true" tabindex="-1"></a>**Step 4: Verification** Validate the resulting object using <span class="in">`is_spacetime_cube()`</span> to confirm proper structure before proceeding to Gi<span class="sc">\*</span> calculation and Mann-Kendall trend analysis.</span>
 <span id="cb107-1805"><a href="#cb107-1805" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1808"><a href="#cb107-1808" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb107-1809"><a href="#cb107-1809" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Function to create space-time cube for each time period</span></span>
-<span id="cb107-1810"><a href="#cb107-1810" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1811"><a href="#cb107-1811" aria-hidden="true" tabindex="-1"></a>create_ehsa_spacetime_cube_period <span class="ot">&lt;-</span> <span class="cf">function</span>(trip_data, spatial_data, time_period_name) {</span>
-<span id="cb107-1812"><a href="#cb107-1812" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1813"><a href="#cb107-1813" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 1. Prepare Grid Axes and Attribute Data ---</span></span>
+<span id="cb107-1806"><a href="#cb107-1806" aria-hidden="true" tabindex="-1"></a>As the process requires separate processing for each peak time period, I create a function including all the steps and apply the function to each peak time period later.</span>
+<span id="cb107-1807"><a href="#cb107-1807" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1810"><a href="#cb107-1810" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb107-1811"><a href="#cb107-1811" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Function to create space-time cube for each time period</span></span>
+<span id="cb107-1812"><a href="#cb107-1812" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1813"><a href="#cb107-1813" aria-hidden="true" tabindex="-1"></a>create_ehsa_spacetime_cube_period <span class="ot">&lt;-</span> <span class="cf">function</span>(trip_data, spatial_data, time_period_name) {</span>
 <span id="cb107-1814"><a href="#cb107-1814" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1815"><a href="#cb107-1815" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1a. Filter the sparse trip data for the specific time period (DEFINITION OF filtered_trips)</span></span>
-<span id="cb107-1816"><a href="#cb107-1816" aria-hidden="true" tabindex="-1"></a>  filtered_trips <span class="ot">&lt;-</span> trip_data <span class="sc">%&gt;%</span></span>
-<span id="cb107-1817"><a href="#cb107-1817" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(TIME_PERIOD <span class="sc">==</span> time_period_name) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1818"><a href="#cb107-1818" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID, YEAR_MONTH, TOTAL_TRIPS)</span>
-<span id="cb107-1819"><a href="#cb107-1819" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1820"><a href="#cb107-1820" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1b. Define the definitive grid axes (Locations and Time)</span></span>
+<span id="cb107-1815"><a href="#cb107-1815" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 1. Prepare Grid Axes and Attribute Data ---</span></span>
+<span id="cb107-1816"><a href="#cb107-1816" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1817"><a href="#cb107-1817" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1a. Filter the sparse trip data for the specific time period (DEFINITION OF filtered_trips)</span></span>
+<span id="cb107-1818"><a href="#cb107-1818" aria-hidden="true" tabindex="-1"></a>  filtered_trips <span class="ot">&lt;-</span> trip_data <span class="sc">%&gt;%</span></span>
+<span id="cb107-1819"><a href="#cb107-1819" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(TIME_PERIOD <span class="sc">==</span> time_period_name) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1820"><a href="#cb107-1820" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID, YEAR_MONTH, TOTAL_TRIPS)</span>
 <span id="cb107-1821"><a href="#cb107-1821" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1822"><a href="#cb107-1822" aria-hidden="true" tabindex="-1"></a>  <span class="co"># LOCATION KEYS: CRITICAL - Ensure location keys match the spatial data order</span></span>
-<span id="cb107-1823"><a href="#cb107-1823" aria-hidden="true" tabindex="-1"></a>  loc_keys <span class="ot">&lt;-</span> spatial_data <span class="sc">%&gt;%</span> </span>
-<span id="cb107-1824"><a href="#cb107-1824" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb107-1825"><a href="#cb107-1825" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID)</span>
-<span id="cb107-1826"><a href="#cb107-1826" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb107-1827"><a href="#cb107-1827" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a vector of ordered HEX_IDs from the spatial data (which are factors, e.g., H0398)</span></span>
-<span id="cb107-1828"><a href="#cb107-1828" aria-hidden="true" tabindex="-1"></a>  ordered_hex_ids <span class="ot">&lt;-</span> loc_keys<span class="sc">$</span>HEX_ID</span>
-<span id="cb107-1829"><a href="#cb107-1829" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1830"><a href="#cb107-1830" aria-hidden="true" tabindex="-1"></a>  <span class="co"># TIME KEYS: All unique months (3 months)</span></span>
-<span id="cb107-1831"><a href="#cb107-1831" aria-hidden="true" tabindex="-1"></a>  time_keys <span class="ot">&lt;-</span> trip_data <span class="sc">%&gt;%</span></span>
-<span id="cb107-1832"><a href="#cb107-1832" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(YEAR_MONTH) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1833"><a href="#cb107-1833" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unique</span>()</span>
-<span id="cb107-1834"><a href="#cb107-1834" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1835"><a href="#cb107-1835" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1c. Create the complete Cartesian product (full grid)</span></span>
-<span id="cb107-1836"><a href="#cb107-1836" aria-hidden="true" tabindex="-1"></a>  required_grid <span class="ot">&lt;-</span> loc_keys <span class="sc">%&gt;%</span></span>
-<span id="cb107-1837"><a href="#cb107-1837" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">cross_join</span>(time_keys) </span>
-<span id="cb107-1838"><a href="#cb107-1838" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1839"><a href="#cb107-1839" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1d. Join the complete grid with the sparse data and fill missing observations with 0</span></span>
-<span id="cb107-1840"><a href="#cb107-1840" aria-hidden="true" tabindex="-1"></a>  balanced_trips <span class="ot">&lt;-</span> required_grid <span class="sc">%&gt;%</span></span>
-<span id="cb107-1841"><a href="#cb107-1841" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(filtered_trips, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"HEX_ID"</span>, <span class="st">"YEAR_MONTH"</span>)) <span class="sc">%&gt;%</span> <span class="co"># USAGE OF filtered_trips</span></span>
-<span id="cb107-1842"><a href="#cb107-1842" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">TOTAL_TRIPS =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1843"><a href="#cb107-1843" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb107-1844"><a href="#cb107-1844" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1e. Convert YEAR_MONTH to a Date object</span></span>
-<span id="cb107-1845"><a href="#cb107-1845" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb107-1846"><a href="#cb107-1846" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">paste0</span>(YEAR_MONTH, <span class="st">"-01"</span>), </span>
-<span id="cb107-1847"><a href="#cb107-1847" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">as.Date</span>(YEAR_MONTH, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
-<span id="cb107-1848"><a href="#cb107-1848" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1849"><a href="#cb107-1849" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb107-1850"><a href="#cb107-1850" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1f. CRITICAL STEP: ENFORCE LOCATION ORDERING AND TYPE MATCHING</span></span>
-<span id="cb107-1851"><a href="#cb107-1851" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb107-1852"><a href="#cb107-1852" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Ensure HEX_ID is a factor, using the levels from the spatial data to preserve order</span></span>
-<span id="cb107-1853"><a href="#cb107-1853" aria-hidden="true" tabindex="-1"></a>      <span class="at">HEX_ID =</span> <span class="fu">factor</span>(HEX_ID, <span class="at">levels =</span> ordered_hex_ids),</span>
-<span id="cb107-1854"><a href="#cb107-1854" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Convert time to a factor for intermediate ordering</span></span>
-<span id="cb107-1855"><a href="#cb107-1855" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">as.factor</span>(YEAR_MONTH)</span>
-<span id="cb107-1856"><a href="#cb107-1856" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1857"><a href="#cb107-1857" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sort first by Location (using the factor level order), then by Time</span></span>
-<span id="cb107-1858"><a href="#cb107-1858" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(HEX_ID, YEAR_MONTH) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1859"><a href="#cb107-1859" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb107-1860"><a href="#cb107-1860" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Revert YEAR_MONTH to Date object, keeping HEX_ID as Factor to match spatial_locations</span></span>
-<span id="cb107-1861"><a href="#cb107-1861" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb107-1862"><a href="#cb107-1862" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">as.Date</span>(<span class="fu">as.character</span>(YEAR_MONTH)) </span>
-<span id="cb107-1863"><a href="#cb107-1863" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1864"><a href="#cb107-1864" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID, YEAR_MONTH, TOTAL_TRIPS)</span>
-<span id="cb107-1865"><a href="#cb107-1865" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb107-1866"><a href="#cb107-1866" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check: Row count verification</span></span>
-<span id="cb107-1867"><a href="#cb107-1867" aria-hidden="true" tabindex="-1"></a>  expected_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(spatial_data) <span class="sc">*</span> <span class="fu">nrow</span>(time_keys)</span>
-<span id="cb107-1868"><a href="#cb107-1868" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(balanced_trips) <span class="sc">!=</span> expected_rows) {</span>
-<span id="cb107-1869"><a href="#cb107-1869" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">sprintf</span>(</span>
-<span id="cb107-1870"><a href="#cb107-1870" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Data balancing failed. Expected %d rows, but found %d."</span>,</span>
-<span id="cb107-1871"><a href="#cb107-1871" aria-hidden="true" tabindex="-1"></a>      expected_rows, <span class="fu">nrow</span>(balanced_trips)</span>
-<span id="cb107-1872"><a href="#cb107-1872" aria-hidden="true" tabindex="-1"></a>    ))</span>
-<span id="cb107-1873"><a href="#cb107-1873" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb107-1874"><a href="#cb107-1874" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1875"><a href="#cb107-1875" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 2. Prepare Geometry ---</span></span>
-<span id="cb107-1876"><a href="#cb107-1876" aria-hidden="true" tabindex="-1"></a>  spatial_locations <span class="ot">&lt;-</span> spatial_data <span class="sc">%&gt;%</span></span>
-<span id="cb107-1877"><a href="#cb107-1877" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID, geometry)</span>
-<span id="cb107-1878"><a href="#cb107-1878" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1879"><a href="#cb107-1879" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 3. Create the space-time cube ---</span></span>
-<span id="cb107-1880"><a href="#cb107-1880" aria-hidden="true" tabindex="-1"></a>  ehsa_st <span class="ot">&lt;-</span> sfdep<span class="sc">::</span><span class="fu">spacetime</span>(</span>
-<span id="cb107-1881"><a href="#cb107-1881" aria-hidden="true" tabindex="-1"></a>    balanced_trips,          </span>
-<span id="cb107-1882"><a href="#cb107-1882" aria-hidden="true" tabindex="-1"></a>    spatial_locations,       </span>
-<span id="cb107-1883"><a href="#cb107-1883" aria-hidden="true" tabindex="-1"></a>    <span class="at">.loc_col =</span> <span class="st">"HEX_ID"</span>,     </span>
-<span id="cb107-1884"><a href="#cb107-1884" aria-hidden="true" tabindex="-1"></a>    <span class="at">.time_col =</span> <span class="st">"YEAR_MONTH"</span> </span>
-<span id="cb107-1885"><a href="#cb107-1885" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb107-1886"><a href="#cb107-1886" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb107-1887"><a href="#cb107-1887" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 4. Verification ---</span></span>
-<span id="cb107-1888"><a href="#cb107-1888" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (sfdep<span class="sc">::</span><span class="fu">is_spacetime_cube</span>(ehsa_st)) {</span>
-<span id="cb107-1889"><a href="#cb107-1889" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="fu">sprintf</span>(<span class="st">"Successfully created space-time cube for %s."</span>, time_period_name))</span>
-<span id="cb107-1890"><a href="#cb107-1890" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(ehsa_st)</span>
-<span id="cb107-1891"><a href="#cb107-1891" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
-<span id="cb107-1892"><a href="#cb107-1892" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Failed to create a valid space-time cube object."</span>)</span>
-<span id="cb107-1893"><a href="#cb107-1893" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb107-1894"><a href="#cb107-1894" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb107-1895"><a href="#cb107-1895" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb107-1896"><a href="#cb107-1896" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1899"><a href="#cb107-1899" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb107-1900"><a href="#cb107-1900" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Create Space-Time Cube for each period</span></span>
-<span id="cb107-1901"><a href="#cb107-1901" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1902"><a href="#cb107-1902" aria-hidden="true" tabindex="-1"></a><span class="co"># Weekday Morning Peak</span></span>
-<span id="cb107-1903"><a href="#cb107-1903" aria-hidden="true" tabindex="-1"></a>st_morning <span class="ot">&lt;-</span> <span class="fu">create_ehsa_spacetime_cube_period</span>(</span>
-<span id="cb107-1904"><a href="#cb107-1904" aria-hidden="true" tabindex="-1"></a>  <span class="at">trip_data =</span> trips_hex_monthly,</span>
-<span id="cb107-1905"><a href="#cb107-1905" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatial_data =</span> wm_q_spdep,</span>
-<span id="cb107-1906"><a href="#cb107-1906" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_period_name =</span> <span class="st">"Weekday_Morning_Peak"</span></span>
-<span id="cb107-1907"><a href="#cb107-1907" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb107-1908"><a href="#cb107-1908" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1909"><a href="#cb107-1909" aria-hidden="true" tabindex="-1"></a><span class="co"># Weekday Afternoon Peak</span></span>
-<span id="cb107-1910"><a href="#cb107-1910" aria-hidden="true" tabindex="-1"></a>st_afternoon <span class="ot">&lt;-</span> <span class="fu">create_ehsa_spacetime_cube_period</span>(</span>
-<span id="cb107-1911"><a href="#cb107-1911" aria-hidden="true" tabindex="-1"></a>  <span class="at">trip_data =</span> trips_hex_monthly,</span>
-<span id="cb107-1912"><a href="#cb107-1912" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatial_data =</span> wm_q_spdep,</span>
-<span id="cb107-1913"><a href="#cb107-1913" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_period_name =</span> <span class="st">"Weekday_Afternoon_Peak"</span></span>
-<span id="cb107-1914"><a href="#cb107-1914" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb107-1915"><a href="#cb107-1915" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1916"><a href="#cb107-1916" aria-hidden="true" tabindex="-1"></a><span class="co"># Weekend/Holiday</span></span>
-<span id="cb107-1917"><a href="#cb107-1917" aria-hidden="true" tabindex="-1"></a>st_weekend <span class="ot">&lt;-</span> <span class="fu">create_ehsa_spacetime_cube_period</span>(</span>
-<span id="cb107-1918"><a href="#cb107-1918" aria-hidden="true" tabindex="-1"></a>  <span class="at">trip_data =</span> trips_hex_monthly,</span>
-<span id="cb107-1919"><a href="#cb107-1919" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatial_data =</span> wm_q_spdep,</span>
-<span id="cb107-1920"><a href="#cb107-1920" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_period_name =</span> <span class="st">"Weekend_Holiday"</span></span>
-<span id="cb107-1921"><a href="#cb107-1921" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb107-1922"><a href="#cb107-1922" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb107-1923"><a href="#cb107-1923" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1924"><a href="#cb107-1924" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Calculating Getis-Ord Local Gi\* Statistics for each period</span></span>
+<span id="cb107-1822"><a href="#cb107-1822" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1b. Define the definitive grid axes (Locations and Time)</span></span>
+<span id="cb107-1823"><a href="#cb107-1823" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1824"><a href="#cb107-1824" aria-hidden="true" tabindex="-1"></a>  <span class="co"># LOCATION KEYS: CRITICAL - Ensure location keys match the spatial data order</span></span>
+<span id="cb107-1825"><a href="#cb107-1825" aria-hidden="true" tabindex="-1"></a>  loc_keys <span class="ot">&lt;-</span> spatial_data <span class="sc">%&gt;%</span> </span>
+<span id="cb107-1826"><a href="#cb107-1826" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb107-1827"><a href="#cb107-1827" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID)</span>
+<span id="cb107-1828"><a href="#cb107-1828" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1829"><a href="#cb107-1829" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create a vector of ordered HEX_IDs from the spatial data (which are factors, e.g., H0398)</span></span>
+<span id="cb107-1830"><a href="#cb107-1830" aria-hidden="true" tabindex="-1"></a>  ordered_hex_ids <span class="ot">&lt;-</span> loc_keys<span class="sc">$</span>HEX_ID</span>
+<span id="cb107-1831"><a href="#cb107-1831" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1832"><a href="#cb107-1832" aria-hidden="true" tabindex="-1"></a>  <span class="co"># TIME KEYS: All unique months (3 months)</span></span>
+<span id="cb107-1833"><a href="#cb107-1833" aria-hidden="true" tabindex="-1"></a>  time_keys <span class="ot">&lt;-</span> trip_data <span class="sc">%&gt;%</span></span>
+<span id="cb107-1834"><a href="#cb107-1834" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(YEAR_MONTH) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1835"><a href="#cb107-1835" aria-hidden="true" tabindex="-1"></a>    <span class="fu">unique</span>()</span>
+<span id="cb107-1836"><a href="#cb107-1836" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1837"><a href="#cb107-1837" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1c. Create the complete Cartesian product (full grid)</span></span>
+<span id="cb107-1838"><a href="#cb107-1838" aria-hidden="true" tabindex="-1"></a>  required_grid <span class="ot">&lt;-</span> loc_keys <span class="sc">%&gt;%</span></span>
+<span id="cb107-1839"><a href="#cb107-1839" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">cross_join</span>(time_keys) </span>
+<span id="cb107-1840"><a href="#cb107-1840" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1841"><a href="#cb107-1841" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 1d. Join the complete grid with the sparse data and fill missing observations with 0</span></span>
+<span id="cb107-1842"><a href="#cb107-1842" aria-hidden="true" tabindex="-1"></a>  balanced_trips <span class="ot">&lt;-</span> required_grid <span class="sc">%&gt;%</span></span>
+<span id="cb107-1843"><a href="#cb107-1843" aria-hidden="true" tabindex="-1"></a>    <span class="fu">left_join</span>(filtered_trips, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"HEX_ID"</span>, <span class="st">"YEAR_MONTH"</span>)) <span class="sc">%&gt;%</span> <span class="co"># USAGE OF filtered_trips</span></span>
+<span id="cb107-1844"><a href="#cb107-1844" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">TOTAL_TRIPS =</span> <span class="dv">0</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1845"><a href="#cb107-1845" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1846"><a href="#cb107-1846" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1e. Convert YEAR_MONTH to a Date object</span></span>
+<span id="cb107-1847"><a href="#cb107-1847" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb107-1848"><a href="#cb107-1848" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">paste0</span>(YEAR_MONTH, <span class="st">"-01"</span>), </span>
+<span id="cb107-1849"><a href="#cb107-1849" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">as.Date</span>(YEAR_MONTH, <span class="at">format =</span> <span class="st">"%Y-%m-%d"</span>)</span>
+<span id="cb107-1850"><a href="#cb107-1850" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1851"><a href="#cb107-1851" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1852"><a href="#cb107-1852" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 1f. CRITICAL STEP: ENFORCE LOCATION ORDERING AND TYPE MATCHING</span></span>
+<span id="cb107-1853"><a href="#cb107-1853" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb107-1854"><a href="#cb107-1854" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Ensure HEX_ID is a factor, using the levels from the spatial data to preserve order</span></span>
+<span id="cb107-1855"><a href="#cb107-1855" aria-hidden="true" tabindex="-1"></a>      <span class="at">HEX_ID =</span> <span class="fu">factor</span>(HEX_ID, <span class="at">levels =</span> ordered_hex_ids),</span>
+<span id="cb107-1856"><a href="#cb107-1856" aria-hidden="true" tabindex="-1"></a>      <span class="co"># Convert time to a factor for intermediate ordering</span></span>
+<span id="cb107-1857"><a href="#cb107-1857" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">as.factor</span>(YEAR_MONTH)</span>
+<span id="cb107-1858"><a href="#cb107-1858" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1859"><a href="#cb107-1859" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sort first by Location (using the factor level order), then by Time</span></span>
+<span id="cb107-1860"><a href="#cb107-1860" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(HEX_ID, YEAR_MONTH) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1861"><a href="#cb107-1861" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1862"><a href="#cb107-1862" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Revert YEAR_MONTH to Date object, keeping HEX_ID as Factor to match spatial_locations</span></span>
+<span id="cb107-1863"><a href="#cb107-1863" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb107-1864"><a href="#cb107-1864" aria-hidden="true" tabindex="-1"></a>      <span class="at">YEAR_MONTH =</span> <span class="fu">as.Date</span>(<span class="fu">as.character</span>(YEAR_MONTH)) </span>
+<span id="cb107-1865"><a href="#cb107-1865" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1866"><a href="#cb107-1866" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID, YEAR_MONTH, TOTAL_TRIPS)</span>
+<span id="cb107-1867"><a href="#cb107-1867" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1868"><a href="#cb107-1868" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Check: Row count verification</span></span>
+<span id="cb107-1869"><a href="#cb107-1869" aria-hidden="true" tabindex="-1"></a>  expected_rows <span class="ot">&lt;-</span> <span class="fu">nrow</span>(spatial_data) <span class="sc">*</span> <span class="fu">nrow</span>(time_keys)</span>
+<span id="cb107-1870"><a href="#cb107-1870" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="fu">nrow</span>(balanced_trips) <span class="sc">!=</span> expected_rows) {</span>
+<span id="cb107-1871"><a href="#cb107-1871" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="fu">sprintf</span>(</span>
+<span id="cb107-1872"><a href="#cb107-1872" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Data balancing failed. Expected %d rows, but found %d."</span>,</span>
+<span id="cb107-1873"><a href="#cb107-1873" aria-hidden="true" tabindex="-1"></a>      expected_rows, <span class="fu">nrow</span>(balanced_trips)</span>
+<span id="cb107-1874"><a href="#cb107-1874" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb107-1875"><a href="#cb107-1875" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb107-1876"><a href="#cb107-1876" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1877"><a href="#cb107-1877" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 2. Prepare Geometry ---</span></span>
+<span id="cb107-1878"><a href="#cb107-1878" aria-hidden="true" tabindex="-1"></a>  spatial_locations <span class="ot">&lt;-</span> spatial_data <span class="sc">%&gt;%</span></span>
+<span id="cb107-1879"><a href="#cb107-1879" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(HEX_ID, geometry)</span>
+<span id="cb107-1880"><a href="#cb107-1880" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1881"><a href="#cb107-1881" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 3. Create the space-time cube ---</span></span>
+<span id="cb107-1882"><a href="#cb107-1882" aria-hidden="true" tabindex="-1"></a>  ehsa_st <span class="ot">&lt;-</span> sfdep<span class="sc">::</span><span class="fu">spacetime</span>(</span>
+<span id="cb107-1883"><a href="#cb107-1883" aria-hidden="true" tabindex="-1"></a>    balanced_trips,          </span>
+<span id="cb107-1884"><a href="#cb107-1884" aria-hidden="true" tabindex="-1"></a>    spatial_locations,       </span>
+<span id="cb107-1885"><a href="#cb107-1885" aria-hidden="true" tabindex="-1"></a>    <span class="at">.loc_col =</span> <span class="st">"HEX_ID"</span>,     </span>
+<span id="cb107-1886"><a href="#cb107-1886" aria-hidden="true" tabindex="-1"></a>    <span class="at">.time_col =</span> <span class="st">"YEAR_MONTH"</span> </span>
+<span id="cb107-1887"><a href="#cb107-1887" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb107-1888"><a href="#cb107-1888" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1889"><a href="#cb107-1889" aria-hidden="true" tabindex="-1"></a>  <span class="co"># --- 4. Verification ---</span></span>
+<span id="cb107-1890"><a href="#cb107-1890" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (sfdep<span class="sc">::</span><span class="fu">is_spacetime_cube</span>(ehsa_st)) {</span>
+<span id="cb107-1891"><a href="#cb107-1891" aria-hidden="true" tabindex="-1"></a>    <span class="fu">message</span>(<span class="fu">sprintf</span>(<span class="st">"Successfully created space-time cube for %s."</span>, time_period_name))</span>
+<span id="cb107-1892"><a href="#cb107-1892" aria-hidden="true" tabindex="-1"></a>    <span class="fu">return</span>(ehsa_st)</span>
+<span id="cb107-1893"><a href="#cb107-1893" aria-hidden="true" tabindex="-1"></a>  } <span class="cf">else</span> {</span>
+<span id="cb107-1894"><a href="#cb107-1894" aria-hidden="true" tabindex="-1"></a>    <span class="fu">stop</span>(<span class="st">"Failed to create a valid space-time cube object."</span>)</span>
+<span id="cb107-1895"><a href="#cb107-1895" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb107-1896"><a href="#cb107-1896" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-1897"><a href="#cb107-1897" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb107-1898"><a href="#cb107-1898" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1901"><a href="#cb107-1901" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb107-1902"><a href="#cb107-1902" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Apply function to create Space-Time Cube for each period</span></span>
+<span id="cb107-1903"><a href="#cb107-1903" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1904"><a href="#cb107-1904" aria-hidden="true" tabindex="-1"></a><span class="co"># Weekday Morning Peak</span></span>
+<span id="cb107-1905"><a href="#cb107-1905" aria-hidden="true" tabindex="-1"></a>st_morning <span class="ot">&lt;-</span> <span class="fu">create_ehsa_spacetime_cube_period</span>(</span>
+<span id="cb107-1906"><a href="#cb107-1906" aria-hidden="true" tabindex="-1"></a>  <span class="at">trip_data =</span> trips_hex_monthly,</span>
+<span id="cb107-1907"><a href="#cb107-1907" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatial_data =</span> wm_q_spdep,</span>
+<span id="cb107-1908"><a href="#cb107-1908" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_period_name =</span> <span class="st">"Weekday_Morning_Peak"</span></span>
+<span id="cb107-1909"><a href="#cb107-1909" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb107-1910"><a href="#cb107-1910" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1911"><a href="#cb107-1911" aria-hidden="true" tabindex="-1"></a><span class="co"># Weekday Afternoon Peak</span></span>
+<span id="cb107-1912"><a href="#cb107-1912" aria-hidden="true" tabindex="-1"></a>st_afternoon <span class="ot">&lt;-</span> <span class="fu">create_ehsa_spacetime_cube_period</span>(</span>
+<span id="cb107-1913"><a href="#cb107-1913" aria-hidden="true" tabindex="-1"></a>  <span class="at">trip_data =</span> trips_hex_monthly,</span>
+<span id="cb107-1914"><a href="#cb107-1914" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatial_data =</span> wm_q_spdep,</span>
+<span id="cb107-1915"><a href="#cb107-1915" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_period_name =</span> <span class="st">"Weekday_Afternoon_Peak"</span></span>
+<span id="cb107-1916"><a href="#cb107-1916" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb107-1917"><a href="#cb107-1917" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1918"><a href="#cb107-1918" aria-hidden="true" tabindex="-1"></a><span class="co"># Weekend/Holiday</span></span>
+<span id="cb107-1919"><a href="#cb107-1919" aria-hidden="true" tabindex="-1"></a>st_weekend <span class="ot">&lt;-</span> <span class="fu">create_ehsa_spacetime_cube_period</span>(</span>
+<span id="cb107-1920"><a href="#cb107-1920" aria-hidden="true" tabindex="-1"></a>  <span class="at">trip_data =</span> trips_hex_monthly,</span>
+<span id="cb107-1921"><a href="#cb107-1921" aria-hidden="true" tabindex="-1"></a>  <span class="at">spatial_data =</span> wm_q_spdep,</span>
+<span id="cb107-1922"><a href="#cb107-1922" aria-hidden="true" tabindex="-1"></a>  <span class="at">time_period_name =</span> <span class="st">"Weekend_Holiday"</span></span>
+<span id="cb107-1923"><a href="#cb107-1923" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb107-1924"><a href="#cb107-1924" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb107-1925"><a href="#cb107-1925" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1926"><a href="#cb107-1926" aria-hidden="true" tabindex="-1"></a>Before the Mann-Kendall test can be applied, it is crucial to first calculate the local Gi<span class="sc">\*</span> statistic for every location (<span class="in">`HEX_ID`</span>) within every time period (month). The Mann-Kendall test is then applied to the resulting time series of Gi<span class="sc">\*</span> values for each location.</span>
+<span id="cb107-1926"><a href="#cb107-1926" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Computing Gi*</span></span>
 <span id="cb107-1927"><a href="#cb107-1927" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1928"><a href="#cb107-1928" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
-<span id="cb107-1929"><a href="#cb107-1929" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1930"><a href="#cb107-1930" aria-hidden="true" tabindex="-1"></a><span class="fu">##### Weekday Morning Peak</span></span>
-<span id="cb107-1931"><a href="#cb107-1931" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1934"><a href="#cb107-1934" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb107-1935"><a href="#cb107-1935" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Define inverse distance Weights</span></span>
-<span id="cb107-1936"><a href="#cb107-1936" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1937"><a href="#cb107-1937" aria-hidden="true" tabindex="-1"></a><span class="co"># Activate geometry context</span></span>
-<span id="cb107-1938"><a href="#cb107-1938" aria-hidden="true" tabindex="-1"></a>st_weights_morning <span class="ot">&lt;-</span> st_morning <span class="sc">%&gt;%</span></span>
-<span id="cb107-1939"><a href="#cb107-1939" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1940"><a href="#cb107-1940" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb107-1941"><a href="#cb107-1941" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define neighbors based on the critical distance threshold</span></span>
-<span id="cb107-1942"><a href="#cb107-1942" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)),</span>
-<span id="cb107-1943"><a href="#cb107-1943" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define row-standardized weights (style = "W")</span></span>
-<span id="cb107-1944"><a href="#cb107-1944" aria-hidden="true" tabindex="-1"></a>    <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, </span>
-<span id="cb107-1945"><a href="#cb107-1945" aria-hidden="true" tabindex="-1"></a>                             geometry, </span>
-<span id="cb107-1946"><a href="#cb107-1946" aria-hidden="true" tabindex="-1"></a>                             <span class="at">scale =</span> <span class="dv">1</span>,</span>
-<span id="cb107-1947"><a href="#cb107-1947" aria-hidden="true" tabindex="-1"></a>                             <span class="at">alpha =</span> <span class="dv">1</span>),</span>
-<span id="cb107-1948"><a href="#cb107-1948" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">1</span></span>
-<span id="cb107-1949"><a href="#cb107-1949" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1950"><a href="#cb107-1950" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Copy neighbor and weight columns over to each time-slice</span></span>
-<span id="cb107-1951"><a href="#cb107-1951" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1952"><a href="#cb107-1952" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span>
-<span id="cb107-1953"><a href="#cb107-1953" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb107-1954"><a href="#cb107-1954" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1955"><a href="#cb107-1955" aria-hidden="true" tabindex="-1"></a><span class="fu">##### Weekday Afternoon Peak</span></span>
-<span id="cb107-1956"><a href="#cb107-1956" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1959"><a href="#cb107-1959" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb107-1960"><a href="#cb107-1960" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Define inverse distance Weights</span></span>
-<span id="cb107-1961"><a href="#cb107-1961" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1962"><a href="#cb107-1962" aria-hidden="true" tabindex="-1"></a><span class="co"># Activate geometry context</span></span>
-<span id="cb107-1963"><a href="#cb107-1963" aria-hidden="true" tabindex="-1"></a>st_weights_afternoon <span class="ot">&lt;-</span> st_afternoon <span class="sc">%&gt;%</span></span>
-<span id="cb107-1964"><a href="#cb107-1964" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1965"><a href="#cb107-1965" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb107-1966"><a href="#cb107-1966" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define neighbors based on the critical distance threshold</span></span>
-<span id="cb107-1967"><a href="#cb107-1967" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)),</span>
-<span id="cb107-1968"><a href="#cb107-1968" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define row-standardized weights (style = "W")</span></span>
-<span id="cb107-1969"><a href="#cb107-1969" aria-hidden="true" tabindex="-1"></a>    <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, </span>
-<span id="cb107-1970"><a href="#cb107-1970" aria-hidden="true" tabindex="-1"></a>                             geometry, </span>
-<span id="cb107-1971"><a href="#cb107-1971" aria-hidden="true" tabindex="-1"></a>                             <span class="at">scale =</span> <span class="dv">1</span>,</span>
-<span id="cb107-1972"><a href="#cb107-1972" aria-hidden="true" tabindex="-1"></a>                             <span class="at">alpha =</span> <span class="dv">1</span>),</span>
-<span id="cb107-1973"><a href="#cb107-1973" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">1</span></span>
-<span id="cb107-1974"><a href="#cb107-1974" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1975"><a href="#cb107-1975" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Copy neighbor and weight columns over to each time-slice</span></span>
-<span id="cb107-1976"><a href="#cb107-1976" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1977"><a href="#cb107-1977" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span>
-<span id="cb107-1978"><a href="#cb107-1978" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb107-1979"><a href="#cb107-1979" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1980"><a href="#cb107-1980" aria-hidden="true" tabindex="-1"></a><span class="fu">##### Weekend/Holiday</span></span>
-<span id="cb107-1981"><a href="#cb107-1981" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1984"><a href="#cb107-1984" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb107-1985"><a href="#cb107-1985" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Define inverse distance Weights</span></span>
-<span id="cb107-1986"><a href="#cb107-1986" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-1987"><a href="#cb107-1987" aria-hidden="true" tabindex="-1"></a><span class="co"># Activate geometry context</span></span>
-<span id="cb107-1988"><a href="#cb107-1988" aria-hidden="true" tabindex="-1"></a>st_weights_weekend <span class="ot">&lt;-</span> st_weekend <span class="sc">%&gt;%</span></span>
-<span id="cb107-1989"><a href="#cb107-1989" aria-hidden="true" tabindex="-1"></a>  <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb107-1990"><a href="#cb107-1990" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb107-1991"><a href="#cb107-1991" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define neighbors based on the critical distance threshold</span></span>
-<span id="cb107-1992"><a href="#cb107-1992" aria-hidden="true" tabindex="-1"></a>    <span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)),</span>
-<span id="cb107-1993"><a href="#cb107-1993" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Define row-standardized weights (style = "W")</span></span>
-<span id="cb107-1994"><a href="#cb107-1994" aria-hidden="true" tabindex="-1"></a>    <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, </span>
-<span id="cb107-1995"><a href="#cb107-1995" aria-hidden="true" tabindex="-1"></a>                             geometry, </span>
-<span id="cb107-1996"><a href="#cb107-1996" aria-hidden="true" tabindex="-1"></a>                             <span class="at">scale =</span> <span class="dv">1</span>,</span>
-<span id="cb107-1997"><a href="#cb107-1997" aria-hidden="true" tabindex="-1"></a>                             <span class="at">alpha =</span> <span class="dv">1</span>),</span>
-<span id="cb107-1998"><a href="#cb107-1998" aria-hidden="true" tabindex="-1"></a>    <span class="at">.before =</span> <span class="dv">1</span></span>
-<span id="cb107-1999"><a href="#cb107-1999" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
-<span id="cb107-2000"><a href="#cb107-2000" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Copy neighbor and weight columns over to each time-slice</span></span>
-<span id="cb107-2001"><a href="#cb107-2001" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb107-2002"><a href="#cb107-2002" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span>
-<span id="cb107-2003"><a href="#cb107-2003" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb107-1930"><a href="#cb107-1930" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb107-1931"><a href="#cb107-1931" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: Function to calculate Gi* manually</span></span>
+<span id="cb107-1932"><a href="#cb107-1932" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-1933"><a href="#cb107-1933" aria-hidden="true" tabindex="-1"></a>calculate_gi_stars_manual <span class="ot">&lt;-</span> <span class="cf">function</span>(st_cube) {</span>
+<span id="cb107-1934"><a href="#cb107-1934" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Add spatial weights to the spacetime cube</span></span>
+<span id="cb107-1935"><a href="#cb107-1935" aria-hidden="true" tabindex="-1"></a>  st_weighted <span class="ot">&lt;-</span> st_cube <span class="sc">%&gt;%</span></span>
+<span id="cb107-1936"><a href="#cb107-1936" aria-hidden="true" tabindex="-1"></a>    <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1937"><a href="#cb107-1937" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb107-1938"><a href="#cb107-1938" aria-hidden="true" tabindex="-1"></a>      <span class="at">nb =</span> <span class="fu">include_self</span>(<span class="fu">st_contiguity</span>(geometry)),</span>
+<span id="cb107-1939"><a href="#cb107-1939" aria-hidden="true" tabindex="-1"></a>      <span class="at">wt =</span> <span class="fu">st_inverse_distance</span>(nb, geometry, <span class="at">scale =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="dv">1</span>),</span>
+<span id="cb107-1940"><a href="#cb107-1940" aria-hidden="true" tabindex="-1"></a>      <span class="at">.before =</span> <span class="dv">1</span></span>
+<span id="cb107-1941"><a href="#cb107-1941" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1942"><a href="#cb107-1942" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_nbs</span>(<span class="st">"nb"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1943"><a href="#cb107-1943" aria-hidden="true" tabindex="-1"></a>    <span class="fu">set_wts</span>(<span class="st">"wt"</span>)</span>
+<span id="cb107-1944"><a href="#cb107-1944" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1945"><a href="#cb107-1945" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get unique locations and their geometry</span></span>
+<span id="cb107-1946"><a href="#cb107-1946" aria-hidden="true" tabindex="-1"></a>  unique_locations <span class="ot">&lt;-</span> st_weighted <span class="sc">%&gt;%</span></span>
+<span id="cb107-1947"><a href="#cb107-1947" aria-hidden="true" tabindex="-1"></a>    <span class="fu">activate</span>(<span class="st">"geometry"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1948"><a href="#cb107-1948" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb107-1949"><a href="#cb107-1949" aria-hidden="true" tabindex="-1"></a>    <span class="fu">distinct</span>(HEX_ID, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1950"><a href="#cb107-1950" aria-hidden="true" tabindex="-1"></a>    <span class="fu">st_as_sf</span>()</span>
+<span id="cb107-1951"><a href="#cb107-1951" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1952"><a href="#cb107-1952" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Extract geometry-level neighbors (for unique locations only)</span></span>
+<span id="cb107-1953"><a href="#cb107-1953" aria-hidden="true" tabindex="-1"></a>  geom_nb <span class="ot">&lt;-</span> unique_locations<span class="sc">$</span>nb</span>
+<span id="cb107-1954"><a href="#cb107-1954" aria-hidden="true" tabindex="-1"></a>  geom_wt <span class="ot">&lt;-</span> unique_locations<span class="sc">$</span>wt</span>
+<span id="cb107-1955"><a href="#cb107-1955" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1956"><a href="#cb107-1956" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Get time periods and location count</span></span>
+<span id="cb107-1957"><a href="#cb107-1957" aria-hidden="true" tabindex="-1"></a>  months <span class="ot">&lt;-</span> <span class="fu">unique</span>(st_weighted<span class="sc">$</span>YEAR_MONTH)</span>
+<span id="cb107-1958"><a href="#cb107-1958" aria-hidden="true" tabindex="-1"></a>  n_locations <span class="ot">&lt;-</span> <span class="fu">nrow</span>(unique_locations)</span>
+<span id="cb107-1959"><a href="#cb107-1959" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1960"><a href="#cb107-1960" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Processing %d locations across %d time periods...</span><span class="sc">\n</span><span class="st">"</span>, </span>
+<span id="cb107-1961"><a href="#cb107-1961" aria-hidden="true" tabindex="-1"></a>              n_locations, <span class="fu">length</span>(months)))</span>
+<span id="cb107-1962"><a href="#cb107-1962" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1963"><a href="#cb107-1963" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Calculate Gi* for each time period</span></span>
+<span id="cb107-1964"><a href="#cb107-1964" aria-hidden="true" tabindex="-1"></a>  gi_list <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb107-1965"><a href="#cb107-1965" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1966"><a href="#cb107-1966" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(t <span class="cf">in</span> <span class="fu">seq_along</span>(months)) {</span>
+<span id="cb107-1967"><a href="#cb107-1967" aria-hidden="true" tabindex="-1"></a>    start_row <span class="ot">&lt;-</span> (t <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> n_locations <span class="sc">+</span> <span class="dv">1</span></span>
+<span id="cb107-1968"><a href="#cb107-1968" aria-hidden="true" tabindex="-1"></a>    end_row <span class="ot">&lt;-</span> t <span class="sc">*</span> n_locations</span>
+<span id="cb107-1969"><a href="#cb107-1969" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1970"><a href="#cb107-1970" aria-hidden="true" tabindex="-1"></a>    <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"  Calculating Gi* for %s (rows %d to %d)...</span><span class="sc">\n</span><span class="st">"</span>, </span>
+<span id="cb107-1971"><a href="#cb107-1971" aria-hidden="true" tabindex="-1"></a>                months[t], start_row, end_row))</span>
+<span id="cb107-1972"><a href="#cb107-1972" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1973"><a href="#cb107-1973" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract time slice data (just the values, not trying to use geometry methods)</span></span>
+<span id="cb107-1974"><a href="#cb107-1974" aria-hidden="true" tabindex="-1"></a>    time_data <span class="ot">&lt;-</span> st_weighted[start_row<span class="sc">:</span>end_row, ] <span class="sc">%&gt;%</span></span>
+<span id="cb107-1975"><a href="#cb107-1975" aria-hidden="true" tabindex="-1"></a>      <span class="fu">st_drop_geometry</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb107-1976"><a href="#cb107-1976" aria-hidden="true" tabindex="-1"></a>      <span class="fu">as_tibble</span>()</span>
+<span id="cb107-1977"><a href="#cb107-1977" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1978"><a href="#cb107-1978" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Calculate Gi* using the pre-computed geometry-level neighbors and weights</span></span>
+<span id="cb107-1979"><a href="#cb107-1979" aria-hidden="true" tabindex="-1"></a>    gi_result <span class="ot">&lt;-</span> <span class="fu">local_gstar_perm</span>(</span>
+<span id="cb107-1980"><a href="#cb107-1980" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> time_data<span class="sc">$</span>TOTAL_TRIPS,</span>
+<span id="cb107-1981"><a href="#cb107-1981" aria-hidden="true" tabindex="-1"></a>      <span class="at">nb =</span> geom_nb,</span>
+<span id="cb107-1982"><a href="#cb107-1982" aria-hidden="true" tabindex="-1"></a>      <span class="at">wt =</span> geom_wt,</span>
+<span id="cb107-1983"><a href="#cb107-1983" aria-hidden="true" tabindex="-1"></a>      <span class="at">nsim =</span> <span class="dv">99</span></span>
+<span id="cb107-1984"><a href="#cb107-1984" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb107-1985"><a href="#cb107-1985" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1986"><a href="#cb107-1986" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Combine with time slice data</span></span>
+<span id="cb107-1987"><a href="#cb107-1987" aria-hidden="true" tabindex="-1"></a>    time_gi <span class="ot">&lt;-</span> time_data <span class="sc">%&gt;%</span></span>
+<span id="cb107-1988"><a href="#cb107-1988" aria-hidden="true" tabindex="-1"></a>      <span class="fu">select</span>(HEX_ID, YEAR_MONTH, TOTAL_TRIPS) <span class="sc">%&gt;%</span></span>
+<span id="cb107-1989"><a href="#cb107-1989" aria-hidden="true" tabindex="-1"></a>      <span class="fu">bind_cols</span>(<span class="fu">as.data.frame</span>(gi_result))</span>
+<span id="cb107-1990"><a href="#cb107-1990" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb107-1991"><a href="#cb107-1991" aria-hidden="true" tabindex="-1"></a>    gi_list[[t]] <span class="ot">&lt;-</span> time_gi</span>
+<span id="cb107-1992"><a href="#cb107-1992" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb107-1993"><a href="#cb107-1993" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1994"><a href="#cb107-1994" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Combine all time periods</span></span>
+<span id="cb107-1995"><a href="#cb107-1995" aria-hidden="true" tabindex="-1"></a>  gi_stars_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(gi_list)</span>
+<span id="cb107-1996"><a href="#cb107-1996" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-1997"><a href="#cb107-1997" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>(<span class="fu">sprintf</span>(<span class="st">"Complete! Calculated Gi* for %d observations.</span><span class="sc">\n\n</span><span class="st">"</span>, </span>
+<span id="cb107-1998"><a href="#cb107-1998" aria-hidden="true" tabindex="-1"></a>              <span class="fu">nrow</span>(gi_stars_all)))</span>
+<span id="cb107-1999"><a href="#cb107-1999" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb107-2000"><a href="#cb107-2000" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(gi_stars_all)</span>
+<span id="cb107-2001"><a href="#cb107-2001" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb107-2002"><a href="#cb107-2002" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb107-2003"><a href="#cb107-2003" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb107-2004"><a href="#cb107-2004" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-2005"><a href="#cb107-2005" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb107-2005"><a href="#cb107-2005" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
 <span id="cb107-2006"><a href="#cb107-2006" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-2007"><a href="#cb107-2007" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2007"><a href="#cb107-2007" aria-hidden="true" tabindex="-1"></a><span class="fu">##### Weekday Morning Peak</span></span>
 <span id="cb107-2008"><a href="#cb107-2008" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-2009"><a href="#cb107-2009" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mann-Kendall Trend Test</span></span>
-<span id="cb107-2010"><a href="#cb107-2010" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-2011"><a href="#cb107-2011" aria-hidden="true" tabindex="-1"></a><span class="fu">### EHSA Classification and Visualization</span></span>
-<span id="cb107-2012"><a href="#cb107-2012" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-2013"><a href="#cb107-2013" aria-hidden="true" tabindex="-1"></a><span class="fu">### Temporal Pattern Interpretation</span></span>
-<span id="cb107-2014"><a href="#cb107-2014" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb107-2015"><a href="#cb107-2015" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusions and Recommendations</span></span>
+<span id="cb107-2011"><a href="#cb107-2011" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb107-2012"><a href="#cb107-2012" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate Gi* for all periods</span></span>
+<span id="cb107-2013"><a href="#cb107-2013" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"=== Morning Peak ===</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb107-2014"><a href="#cb107-2014" aria-hidden="true" tabindex="-1"></a>gi_stars_morning <span class="ot">&lt;-</span> <span class="fu">calculate_gi_stars_manual</span>(st_morning)</span>
+<span id="cb107-2015"><a href="#cb107-2015" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2016"><a href="#cb107-2016" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb107-2017"><a href="#cb107-2017" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2018"><a href="#cb107-2018" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2019"><a href="#cb107-2019" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2020"><a href="#cb107-2020" aria-hidden="true" tabindex="-1"></a><span class="fu">##### Weekday Afternoon Peak</span></span>
+<span id="cb107-2021"><a href="#cb107-2021" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2024"><a href="#cb107-2024" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb107-2025"><a href="#cb107-2025" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== Afternoon Peak ===</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb107-2026"><a href="#cb107-2026" aria-hidden="true" tabindex="-1"></a>gi_stars_afternoon <span class="ot">&lt;-</span> <span class="fu">calculate_gi_stars_manual</span>(st_afternoon)</span>
+<span id="cb107-2027"><a href="#cb107-2027" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2028"><a href="#cb107-2028" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2029"><a href="#cb107-2029" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb107-2030"><a href="#cb107-2030" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2031"><a href="#cb107-2031" aria-hidden="true" tabindex="-1"></a><span class="fu">##### Weekend/Holiday</span></span>
+<span id="cb107-2032"><a href="#cb107-2032" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2035"><a href="#cb107-2035" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb107-2036"><a href="#cb107-2036" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"</span><span class="sc">\n</span><span class="st">=== Weekend/Holiday ===</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb107-2037"><a href="#cb107-2037" aria-hidden="true" tabindex="-1"></a>gi_stars_weekend <span class="ot">&lt;-</span> <span class="fu">calculate_gi_stars_manual</span>(st_weekend)</span>
+<span id="cb107-2038"><a href="#cb107-2038" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb107-2039"><a href="#cb107-2039" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2040"><a href="#cb107-2040" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb107-2041"><a href="#cb107-2041" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2042"><a href="#cb107-2042" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2043"><a href="#cb107-2043" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2044"><a href="#cb107-2044" aria-hidden="true" tabindex="-1"></a><span class="fu">### Mann-Kendall Trend Test</span></span>
+<span id="cb107-2045"><a href="#cb107-2045" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2046"><a href="#cb107-2046" aria-hidden="true" tabindex="-1"></a><span class="fu">### EHSA Classification and Visualization</span></span>
+<span id="cb107-2047"><a href="#cb107-2047" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2048"><a href="#cb107-2048" aria-hidden="true" tabindex="-1"></a><span class="fu">### Temporal Pattern Interpretation</span></span>
+<span id="cb107-2049"><a href="#cb107-2049" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb107-2050"><a href="#cb107-2050" aria-hidden="true" tabindex="-1"></a><span class="fu">## Conclusions and Recommendations</span></span>
 </code><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
