@@ -410,6 +410,7 @@ The total number of trips and the their distributions during the day across 3 mo
 ### Distribution of trips in each period
 
 ::: panel-tabset
+
 #### Weekday Morning Peak
 
 ```{r}
@@ -711,7 +712,7 @@ For convenience, 4 reusable functions are created as below:
 **calculate_local_morans()**
 
 | **Parameter** | **Description** |
-|------------------------|-----------------------------------------------|
+|----------------------|--------------------------------------------------|
 | `data` | `sf` object containing the target numeric column used for Local Moran’s I calculation. |
 | `listw` | `spdep::listw` object representing spatial weights; must have the same row order as `data`. |
 | `column_name` | Character string specifying the name of the variable to analyze. |
@@ -1910,19 +1911,15 @@ The Mann-Kendall test detects monotonic trends in bus ridership patterns over ti
 
 **Interpretation:**
 
-Reject H₀ if p-value \< significance level (0.05)
+Reject H₀ if p-value \< significance level (e.g., 0.05)
 
 Tau statistic (-1 to 1):
 
--   tau \> 0.3: Strong Upward
+-   -1: Perfectly downward ridership trend
 
--   tau \> 0: Weak Upward
+-   +1: Perfectly upward ridership trend
 
--   tau \< -0.3: Strong Downward
-
--   tau \< 0: Weak Downward
-
--   tau = 1: No Trend"
+-   0: No trend
 
 This identifies whether bus ridership is systematically increasing or decreasing across the analyzed time periods.
 
@@ -1946,6 +1943,7 @@ perform_mann_kendall <- function(gi_stars_df) {
 ```
 
 ::: panel-tabset
+
 #### Weekday Morning Peak
 
 ```{r}
@@ -1983,16 +1981,14 @@ selected_hexagons <- mk_sorted %>%
 
 print(mk_sorted %>% filter(HEX_ID %in% selected_hexagons))
 ```
-
-In the above results, sl is the p-value. As all the hexagons show p-value \> 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon above.
+In the above results, sl is the p-value. As all the hexagons show p-value > 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon above.
 
 Let's check if there is any hexagon having significant result.
 
 ```{r}
 mk_morning %>% filter(sl < 0.05)
 ```
-
-For weekday morning peak, as there is no hexagon having p-value \< 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
+For weekday morning peak, as there is no hexagon having p-value < 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
 
 #### Weekday Afternoon Peak
 
@@ -2033,7 +2029,7 @@ selected_hexagons <- mk_sorted %>%
 print(mk_sorted %>% filter(HEX_ID %in% selected_hexagons))
 ```
 
-In the above results, sl is the p-value. As all the hexagons show p-value \> 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon above.
+In the above results, sl is the p-value. As all the hexagons show p-value > 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon above.
 
 Let's check if there is any hexagon having significant result.
 
@@ -2041,7 +2037,7 @@ Let's check if there is any hexagon having significant result.
 mk_afternoon %>% filter(sl < 0.05)
 ```
 
-For weekday afternoon peak, as there is no hexagon having p-value \< 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
+For weekday afternoon peak, as there is no hexagon having p-value < 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
 
 #### Weekend/Holiday
 
@@ -2082,7 +2078,7 @@ selected_hexagons <- mk_sorted %>%
 print(mk_sorted %>% filter(HEX_ID %in% selected_hexagons))
 ```
 
-In the above results, sl is the p-value. As all the hexagons show p-value \> 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon above.
+In the above results, sl is the p-value. As all the hexagons show p-value > 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon above.
 
 Let's check if there is any hexagon having significant result.
 
@@ -2090,7 +2086,8 @@ Let's check if there is any hexagon having significant result.
 mk_weekend %>% filter(sl < 0.05)
 ```
 
-For weekend/holiday peak, as there is no hexagon having p-value \< 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
+For weekend/holiday peak, as there is no hexagon having p-value < 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
+
 :::
 
 ### EHSA Classification and Visualization
@@ -2125,6 +2122,7 @@ ehsa_weekend <- emerging_hotspot_analysis(
 ```
 
 ::: panel-tabset
+
 #### Weekday Morning Peak
 
 ```{r}
@@ -2157,11 +2155,13 @@ ggplot(data = ehsa_weekend, aes(x = classification)) +
   coord_flip() +  # flip coordinates
   theme_light()
 ```
+
 :::
 
 ### Combine Gi\* values with EHSA classification
 
 ::: panel-tabset
+
 #### Weekday Morning Peak
 
 ```{r}
@@ -2268,6 +2268,9 @@ ehsa_sig_pm <- ehsa_weekend_complete %>% filter(p_value < 0.05)
 ehsa_sig_pm
 
 ```
+
 :::
 
+
 ## Conclusions and Recommendations
+
