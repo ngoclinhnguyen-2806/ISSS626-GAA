@@ -1,0 +1,174 @@
+---
+title: "In-class Exercise 8 | Geographically Weighted Predictive Models"
+subtitle: "Data Preparation for Take-home Exercise 3"
+date: "Oct 25, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+format:
+  html:
+    code-link: true
+    toc: true
+number-sections: true
+number-offset: 1
+editor: visual
+---
+
+## Overview
+
+### The data
+
+The data used in this exercise includes Aspatial and Geospatial datasets, categorized below based on whether they primarily contain attribute information or geometric features.
+
+#### Aspatial
+
+These datasets primarily contain attribute information, some of which do not have direct geographic coordinates.
+
+| Dataset Name | Description | Source | File Type |
+|:-----------------|:-----------------|:-----------------|:-----------------|
+| HDB Resale data | A list of HDB resale transacted prices in Singapore from Jan 2017 onwards. | Data.gov.sg | csv |
+| Primary school data | Extracted from the list on General information of schools from the data.gov portal. | Data.gov.sg | csv |
+| CBD coordinates | Coordinates obtained from Google. | Retrieved/Scraped from other sources (Google) | N/A (List data) |
+| Shopping malls data | A list of Shopping malls in Singapore. | Retrieved/Scraped from other sources (Wikipedia) | N/A (List data) |
+| Good primary schools list | A list of primary schools ordered in ranking in terms of popularity. | Retrieved/Scraped from other sources (Local Salary Forum) | N/A (List data) |
+
+#### Geospatial
+
+These datasets include geometric features and locational factors, with or without explicit geographic coordinates in the primary list/file type.
+
+| Dataset Name | Description | Source | File Type |
+|:-----------------|:-----------------|:-----------------|:-----------------|
+| *MP14_SUBZONE_WEB_PL* | A polygon feature data providing information of URA 2014 Master Plan Planning Subzone boundary data. | Data.gov.sg | ESRI shapefile |
+| Eldercare data | A list of eldercare in Singapore. | Data.gov.sg | shapefile |
+| Hawker Centre data | A list of hawker centres in Singapore. | Data.gov.sg | geojson |
+| Parks data | A list of parks in Singapore. | Data.gov.sg | geojson |
+| Supermarket data | A list of supermarkets in Singapore. | Data.gov.sg | geojson |
+| CHAS clinics data | A list of CHAS clinics in Singapore. | Data.gov.sg | geojson |
+| Childcare service data | A list of childcare services in Singapore. | Data.gov.sg | geojson |
+| Kindergartens data | A list of kindergartens in Singapore. | Data.gov.sg | geojson |
+| MRT data | A list of MRT/LRT stations in Singapore with the station names and codes. | Datamall.lta.gov.sg | shapefile |
+| Bus stops data | A list of bus stops in Singapore. | Datamall.lta.gov.sg | shapefile |
+
+### Loading R packages
+
+```{r}
+pacman::p_load(httr, tidyverse, sf, tmap, jsonlite, progress, spdep, GWmodel,
+               rsample, Metrics, SpatialML, knitr, kableExtra, spatialRF, randomForestExplainer)
+```
+
+## Geocoding HDB resale data
+
+We will use Reverse ZIPCode API.
+
+### Basic version
+
+```{r}
+HDBresale <- read_csv("data/rawdata/HDBresale.csv") %>% 
+  filter (flat_type == "4 ROOM") %>% 
+  filter (month >= "2025-09" & month <"2025-10")
+```
+```{r}
+geocode <- function(block, streetname) {
+  base_url <- "https://onemap.gov.sg/api/common/elastic/search"
+  address <- paste(block, streetname, sep=" ")
+  query <- list("searchVal" = address,
+                "returnGeom" = "Y",
+                "getAddrDetails" = "N",
+                "pageNum" = "1")
+  
+  res <- GET(base_url, query=query)
+  restext <- content(res, as="text")
+  
+  output <- fromJSON(restext) %>%
+    as.data.frame %>%
+    select(results.LATITUDE, results.LONGITUDE)
+  
+  return(output)
+}
+```
+
+```{r}
+HDBresale$street_name <- gsub("ST\\.", "SAINT", HDBresale$street_name)
+```
+
+```{r}
+HDBresale$LATITUDE <- 0
+HDBresale$LONGTITUDE <- 0
+
+for (i in 1:nrow(HDBresale)) {
+  temp_output <- geocode(HDBresale[i, 4], HDBresale[i, 5])
+  
+  HDBresale$LATITUDE[i] <- temp_output$results.LATITUDE
+  HDBresale$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r}
+HDBresale_sf <- HDBresale %>%
+  st_as_sf(
+    coords = c("LONGITUDE", "LATITUDE"),
+    crs=4326
+  ) %>%
+  st_transform(crs=3414)
+```
+
+```{r}
+preschool = st_read("data/rawdata/PreSchoolsLocation.kml") %>% st_transform(crs=3414)
+```
+
+```{r}
+within_350m <- st_is_within_distance(
+  HDBresale_sf, preschool, dist = 350
+)
+
+HDBresale_sf <- HDBresale_sf %>% 
+  mutate(prischool_350m = map_int(within_350m, length))
+```
+
+### Data Sampling
+
+```{r}
+mdata <- read_rds("data/rawdata/mdata.rds")
+```
+
+```{r}
+set.seed(1234)
+HDB_sample <- mdata %>% sample_n(1500)
+```
+
+### Checking of overlapping point
+
+```{r}
+overlapping_points <- HDB_sample %>%
+  mutate(overlap = lengths(st_equals(., .)) >1)
+```
+
+
+### Spatial jitter
+
+This is to move the point features by 5m to avoid overlapping point features.
+
+```{r}
+HDB_sample <- HDB_sample %>%
+  st_jitter(amount=1)
+```
+
+### Data Split
+
+```{r}
+set.seed(1234)
+resale_split <- initial_split(HDB_sample, prop = 6.67/10,)
+
+train_data <- training(resale_split)
+test_data <- testing(resale_split)
+
+```
+
+
+
+

@@ -710,7 +710,7 @@ For convenience, 4 reusable functions are created as below:
 **calculate_local_morans()**
 
 | **Parameter** | **Description** |
-|-------------------|-----------------------------------------------------|
+|---------------------|---------------------------------------------------|
 | `data` | `sf` object containing the target numeric column used for Local Moran’s I calculation. |
 | `listw` | `spdep::listw` object representing spatial weights; must have the same row order as `data`. |
 | `column_name` | Character string specifying the name of the variable to analyze. |
@@ -993,11 +993,11 @@ The LISA clusters map identifies: - 84 High-High clusters (3.9%), falling betwee
 The clusters' widespread distribution across residential neighborhoods, commercial centers, and recreational areas reflects Singapore's multi-nodal weekend mobility, where trips originate from and target diverse locations rather than following the concentrated commuter corridors of weekdays.
 :::
 
-#### Getis-Ord Gi*
+#### Getis-Ord Gi\*
 
-Getis-Ord Gi* complements Local Moran's I by focusing exclusively on hotspot and coldspot detection, measuring whether high or low values cluster spatially. Unlike Moran's I which identifies outliers, Gi* concentrates on areas where a location and its neighbors collectively exhibit significantly high (hot spots) or low (cold spots) values. These Gi* statistics are essential for subsequent Emerging Hot Spot Analysis (EHSA).
+Getis-Ord Gi\* complements Local Moran's I by focusing exclusively on hotspot and coldspot detection, measuring whether high or low values cluster spatially. Unlike Moran's I which identifies outliers, Gi\* concentrates on areas where a location and its neighbors collectively exhibit significantly high (hot spots) or low (cold spots) values. These Gi\* statistics are essential for subsequent Emerging Hot Spot Analysis (EHSA).
 
-For Getis-Ord Gi* analysis, fixed distance weights with a 375-meter threshold are computed, and row-standardized weights (style='W') are applied to account for varying neighbor counts across hexagons, ensuring edge locations with fewer neighbors are comparable to interior hexagons with complete neighborhoods.
+For Getis-Ord Gi\* analysis, fixed distance weights with a 375-meter threshold are computed, and row-standardized weights (style='W') are applied to account for varying neighbor counts across hexagons, ensuring edge locations with fewer neighbors are comparable to interior hexagons with complete neighborhoods.
 
 ```{r}
 #| code-summary: Compute fixed distance weights for Gi*
@@ -1021,9 +1021,9 @@ cat("Average neighbors (distance-based):",
 
 ```
 
-Next, Getis-Ord Gi* is computed using the analytical `localG()` function from the spdep package. The permutation-based alternative (`local_gstar_perm()` from `sfdep`) encountered technical errors when processing the distance-weighted neighbor structure created from filtered hexagonal data, specifically failing to generate accessible pseudo-p value attributes in the output object.
+Next, Getis-Ord Gi\* is computed using the analytical `localG()` function from the spdep package. The permutation-based alternative (`local_gstar_perm()` from `sfdep`) encountered technical errors when processing the distance-weighted neighbor structure created from filtered hexagonal data, specifically failing to generate accessible pseudo-p value attributes in the output object.
 
-Meanwhile, the analytical method calculates standardized Gi* statistics as Z-scores under the assumption of normality, with two-tailed p-values derived via `2 * pnorm(-abs(z))`. This approach is theoretically sound for normally-distributed spatial data and computationally efficient for large datasets, yielding hotspot classifications statistically consistent with Monte Carlo permutation tests (typically >95% agreement in comparative studies) while avoiding computational bottlenecks associated with resampling thousands of spatial units across 99 iterations.
+Meanwhile, the analytical method calculates standardized Gi\* statistics as Z-scores under the assumption of normality, with two-tailed p-values derived via `2 * pnorm(-abs(z))`. This approach is theoretically sound for normally-distributed spatial data and computationally efficient for large datasets, yielding hotspot classifications statistically consistent with Monte Carlo permutation tests (typically \>95% agreement in comparative studies) while avoiding computational bottlenecks associated with resampling thousands of spatial units across 99 iterations.
 
 ```{r}
 #| code-summary: Calculate critical threshold
@@ -1288,7 +1288,7 @@ The HCSA clusters map shows red hotspots distributed more evenly than weekday pa
 
 ### Comparative Analysis of LMSA Results
 
-#### Method Comparison (Moran's I vs Gi*)
+#### Method Comparison (Moran's I vs Gi\*)
 
 Let's perform method comparison between the two LMSA methods to reveal complementary insights into spatial clustering patterns.
 
@@ -1607,9 +1607,33 @@ Afternoon-only hotspots (4 hexagons) are minimal, suggesting most employment cen
 
 ## Emerging Hot Spot Analysis (EHSA)
 
-Emerging Hot Spot Analysis (EHSA) extends spatial analysis into the temporal dimension, identifying how hotspots evolve over time. By combining Getis-Ord Gi* statistics with Mann-Kendall trend tests within a space-time cube framework, EHSA categorizes locations into patterns such as new, intensifying, diminishing, or sporadic hotspots. This temporal perspective reveals whether high boarding activity zones are stable, growing, or declining, enabling proactive transport planning that anticipates demand shifts rather than merely responding to current patterns.
+Emerging Hot Spot Analysis (EHSA) extends spatial analysis into the temporal dimension, identifying how hotspots evolve over time. By combining Getis-Ord Gi\* statistics with Mann-Kendall trend tests within a space-time cube framework, EHSA categorizes locations into patterns such as new, intensifying, diminishing, or sporadic hotspots. This temporal perspective reveals whether high boarding activity zones are stable, growing, or declining, enabling proactive transport planning that anticipates demand shifts rather than merely responding to current patterns.
 
 ### Creating Space-Time Cube
+
+The space-time cube creation involves four critical steps to transform sparse temporal trip data into a complete spatio-temporal data structure suitable for Emerging Hot Spot Analysis:
+
+**Step 1: Prepare Grid Axes and Attribute Data**
+
+-   **Filter temporal data:** Extract trips for the specific time period (Weekday Morning Peak, Weekday Afternoon Peak, or Weekend/Holiday) from the monthly aggregated dataset.
+
+-   **Define spatial axis:** Extract ordered location keys (HEX_IDs) from the spatial data, maintaining the original factor level ordering to ensure alignment between temporal data and geometry.
+
+-   **Define temporal axis:** Identify all unique time periods (three months: July, August, September 2025) present in the dataset.
+
+-   **Create complete grid:** Generate a Cartesian product of all locations and all time periods, ensuring every hexagon has an entry for every month, regardless of whether trips occurred.
+
+-   **Balance sparse data:** Left-join the complete grid with actual trip observations, filling missing combinations with zero trips to create a fully balanced dataset without gaps.
+
+-   **Enforce data structure:** Convert `YEAR_MONTH` strings to Date objects, ensure `HEX_ID` matches spatial data factor levels, and sort by location then time to maintain proper cube structure.
+
+-   **Verify completeness:** Confirm row count equals (number of hexagons × number of months) to ensure no observations are missing.
+
+**Step 2: Prepare Geometry** Extract unique hexagon geometries with their identifiers from the spatial dataset, creating a separate sf object containing one geometry per location.
+
+**Step 3: Create Space-Time Cube** Use `sfdep::spacetime()` to construct the cube by passing the balanced temporal data (Step 1) and spatial geometries (Step 2) separately, linking them via `HEX_ID` location identifiers and `YEAR_MONTH` temporal identifiers.
+
+**Step 4: Verification** Validate the resulting object using `is_spacetime_cube()` to confirm proper structure before proceeding to Gi\* calculation and Mann-Kendall trend analysis.
 
 ```{r}
 #| code-summary: Function to create space-time cube for each time period
@@ -1725,11 +1749,86 @@ st_weekend <- create_ehsa_spacetime_cube_period(
 )
 ```
 
+#### Calculating Getis-Ord Local Gi\* Statistics for each period
+
+Before the Mann-Kendall test can be applied, it is crucial to first calculate the local Gi\* statistic for every location (`HEX_ID`) within every time period (month). The Mann-Kendall test is then applied to the resulting time series of Gi\* values for each location.
+
+::: panel-tabset
+
+##### Weekday Morning Peak
+
+```{r}
+#| code-summary: Define inverse distance Weights
+
+# Activate geometry context
+st_weights_morning <- st_morning %>%
+  activate("geometry") %>%
+  mutate(
+    # Define neighbors based on the critical distance threshold
+    nb = include_self(st_contiguity(geometry)),
+    # Define row-standardized weights (style = "W")
+    wt = st_inverse_distance(nb, 
+                             geometry, 
+                             scale = 1,
+                             alpha = 1),
+    .before = 1
+  ) %>%
+  # Copy neighbor and weight columns over to each time-slice
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+##### Weekday Afternoon Peak
+
+```{r}
+#| code-summary: Define inverse distance Weights
+
+# Activate geometry context
+st_weights_afternoon <- st_afternoon %>%
+  activate("geometry") %>%
+  mutate(
+    # Define neighbors based on the critical distance threshold
+    nb = include_self(st_contiguity(geometry)),
+    # Define row-standardized weights (style = "W")
+    wt = st_inverse_distance(nb, 
+                             geometry, 
+                             scale = 1,
+                             alpha = 1),
+    .before = 1
+  ) %>%
+  # Copy neighbor and weight columns over to each time-slice
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+##### Weekend/Holiday
+
+```{r}
+#| code-summary: Define inverse distance Weights
+
+# Activate geometry context
+st_weights_weekend <- st_weekend %>%
+  activate("geometry") %>%
+  mutate(
+    # Define neighbors based on the critical distance threshold
+    nb = include_self(st_contiguity(geometry)),
+    # Define row-standardized weights (style = "W")
+    wt = st_inverse_distance(nb, 
+                             geometry, 
+                             scale = 1,
+                             alpha = 1),
+    .before = 1
+  ) %>%
+  # Copy neighbor and weight columns over to each time-slice
+  set_nbs("nb") %>%
+  set_wts("wt")
+```
+
+:::
+
+
+
 ### Mann-Kendall Trend Test
-
-#### Calculating Getis-Ord Local Gi* Statistics for each period
-
-Before the Mann-Kendall test can be applied, it is crucial to first calculate the local Gi* statistic for every location (`HEX_ID`) within every time period (month). The Mann-Kendall test is then applied to the resulting time series of Gi* values for each location.
 
 ### EHSA Classification and Visualization
 

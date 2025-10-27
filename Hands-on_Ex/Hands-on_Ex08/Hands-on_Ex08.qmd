@@ -1,0 +1,63 @@
+---
+title: "Hands-on Exercise 8 | Geographically Weighted Predictive Models"
+subtitle: "In this in-class exercise, you will learn how to build predictive model by using geographical random forest method."
+date: "Oct 25, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+format:
+  html:
+    code-link: true
+    toc: true
+number-sections: true
+number-offset: 1
+editor: visual
+---
+
+## Overview
+
+Predictive modeling utilizes statistical learning or machine learning techniques to forecast outcomes, using a set of known variables and past outcomes for calibration. Geospatial predictive modeling is based on the concept that event occurrences are constrained and are neither uniform nor random in distribution across space. These locations are influenced by geospatial factors, such as infrastructural, sociocultural, and topographic elements. The goal of geospatial predictive modeling is to describe these constraints and influences by spatially correlating the occurrences of historical locations with relevant environmental factors.
+
+### The data
+
+The data used in this exercise includes Aspatial and Geospatial datasets, categorized below based on whether they primarily contain attribute information or geometric features.
+
+#### Aspatial
+
+These datasets primarily contain attribute information, some of which do not have direct geographic coordinates.
+
+| Dataset Name | Description | Source | File Type |
+|:---|:---|:---|:---|
+| HDB Resale data | A list of HDB resale transacted prices in Singapore from Jan 2017 onwards. | Data.gov.sg | csv |
+| Primary school data | Extracted from the list on General information of schools from the data.gov portal. | Data.gov.sg | csv |
+| CBD coordinates | Coordinates obtained from Google. | Retrieved/Scraped from other sources (Google) | N/A (List data) |
+| Shopping malls data | A list of Shopping malls in Singapore. | Retrieved/Scraped from other sources (Wikipedia) | N/A (List data) |
+| Good primary schools list | A list of primary schools ordered in ranking in terms of popularity. | Retrieved/Scraped from other sources (Local Salary Forum) | N/A (List data) |
+
+#### Geospatial
+
+These datasets include geometric features and locational factors, with or without explicit geographic coordinates in the primary list/file type.
+
+| Dataset Name | Description | Source | File Type |
+|:---|:---|:---|:---|
+| *MP14_SUBZONE_WEB_PL* | A polygon feature data providing information of URA 2014 Master Plan Planning Subzone boundary data. | Data.gov.sg | ESRI shapefile |
+| Eldercare data | A list of eldercare in Singapore. | Data.gov.sg | shapefile |
+| Hawker Centre data | A list of hawker centres in Singapore. | Data.gov.sg | geojson |
+| Parks data | A list of parks in Singapore. | Data.gov.sg | geojson |
+| Supermarket data | A list of supermarkets in Singapore. | Data.gov.sg | geojson |
+| CHAS clinics data | A list of CHAS clinics in Singapore. | Data.gov.sg | geojson |
+| Childcare service data | A list of childcare services in Singapore. | Data.gov.sg | geojson |
+| Kindergartens data | A list of kindergartens in Singapore. | Data.gov.sg | geojson |
+| MRT data | A list of MRT/LRT stations in Singapore with the station names and codes. | Datamall.lta.gov.sg | shapefile |
+| Bus stops data | A list of bus stops in Singapore. | Datamall.lta.gov.sg | shapefile |
+
+### Learning outcomes
+
+### Loading R packages
+
+## 
