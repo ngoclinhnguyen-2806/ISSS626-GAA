@@ -863,6 +863,7 @@ plot_moran_quadrant <- function(lisa_sf, column_name, sig = 0.05) {
 ```
 
 ::: panel-tabset
+
 ##### Weekday Morning Peak
 
 ```{r}
@@ -1392,8 +1393,8 @@ plot_lmsa_agreement <- function(moran_sf, gi_sf, period_name) {
         )
       ),
       fill.legend = tm_legend(
-        title = "Method Agreement",
-        position = c("right", "top")
+        title = "Method Agreement"
+        #,position = c("right", "top")
       )
     ) +
     tm_borders(lwd = 0.5, col = "white") +
@@ -1406,6 +1407,7 @@ plot_lmsa_agreement <- function(moran_sf, gi_sf, period_name) {
 ```
 
 ::: panel-tabset
+
 ##### Weekday Morning Peak
 
 ```{r}
@@ -1418,7 +1420,7 @@ morning_comparison <- compare_lmsa_methods(
 )
 ```
 
-The comparative analysis reveals strong concordance between Local Moran's I and Getis-Ord Gi\* methods, with 72 hexagons (33.7% of significant cases) classified as strong hotspots where both methods agree (High-High and Hot Spot). This dual confirmation provides high confidence for prioritizing these locations in transport planning. The cross-tabulation shows 176 hexagons significant in Moran's I versus 119 in Gi\* , indicating Moran's I is more sensitive to spatial patterns, while Gi\* applies stricter thresholds for hotspot identification.
+The comparative analysis reveals strong concordance between Local Moran’s I and Getis-Ord Gi* methods, with 77 hexagons (42.8% of significant Moran’s I cases) classified as strong hotspots where both methods agree (High-High and Hot Spot). This dual confirmation provides high confidence for prioritizing these locations in transport planning. The cross-tabulation indicates 180 hexagons significant in Moran’s I, while Gi* significance could not be determined (NA), suggesting Moran’s I is more sensitive to spatial patterns under the current configuration.
 
 ```{r}
 #| code-summary: Create agreement maps
@@ -1426,11 +1428,11 @@ The comparative analysis reveals strong concordance between Local Moran's I and 
 plot_lmsa_agreement(morning_moran, morning_gi, "Weekday Morning Peak")
 ```
 
-The agreement map displays strong hotspots (dark red) concentrated in established residential corridors across northern zones (Woodlands, Sembawang, Yishun), central regions (Bishan, Ang Mo Kio, Toa Payoh), western areas (Jurong East, Clementi, Bukit Batok), and eastern estates (Tampines, Bedok, Pasir Ris). These represent the most robust evidence of sustained high boarding activity, warranting priority capacity allocation and service frequency optimization.
+The agreement map displays strong hotspots (dark red) concentrated in established residential corridors across northern zones (Woodlands, Sembawang, Yishun), central regions (Bishan, Ang Mo Kio, Toa Payoh), western areas (Jurong East, Clementi, Bukit Batok), and eastern estates (Tampines, Bedok, Pasir Ris). These represent the most robust evidence of sustained high boarding activity, with 77 dual-confirmed hotspots where both Local Moran’s I and Getis-Ord Gi* methods agree—warranting priority for capacity allocation and service-frequency optimization.
 
-Orange clusters indicate "Moran Only (High-High)" hexagons—27 locations showing significant spatial clustering in Moran's I but not meeting Gi\*'s stricter hotspot threshold. These represent moderate-intensity clusters still relevant for planning. Yellow patches show 47 "Spatial Outlier (Moran)" hexagons exhibiting Low-High patterns, scattered across various regions, representing locations with lower boarding surrounded by high-activity neighbors—potentially transit-dependent zones, parks, or areas with different land-use characteristics requiring investigation.
+Orange clusters indicate “Moran Only (High-High)” hexagons—26 locations showing significant spatial clustering in Moran’s I but not meeting Gi*’s stricter hotspot threshold. These represent moderate-intensity clusters still relevant for transport planning. Yellow patches show 47 “Spatial Outlier (Moran)” hexagons with Low-High patterns scattered across various regions, representing areas of lower boarding surrounded by high-activity neighbors—potentially transit-dependent zones, parks, or areas with mixed land-use characteristics requiring investigation.
 
-Notably absent are blue "Strong Coldspot (Both Agree)" hexagons, confirming no areas exhibit statistically significant low-activity clustering across both methods. The light blue "Gi\* Only (Hot Spot)" category (23 hexagons) identifies locations where Gi\* detected hotspots missed by Moran's I, though these are minimal. The overwhelming grey coverage (91.7% of hexagons) represents areas without significant spatial autocorrelation, confirming that meaningful clustering concentrates in specific corridors rather than distributing uniformly across Singapore.
+Notably absent are blue “Strong Coldspot (Both Agree)” hexagons, confirming that no areas exhibit statistically significant low-activity clustering under both methods. The light-blue “Gi Only (Hot Spot)”* category—23 locations—identifies hotspots detected by Gi* but missed by Moran’s I, though their extent remains limited. The predominant grey coverage (91.7 % of hexagons) indicates areas without significant spatial autocorrelation, confirming that meaningful clustering remains localized to specific corridors rather than distributed uniformly across Singapore.
 
 ##### Weekday Afternoon Peak
 
@@ -1444,7 +1446,7 @@ afternoon_comparison <- compare_lmsa_methods(
 )
 ```
 
-The afternoon peak shows significantly lower method concordance than morning, with only 35 dual-confirmed hotspots (27.0% of significant cases) versus morning's 72, reflecting more dispersed boarding patterns from distributed employment centers. Moran's I identifies 130 significant hexagons while Gi\* applies stricter thresholds, maintaining morning's sensitivity pattern.
+The afternoon peak shows lower concordance between Local Moran’s I and Getis-Ord Gi* methods than the morning period, with only 38 dual-confirmed hotspots (31.4% of significant cases) compared to 77 in the morning. This indicates more spatial dispersion of boarding activity around employment centers. Moran’s I identifies 121 significant hexagons, while Gi* results are unavailable in this comparison, suggesting that Moran’s I remains the more sensitive indicator for detecting afternoon spatial clustering.
 
 ```{r}
 #| code-summary: Create agreement maps
@@ -1452,11 +1454,11 @@ The afternoon peak shows significantly lower method concordance than morning, wi
 plot_lmsa_agreement(afternoon_moran, afternoon_gi, "Weekday Afternoon Peak")
 ```
 
-Strong hotspots (dark red) scatter across northern areas (Woodlands, Yishun), central business districts, western zones (Jurong, Clementi), and eastern regions (Tampines, Bedok), representing major employment departure points. However, their smaller clusters and geographic dispersion confirm afternoon mobility lacks morning's spatial cohesion from concentrated residential origins.
+Strong hotspots (dark red) appear scattered across northern areas (Woodlands, Yishun), central business districts, western zones (Jurong, Clementi), and eastern regions (Tampines, Bedok), representing key employment departure points. However, the smaller clusters and wider dispersion confirm that afternoon mobility lacks the spatial cohesion observed during the morning peak, reflecting more diversified trip destinations.
 
-Orange "Moran Only" hexagons (16) are fewer than morning, while spatial outliers (28 Low-High, yellow) remain scattered. Light blue "Gi\* Only" hotspots (14) are minimal. The 93.3% grey coverage exceeds morning peak, confirming afternoon hotspots are highly localized rather than forming extensive corridors.
+Orange clusters indicate “Moran Only (High-High)” hexagons—14 locations showing significant clustering under Moran’s I but not meeting Gi\*’s hotspot threshold. Yellow patches mark 28 “Spatial Outlier (Moran)” hexagons exhibiting Low-High patterns, suggesting localized low-boarding zones surrounded by high-activity areas—potentially near transit interchanges or mixed-use developments. The light-blue “Gi Only (Hot Spot)”* group—21 locations—represents hotspots uniquely identified by Gi*, though relatively limited in extent. The dominant grey coverage (93.3 % of hexagons) indicates non-significant areas, confirming that afternoon clustering is highly localized rather than forming extensive corridors.
 
-The reduced dual-confirmed hotspots and increased fragmentation suggest afternoon requires distributed service capacity across multiple business hubs—likely CBD, Raffles Place, Jurong Gateway, Tampines Regional Centre—rather than morning's concentrated corridor approach. These 35 strong hotspots warrant focused high-capacity service despite overall dispersed patterns.
+The reduced 38 dual-confirmed hotspots compared with the morning’s 77 and their fragmented distribution suggest the afternoon period requires distributed service capacity across multiple employment and commercial hubs—such as the CBD, Raffles Place, Jurong Gateway, and Tampines Regional Centre—rather than the corridor-focused strategy seen in the morning. These strong hotspots nevertheless warrant targeted high-capacity service despite the overall dispersed pattern.
 
 ##### Weekend/Holiday
 
@@ -1470,7 +1472,7 @@ weekend_comparison <- compare_lmsa_methods(
 )
 ```
 
-Weekend/holiday shows intermediate concordance with 59 dual-confirmed hotspots (39.3% of significant cases), between morning's 72 and afternoon's 35. Moran's I identifies 150 significant hexagons—highest across all periods—indicating weekend patterns exhibit broader spatial autocorrelation despite lower trip volumes, while Gi\* maintains conservative thresholds.
+Weekend and holiday periods show intermediate concordance between Local Moran’s I and Getis-Ord Gi* methods, with 59 dual-confirmed hotspots (42.1% of significant cases)—falling between the morning’s 77 and afternoon’s 38. Moran’s I identifies 140 significant hexagons, the highest count among all periods, suggesting broader spatial clustering despite lower trip volumes. This implies that weekend travel patterns remain spatially structured, while Gi* continues to apply stricter thresholds for hotspot detection.
 
 ```{r}
 #| code-summary: Create agreement maps
@@ -1479,11 +1481,11 @@ Weekend/holiday shows intermediate concordance with 59 dual-confirmed hotspots (
 plot_lmsa_agreement(weekend_moran, weekend_gi, "Weekend/Holiday")
 ```
 
-Strong hotspots (dark red) distribute widely: northern zones (Woodlands, Yishun), central urban areas (Orchard, Marina Bay), central-southern regions (dense cluster likely Geylang/Paya Lebar), western mall districts (Jurong East), and eastern coastal areas (Tampines, Bedok, Pasir Ris). This diversity reflects weekend trips targeting multiple nodes—shopping malls, entertainment precincts, dining destinations, recreational facilities—rather than concentrated commuter corridors.
+Strong hotspots (dark red) are broadly distributed across northern zones (Woodlands, Yishun), central urban areas (Orchard, Marina Bay), central-southern regions (notably Geylang and Paya Lebar), western mall districts (Jurong East), and eastern coastal areas (Tampines, Bedok, Pasir Ris). This dispersion reflects diverse weekend trip purposes—including shopping, entertainment, dining, and recreation—rather than the concentrated commuter corridors seen on weekdays.
 
-Orange "Moran Only" hexagons (25) show moderate weekend activity, while spatial outliers (15 Low-High) are fewer than weekdays, suggesting more coherent leisure patterns. Light blue "Gi\* Only" hotspots (14) remain minimal. The 92.3% grey coverage confirms clustering concentrates where attractions cluster.
+Orange clusters represent “Moran Only (High-High)” hexagons—15 locations showing moderate clustering under Moran’s I but not meeting Gi\*’s hotspot threshold, suggesting smaller yet notable local activity centers. Yellow patches denote “Spatial Outlier (Moran)” hexagons—16 Low-High locations—indicating isolated low-boarding areas surrounded by higher activity, often adjacent to parks, leisure zones, or coastal attractions. The light-blue “Gi Only (Hot Spot)”* category includes 19 locations, marking hotspots uniquely identified by Gi*. The grey coverage (92.3 % of hexagons) confirms that significant clustering remains limited to major leisure and retail nodes.
 
-The 59 dual-confirmed hotspots represent multi-functional centers—regional town malls, waterfront destinations, entertainment districts, mixed-use zones. Unlike weekday directional flows, weekend hotspots emerge wherever attractions concentrate, requiring balanced coverage across recreational nodes rather than focused corridor capacity.
+The 59 dual-confirmed hotspots highlight key multi-functional centers such as regional town hubs, coastal entertainment districts, and mixed-use commercial areas. Compared with weekday patterns, weekend and holiday clustering is broader and more evenly distributed, emphasizing balanced service coverage across recreation and attraction nodes rather than focused corridor capacity.
 :::
 
 #### Temporal Comparison (Across Three Periods)
@@ -1578,8 +1580,8 @@ tm_shape(temporal_map) +
       )
     ),
     fill.legend = tm_legend(
-      title = "Temporal Pattern",
-      position = c("left", "top")
+      title = "Temporal Pattern"
+      #,position = c("left", "top")
     )
   ) +
   tm_borders(lwd = 0.5, col = "white") +
@@ -1590,7 +1592,7 @@ tm_shape(temporal_map) +
   )
 ```
 
-The temporal analysis identifies 71 persistent hotspots (3.3%) maintaining high boarding across all periods, representing Singapore's most critical transit nodes. These darkest red hexagons concentrate in northern zones (Woodlands, Yishun), central corridors (Bishan, Ang Mo Kio), western estates (Jurong, Clementi), and eastern areas (Tampines, Bedok)—mature mixed-use neighborhoods serving both commuter and leisure demands requiring sustained high-capacity service.
+The temporal analysis identifies 71 persistent hotspots (3.3%) maintaining high boarding across all periods, representing Singapore's most critical transit nodes. These darkest red hexagons concentrate in western estates (Jurong, Clementi) most vividly with 10 hexagons adjacent to each other, then north-eastern zones (Sengkang, Punggol), central corridors (Bishan, Ang Mo Kio), and eastern areas (Tampines, Bedok)—mature mixed-use neighborhoods serving both commuter and leisure demands requiring sustained high-capacity service.
 
 Period-specific patterns reveal distinct mobility dynamics. Morning-only hotspots (57 hexagons, orange) dominate numerically, scattered across residential belts, confirming morning peak's residential-origin character. These pure residential neighborhoods generate substantial weekday morning flows but lack afternoon or weekend intensity, indicating areas requiring peak-hour capacity scaling rather than all-day service.
 
@@ -2291,7 +2293,7 @@ This study successfully identified spatial clustering patterns in Singapore's bu
 
 ### Key Conclusions
 
-Local Moran's I and Getis-Ord Gi* analyses identified significant spatial clustering with strong method concordance (72 dual-confirmed morning hotspots, 35 afternoon, 59 weekend). Weekday morning hotspots concentrate in residential corridors (Woodlands, Yishun, Tampines, Bedok), confirming origin-based commuter patterns. Afternoon hotspots dispersed across employment centers reflect distributed workplace departures, while weekend patterns highlighted recreational nodes. 
+Local Moran’s I and Getis-Ord Gi* analyses identified significant spatial clustering with strong method concordance (77 dual-confirmed morning hotspots, 38 afternoon, and 59 weekend/holiday). Weekday morning hotspots concentrate in residential corridors (Jurong East, Clementi, Sengkang, Punggol, Woodlands, Yishun, Tampines, Bedok), confirming origin-based commuter patterns. Afternoon hotspots are more geographically dispersed across employment and commercial centers, reflecting distributed workplace departures, while weekend patterns highlight leisure-oriented and recreational nodes with broader spatial spread.
 
 However, EHSA revealed no significant emerging trends across all periods, indicating stable boarding patterns within the three-month window. The right-skewed trip distribution and presence of 21 isolated hexagons with valid data underscore Singapore's heterogeneous spatial structure.
 
