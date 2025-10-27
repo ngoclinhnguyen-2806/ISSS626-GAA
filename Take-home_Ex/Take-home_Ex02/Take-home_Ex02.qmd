@@ -1638,7 +1638,7 @@ The space-time cube creation involves four critical steps to transform sparse te
 As the process requires separate processing for each peak time period, I create a function including all the steps and apply the function to each peak time period later.
 
 ```{r}
-#| code-summary: Function to create space-time cube for each time period
+#| code-summary: Function to create space-time cube for each peak time period
 
 create_ehsa_spacetime_cube_period <- function(trip_data, spatial_data, time_period_name) {
   
@@ -1751,7 +1751,7 @@ st_weekend <- create_ehsa_spacetime_cube_period(
 )
 ```
 
-#### Computing Gi*
+### Computing Gi*
 
 ```{r}
 #| code-summary: Function to calculate Gi* manually
@@ -1827,44 +1827,298 @@ calculate_gi_stars_manual <- function(st_cube) {
 }
 ```
 
+::: panel-tabset
+
+#### Weekday Morning Peak
+
+```{r}
+#|code-summary: Calculate Gi*
+gi_stars_morning <- calculate_gi_stars_manual(st_morning)
+head(gi_stars_morning)
+```
+
+```{r}
+#|code-summary: Verify results
+cat("\nVerification:\n", 
+    "Morning Gi* results:", nrow(gi_stars_morning), "rows\n",
+    "Columns:", paste(names(gi_stars_morning), collapse = ", "), "\n")
+```
+
+#### Weekday Afternoon Peak
+
+```{r}
+#|code-summary: Calculate Gi*
+gi_stars_afternoon <- calculate_gi_stars_manual(st_afternoon)
+head(gi_stars_afternoon)
+```
+
+```{r}
+#|code-summary: Verify results
+cat("\nVerification:\n", 
+    "Afternoon Gi* results:", nrow(gi_stars_afternoon), "rows\n",
+    "Columns:", paste(names(gi_stars_afternoon), collapse = ", "), "\n")
+```
+
+#### Weekend/Holiday
+
+```{r}
+#|code-summary: Calculate Gi*
+gi_stars_weekend <- calculate_gi_stars_manual(st_weekend)
+head(gi_stars_weekend)
+```
+
+```{r}
+#|code-summary: Verify results
+cat("\nVerification:\n", 
+    "Afternoon Gi* results:", nrow(gi_stars_weekend), "rows\n",
+    "Columns:", paste(names(gi_stars_weekend), collapse = ", "), "\n")
+```
+:::
+
+### Perform Mann-Kendall test on Gi* values
+
+```{r}
+#| code-summary: Function to perform Mann-Kendall test grouped by location
+
+perform_mann_kendall <- function(gi_stars_df) {
+  mk_results <- gi_stars_df %>%
+    group_by(HEX_ID) %>%
+    summarise(
+      mk = list(
+        unclass(
+          Kendall::MannKendall(gi_star)
+        )
+      )
+    ) %>%
+    tidyr::unnest_wider(mk)
+  
+  return(mk_results)
+}
+```
 
 ::: panel-tabset
 
-##### Weekday Morning Peak
+#### Weekday Morning Peak
 
 ```{r}
-# Calculate Gi* for all periods
-cat("=== Morning Peak ===\n")
-gi_stars_morning <- calculate_gi_stars_manual(st_morning)
+#| code-summary: Perform Mann-Kendall test
+#| output: false
+#| error: false
 
+mk_morning <- perform_mann_kendall(gi_stars_morning)
+head(mk_morning)
 ```
 
-
-
-##### Weekday Afternoon Peak
+**Visualization of Mann-Kendall Test on Gi* - Morning Peak**
 
 ```{r}
+#| code-summary: Select a few representative locations for visualization
 
-cat("\n=== Afternoon Peak ===\n")
-gi_stars_afternoon <- calculate_gi_stars_manual(st_afternoon)
+# Choose locations with different trend patterns
 
+# Sort by significance and tau value to get diverse examples
+mk_sorted <- mk_morning %>%
+  arrange(sl) %>%
+  mutate(trend_type = case_when(
+    sl >= 0.05 ~ "Not Significant",
+    tau > 0.3 ~ "Strong Upward",
+    tau > 0 ~ "Weak Upward",
+    tau < -0.3 ~ "Strong Downward",
+    tau < 0 ~ "Weak Downward",
+    TRUE ~ "No Trend"
+  ))
 
+# Select representative hexagons
+selected_hexagons <- mk_sorted %>%
+  group_by(trend_type) %>%
+  slice_head(n = 5) %>%
+  pull(HEX_ID)
+
+print(mk_sorted %>% filter(HEX_ID %in% selected_hexagons))
 ```
 
-##### Weekend/Holiday
+#### Weekday Afternoon Peak
 
 ```{r}
-cat("\n=== Weekend/Holiday ===\n")
-gi_stars_weekend <- calculate_gi_stars_manual(st_weekend)
+#| code-summary: Perform Mann-Kendall test
+#| output: false
+#| error: false
+
+mk_afternoon <- perform_mann_kendall(gi_stars_afternoon)
+head(mk_afternoon)
 ```
 
+**Visualization of Mann-Kendall Test on Gi* - Afternoon Peak**
+
+```{r}
+#| code-summary: Select a few representative locations for visualization
+
+# Choose locations with different trend patterns
+
+# Sort by significance and tau value to get diverse examples
+mk_sorted <- mk_afternoon %>%
+  arrange(sl) %>%
+  mutate(trend_type = case_when(
+    sl >= 0.05 ~ "Not Significant",
+    tau > 0.3 ~ "Strong Upward",
+    tau > 0 ~ "Weak Upward",
+    tau < -0.3 ~ "Strong Downward",
+    tau < 0 ~ "Weak Downward",
+    TRUE ~ "No Trend"
+  ))
+
+# Select representative hexagons
+selected_hexagons <- mk_sorted %>%
+  group_by(trend_type) %>%
+  slice_head(n = 5) %>%
+  pull(HEX_ID)
+
+print(mk_sorted %>% filter(HEX_ID %in% selected_hexagons))
+```
+
+#### Weekend/Holiday
+
+```{r}
+#| code-summary: Perform Mann-Kendall test
+#| output: false
+#| error: false
+
+mk_weekend <- perform_mann_kendall(gi_stars_weekend)
+head(mk_weekend)
+```
+
+**Visualization of Mann-Kendall Test on Gi* - Weekend/Holiday**
+
+```{r}
+#| code-summary: Select a few representative locations for visualization
+
+# Choose locations with different trend patterns
+
+# Sort by significance and tau value to get diverse examples
+mk_sorted <- mk_weekend %>%
+  arrange(sl) %>%
+  mutate(trend_type = case_when(
+    sl >= 0.05 ~ "Not Significant",
+    tau > 0.3 ~ "Strong Upward",
+    tau > 0 ~ "Weak Upward",
+    tau < -0.3 ~ "Strong Downward",
+    tau < 0 ~ "Weak Downward",
+    TRUE ~ "No Trend"
+  ))
+
+# Select representative hexagons
+selected_hexagons <- mk_sorted %>%
+  group_by(trend_type) %>%
+  slice_head(n = 5) %>%
+  pull(HEX_ID)
+
+print(mk_sorted %>% filter(HEX_ID %in% selected_hexagons))
+```
 :::
 
-
-
-### Mann-Kendall Trend Test
-
 ### EHSA Classification and Visualization
+
+```{r}
+#| code-summary: Use built-in function emerging_hotspot_analysis() for classification
+
+ehsa_morning <- emerging_hotspot_analysis(
+  x = st_morning,
+  .var = "TOTAL_TRIPS",
+  k = 1,
+  nsim = 99
+)
+
+ehsa_afternoon <- emerging_hotspot_analysis(
+  x = st_afternoon,
+  .var = "TOTAL_TRIPS",
+  k = 1,
+  nsim = 99
+)
+
+ehsa_weekend <- emerging_hotspot_analysis(
+  x = st_weekend,
+  .var = "TOTAL_TRIPS",
+  k = 1,
+  nsim = 99
+)
+```
+
+### Combine Gi* values with EHSA classification
+
+::: panel-tabset
+
+#### Weekday Morning Peak
+
+```{r}
+#| code-summary: Merge Gi* values with EHSA classifications
+ehsa_morning_complete <- ehsa_morning %>%
+  left_join(
+    gi_stars_morning %>% 
+      group_by(HEX_ID) %>%
+      summarise(
+        mean_gi_star = mean(gi_star, na.rm = TRUE),
+        mean_p_gi = mean(p_sim, na.rm = TRUE)
+      ),
+    by = c("location" = "HEX_ID")
+  ) %>%
+  rename(HEX_ID = location)
+
+head(ehsa_morning_complete)
+```
+
+```{r}
+#| code-summary: Check complete results
+cat("Complete EHSA with Gi* values:\n", names(ehsa_morning_complete))
+```
+
+#### Weekday Afternoon Peak
+
+```{r}
+#| code-summary: Merge Gi* values with EHSA classifications
+ehsa_afternoon_complete <- ehsa_afternoon %>%
+  left_join(
+    gi_stars_afternoon %>% 
+      group_by(HEX_ID) %>%
+      summarise(
+        mean_gi_star = mean(gi_star, na.rm = TRUE),
+        mean_p_gi = mean(p_sim, na.rm = TRUE)
+      ),
+    by = c("location" = "HEX_ID")
+  ) %>%
+  rename(HEX_ID = location)
+
+head(ehsa_afternoon_complete)
+```
+
+```{r}
+#| code-summary: Check complete results
+cat("Complete EHSA with Gi* values:\n", names(ehsa_afternoon_complete))
+```
+
+#### Weekend/Holiday
+
+```{r}
+#| code-summary: Merge Gi* values with EHSA classifications
+ehsa_weekend_complete <- ehsa_weekend %>%
+  left_join(
+    gi_stars_weekend %>% 
+      group_by(HEX_ID) %>%
+      summarise(
+        mean_gi_star = mean(gi_star, na.rm = TRUE),
+        mean_p_gi = mean(p_sim, na.rm = TRUE)
+      ),
+    by = c("location" = "HEX_ID")
+  ) %>%
+  rename(HEX_ID = location)
+
+head(ehsa_weekend_complete)
+```
+
+```{r}
+#| code-summary: Check complete results
+cat("Complete EHSA with Gi* values:\n", names(ehsa_weekend_complete))
+```
+:::
 
 ### Temporal Pattern Interpretation
 
