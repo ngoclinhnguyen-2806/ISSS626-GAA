@@ -711,7 +711,7 @@ For convenience, 4 reusable functions are created as below:
 **calculate_local_morans()**
 
 | **Parameter** | **Description** |
-|------------------------|-----------------------------------------------|
+|--------------------------|----------------------------------------------|
 | `data` | `sf` object containing the target numeric column used for Local Moran’s I calculation. |
 | `listw` | `spdep::listw` object representing spatial weights; must have the same row order as `data`. |
 | `column_name` | Character string specifying the name of the variable to analyze. |
@@ -1406,7 +1406,6 @@ plot_lmsa_agreement <- function(moran_sf, gi_sf, period_name) {
 ```
 
 ::: panel-tabset
-
 ##### Weekday Morning Peak
 
 ```{r}
@@ -1729,7 +1728,6 @@ create_ehsa_spacetime_cube_period <- function(trip_data, spatial_data, time_peri
 ```
 
 ::: panel-tabset
-
 #### Weekday Morning Peak
 
 ```{r}
@@ -1772,7 +1770,6 @@ st_weekend <- create_ehsa_spacetime_cube_period(
 
 head(st_weekend)
 ```
-
 :::
 
 ### Computing Gi\*
@@ -1852,7 +1849,6 @@ calculate_gi_stars_manual <- function(st_cube) {
 ```
 
 ::: panel-tabset
-
 #### Weekday Morning Peak
 
 ```{r}
@@ -1937,6 +1933,16 @@ Tau statistic (-1 to 1):
 
 This identifies whether bus ridership is systematically increasing or decreasing across the analyzed time periods.
 
+However, as we only have data of 3 time points (3 months), Mann-Kendall test will:
+
+✅ Detect strong consistent trends (all 3 months increasing or decreasing)
+
+✅ Identify stable hotspots (high in all 3 months)
+
+⚠️ Have limited statistical power (fewer time points = harder to detect subtle trends)
+
+⚠️ Cannot detect complex patterns (oscillating, U-shaped trends need more data)
+
 ```{r}
 #| code-summary: Function to perform Mann-Kendall test grouped by location
 
@@ -1957,7 +1963,6 @@ perform_mann_kendall <- function(gi_stars_df) {
 ```
 
 ::: panel-tabset
-
 #### Weekday Morning Peak
 
 ```{r}
@@ -2103,7 +2108,6 @@ mk_weekend %>% filter(sl < 0.05)
 ```
 
 For weekend/holiday peak, as there is no hexagon having p-value \< 0.05, we will not reject the null hypothesis that there is no monotonic trend in ridership in any hexagon.
-
 :::
 
 ### EHSA Classification and Visualization
@@ -2137,6 +2141,14 @@ ehsa_weekend <- emerging_hotspot_analysis(
 )
 ```
 
+When running the code above, an long warning of `Error exit, tauk2, IFAULT = 12` was caught. This warning comes from the Kendall package used internally by `emerging_hotspot_analysis()` for the Mann-Kendall trend test. `IFAULT = 12` means **Insufficient data for trend analysis**. The warning occurred because:
+
+-   We have only 3 time points (July, August, September)
+
+-   Many hexagons likely have no variation across the 3 months (e.g., 0 trips in all 3 months, or identical values)
+
+-   Mann-Kendall test requires variation to detect trends
+
 ::: panel-tabset
 
 #### Weekday Morning Peak
@@ -2150,6 +2162,8 @@ ggplot(data = ehsa_morning, aes(x = classification)) +
   theme_light()
 ```
 
+The distribution reveals that the majority of hexagons (approximately 1,500) show "no pattern detected," indicating stable, non-significant spatial patterns across the three-month period. Persistent cold spots are more prevalent than hot spots, suggesting consistent low-activity zones. New, consecutive, and sporadic patterns appear minimally, reflecting limited emerging trends within the short temporal window.
+
 #### Weekday Afternoon Peak
 
 ```{r}
@@ -2161,6 +2175,8 @@ ggplot(data = ehsa_afternoon, aes(x = classification)) +
   theme_light()
 ```
 
+The afternoon pattern closely mirrors morning peak, with most hexagons (approximately 1,500) showing "no pattern detected," indicating temporal stability. Consecutive and persistent cold spots appear slightly more prominent than morning, suggesting sustained low-activity zones during afternoon departures. Sporadic patterns and new hotspots remain minimal. The dominance of stable patterns reflects dispersed afternoon boarding across multiple employment centers rather than concentrated emerging trends.
+
 #### Weekend/Holiday
 
 ```{r}
@@ -2171,12 +2187,15 @@ ggplot(data = ehsa_weekend, aes(x = classification)) +
   coord_flip() +  # flip coordinates
   theme_light()
 ```
+
+Weekend patterns show similar dominance of "no pattern detected" hexagons (approximately 1,500), indicating stable leisure travel patterns. Persistent cold spots are more prominent than weekdays, reflecting zones with consistently low weekend activity. Consecutive cold spots appear slightly elevated, suggesting emerging low-activity areas. Hot spot patterns remain minimal, confirming weekend boarding disperses across multiple recreational nodes rather than forming concentrated emerging trends.
+
 :::
 
 ### Combine Gi\* values with EHSA classification
 
 ::: panel-tabset
-
+\
 #### Weekday Morning Peak
 
 ```{r}
@@ -2198,19 +2217,12 @@ head(ehsa_morning_complete)
 ```
 
 ```{r}
-#| code-summary: Check complete results
-#| echo: false
-#| output: false
-
-cat("Complete EHSA with Gi* values:\n", names(ehsa_morning_complete))
-```
-
-```{r}
 #| code-summary: Filter significant hotspots for each (p < 0.05)
 ehsa_sig_am <- ehsa_morning_complete %>% filter(p_value < 0.05)
 ehsa_sig_am
 
 ```
+The absence of significant EHSA patterns (p < 0.05) reflects the limited three-month temporal window and stable boarding patterns across the study period. With only three time points, detecting statistically significant emerging trends requires substantial month-to-month variation. Most hexagons maintain consistent activity levels, preventing identification of meaningful hotspot evolution despite spatial clustering at individual time slices.
 
 #### Weekday Afternoon Peak
 
@@ -2233,20 +2245,13 @@ head(ehsa_afternoon_complete)
 ```
 
 ```{r}
-#| code-summary: Check complete results
-#| echo: false
-#| output: false
-
-cat("Complete EHSA with Gi* values:\n", names(ehsa_afternoon_complete))
-```
-
-```{r}
 #| code-summary: Filter significant hotspots for each (p < 0.05)
 
 ehsa_sig_pm <- ehsa_afternoon_complete %>% filter(p_value < 0.05)
 ehsa_sig_pm
 
 ```
+Afternoon peak similarly shows no significant EHSA patterns (p < 0.05), mirroring morning results. The three-month timeframe proves insufficient for detecting meaningful temporal trends in afternoon boarding patterns. Employment-based departure patterns remain stable across the study period, with no emerging hotspots or significant spatial-temporal evolution. Extended monitoring would better capture potential seasonal or longer-term employment center dynamics.
 
 #### Weekend/Holiday
 
@@ -2269,20 +2274,39 @@ head(ehsa_weekend_complete)
 ```
 
 ```{r}
-#| code-summary: Check complete results
-#| echo: false
-#| output: false
-
-cat("Complete EHSA with Gi* values:\n", names(ehsa_weekend_complete))
-```
-
-```{r}
 #| code-summary: Filter significant hotspots for each (p < 0.05)
 
 ehsa_sig_pm <- ehsa_weekend_complete %>% filter(p_value < 0.05)
 ehsa_sig_pm
 
 ```
+
+Weekend patterns also show no significant EHSA classifications (p < 0.05), consistent with both weekday periods. Leisure travel patterns remain stable across three months, with no emerging recreational hotspots. The uniform lack of significant temporal trends across all three periods confirms the three-month window is insufficient for detecting meaningful spatial-temporal evolution in Singapore's bus boarding patterns.
+
 :::
 
 ## Conclusions and Recommendations
+
+This study successfully identified spatial clustering patterns in Singapore's bus passenger boarding volumes using Local Spatial Autocorrelation (LMSA) and Emerging Hot Spot Analysis (EHSA) across 2,134 hexagonal zones during July-September 2025. The analysis revealed distinct mobility signatures across three temporal contexts, demonstrating the utility of spatial statistics for understanding urban transit demand.
+
+### Key Conclusions
+
+Local Moran's I and Getis-Ord Gi* analyses identified significant spatial clustering with strong method concordance (72 dual-confirmed morning hotspots, 35 afternoon, 59 weekend). Weekday morning hotspots concentrate in residential corridors (Woodlands, Yishun, Tampines, Bedok), confirming origin-based commuter patterns. Afternoon hotspots dispersed across employment centers reflect distributed workplace departures, while weekend patterns highlighted recreational nodes. 
+
+However, EHSA revealed no significant emerging trends across all periods, indicating stable boarding patterns within the three-month window. The right-skewed trip distribution and presence of 21 isolated hexagons with valid data underscore Singapore's heterogeneous spatial structure.
+
+### Limitations
+
+Several methodological and data constraints limit the study's scope. 
+
+The three-month observation window (July-September 2025) proved insufficient for EHSA trend detection, as Mann-Kendall tests require substantial temporal variation across multiple time points to identify meaningful evolution. This brief period cannot capture seasonal variations, policy interventions, or longer-term urban development impacts on mobility patterns. Additionally, monthly aggregation without daily granularity obscures intra-period variations such as weekday-specific fluctuations, public holidays, or weather-related disruptions that influence boarding behavior.
+
+The analysis also excludes critical contextual variables that could explain spatial patterns. Socioeconomic characteristics (income levels, vehicle ownership rates), land-use intensity (residential density, employment concentration), and transport infrastructure attributes (MRT proximity, road network connectivity) remain unexamined, limiting causal interpretation of identified hotspots. Furthermore, boarding data alone provides incomplete mobility insights—destination patterns, transfer behaviors, and multimodal integration remain unexplored, preventing comprehensive understanding of Singapore's transit ecosystem.
+
+### Recommendations
+
+For infrastructure planning, prioritize persistent dual-confirmed hotspots requiring sustained high-capacity service. Implement dynamic capacity allocation for period-specific zones—morning residential corridors need peak-hour scaling, while weekend recreational nodes warrant flexible frequency adjustments.
+
+Methodologically, extend temporal coverage to 12+ months spanning multiple seasons to enable meaningful EHSA trend detection. Incorporate daily granularity to capture intra-period variations and validate stability assumptions. Integrate socioeconomic variables and land-use data to explain spatial outliers and isolated hexagon patterns, enhancing predictive capacity for proactive transport planning interventions.
+
+
