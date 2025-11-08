@@ -249,12 +249,13 @@ hexagon_Hansen_25 <- bind_cols(hexagons, acc_Hansen_25)
 ## Visualising Accessibility
 
 :::: panel-tabset
+
 ### power=0.5
 
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
+
 mapex <- st_bbox(hexagons)
 
 tmap_mode("plot")
@@ -266,18 +267,14 @@ tm_shape(hexagon_Hansen_05,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
-  tm_dots(size = 0.3,
+  tm_dots(size = 0.5,
           fill = "red",
           col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
             main.title.size = 2,
-            legend.outside = FALSE,
-            legend.height = 0.45, 
-            legend.width = 3.0,
-            legend.format = list(digits = 6),
-            legend.position = c("right", "top"),
+            legend.outside = TRUE,
             frame = TRUE) +
   tm_compass(type="8star", size = 2) +
   tm_scale_bar() +
@@ -290,7 +287,7 @@ tm_shape(eldercare) +
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
+
 mapex <- st_bbox(hexagons)
 
 tmap_mode("plot")
@@ -302,18 +299,14 @@ tm_shape(hexagon_Hansen_10,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
-  tm_dots(size = 0.3,
+  tm_dots(size = 0.5,
           fill = "red",
           col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
             main.title.size = 2,
-            legend.outside = FALSE,
-            legend.height = 0.45, 
-            legend.width = 3.0,
-            legend.format = list(digits = 6),
-            legend.position = c("right", "top"),
+            legend.outside = TRUE,
             frame = TRUE) +
   tm_compass(type="8star", size = 2) +
   tm_scale_bar() +
@@ -324,7 +317,7 @@ tm_shape(eldercare) +
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
+
 mapex <- st_bbox(hexagons)
 
 tmap_mode("plot")
@@ -336,18 +329,14 @@ tm_shape(hexagon_Hansen_15,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
-  tm_dots(size = 0.3,
+  tm_dots(size = 0.5,
           fill = "red",
           col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
             main.title.size = 2,
-            legend.outside = FALSE,
-            legend.height = 0.45, 
-            legend.width = 3.0,
-            legend.format = list(digits = 6),
-            legend.position = c("right", "top"),
+            legend.outside = TRUE,
             frame = TRUE) +
   tm_compass(type="8star", size = 2) +
   tm_scale_bar() +
@@ -359,7 +348,7 @@ tm_shape(eldercare) +
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
+
 mapex <- st_bbox(hexagons)
 
 tmap_mode("plot")
@@ -371,18 +360,14 @@ tm_shape(hexagon_Hansen_20,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
-  tm_dots(size = 0.3,
+  tm_dots(size = 0.5,
           fill = "red",
           col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
             main.title.size = 2,
-            legend.outside = FALSE,
-            legend.height = 0.45, 
-            legend.width = 3.0,
-            legend.format = list(digits = 6),
-            legend.position = c("right", "top"),
+            legend.outside = TRUE,
             frame = TRUE) +
   tm_compass(type="8star", size = 2) +
   tm_scale_bar() +
@@ -394,7 +379,7 @@ tm_shape(eldercare) +
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
+
 mapex <- st_bbox(hexagons)
 
 tmap_mode("plot")
@@ -406,18 +391,14 @@ tm_shape(hexagon_Hansen_25,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
-  tm_dots(size = 0.3,
+  tm_dots(size = 0.5,
           fill = "red",
           col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
             main.title.size = 2,
-            legend.outside = FALSE,
-            legend.height = 0.45, 
-            legend.width = 3.0,
-            legend.format = list(digits = 6),
-            legend.position = c("right", "top"),
+            legend.outside = TRUE,
             frame = TRUE) +
   tm_compass(type="8star", size = 2) +
   tm_scale_bar() +
@@ -441,7 +422,6 @@ hexagon_Hansen_05 <- st_join(hexagon_Hansen_05, mpsz,
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
 
 ggbetweenstats(
   data = hexagon_Hansen_05,
@@ -460,7 +440,6 @@ hexagon_Hansen_10 <- st_join(hexagon_Hansen_10, mpsz,
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
 
 ggbetweenstats(
   data = hexagon_Hansen_10,
@@ -479,7 +458,6 @@ hexagon_Hansen_15 <- st_join(hexagon_Hansen_15, mpsz,
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
 
 ggbetweenstats(
   data = hexagon_Hansen_15,
@@ -498,7 +476,6 @@ hexagon_Hansen_20 <- st_join(hexagon_Hansen_20, mpsz,
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
 
 ggbetweenstats(
   data = hexagon_Hansen_20,
@@ -517,7 +494,6 @@ hexagon_Hansen_25 <- st_join(hexagon_Hansen_25, mpsz,
 ```{r}
 #| fig-width: 12
 #| fig-height: 7
-#| echo: false
 
 ggbetweenstats(
   data = hexagon_Hansen_25,
