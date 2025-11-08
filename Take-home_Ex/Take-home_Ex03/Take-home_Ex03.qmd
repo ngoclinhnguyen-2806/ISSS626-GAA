@@ -1,0 +1,40 @@
+---
+title: "Take-home Exercise 3 | Modelling HDB Resale Prices with Geographically Weighted Methods"
+subtitle: "The objective of this take-home exercise is to develop a spatially informed model to determine factors affecting or to predict HDB resale prices in Singapore, making use of appropriate geospatial analytics methods."
+date: "Nov 13, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+  error: false
+format:
+  html:
+    code-link: true       # Clickable function links
+    toc: true             # Table of contents
+    code-fold: true       # Foldable code
+    code-tools: true      # Code tools menu
+number-sections: false
+number-offset: 1
+editor: visual
+---
+
+## Overview
+
+
+### Objectives
+
+
+### Analysis Questions
+
+
+### The Data
+
+
+## Set up R environment
+
+
+## Data Import & Preparation

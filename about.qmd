@@ -14,6 +14,8 @@ I’m currently pursuing my Master of IT in Business (Data Science and Analytics
 
 🐍 Technical expertise in MySQL, Python, PySpark, and BI tools like Power Query and SAS
 
+🤖 I can also do MLOps with Docker and MLFlow
+
 🔎 A calm, detail-oriented approach—because the best insights often hide in the small details
 
 💪 A can-do attitude, thriving under pressure while delivering high-quality results

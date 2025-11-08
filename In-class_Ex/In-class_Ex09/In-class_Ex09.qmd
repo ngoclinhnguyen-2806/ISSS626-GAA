@@ -49,12 +49,10 @@ CHAS <- st_read("data/rawdata/CHASClinics.kml") %>%
 
 Next, `st_buffer()` of sf package is used to create a buffer of 1km around each eldercare features
 
-::: {style="font-size: 1.50em"}
 ```{r}
 buffer_1km <- st_buffer(eldercare, 
                         dist = 1000)
 ```
-:::
 
 ### Visualising
 
