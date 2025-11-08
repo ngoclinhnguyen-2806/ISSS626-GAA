@@ -1055,5 +1055,75 @@
     "title": "Hands-on Exercise 8 | Geographically Weighted Predictive Models",
     "section": "2 ",
     "text": "2"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/In-class_Ex09.html",
+    "href": "In-class_Ex/In-class_Ex09/In-class_Ex09.html",
+    "title": "In-class Exercise 9: Geography of Accessibility",
+    "section": "",
+    "text": "pacman::p_load(SpatialAcc, sf, tidyverse, \n               tmap, ggstatsplot)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#getting-started",
+    "href": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#getting-started",
+    "title": "In-class Exercise 9: Geography of Accessibility",
+    "section": "",
+    "text": "pacman::p_load(SpatialAcc, sf, tidyverse, \n               tmap, ggstatsplot)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#count-number-of-points-within-a-distance",
+    "href": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#count-number-of-points-within-a-distance",
+    "title": "In-class Exercise 9: Geography of Accessibility",
+    "section": "\n2 Count Number of Points within a Distance",
+    "text": "2 Count Number of Points within a Distance\nThe task is to count number of point features (i.e. CHAS clinics) within 1km of another point features (i.e. eldercare centre).\n\n\nRead data\nBuffering\nVisualising\nCounting points\n\n\n\n\neldercare &lt;- st_read(dsn = \"data/rawdata/ELDERCARE\",\n                     layer = \"ELDERCARE\") %&gt;%\n  st_transform(crs = 3414)\n\n\nCHAS &lt;- st_read(\"data/rawdata/CHASClinics.kml\") %&gt;%\n  st_transform(crs = 3414)\n\n\n\nNext, st_buffer() of sf package is used to create a buffer of 1km around each eldercare features\n\n\nbuffer_1km &lt;- st_buffer(eldercare, \n                        dist = 1000)\n\n\n\n\n\n\nThe code chunk below is used to plot the newly created buffers and the CHAS clinics.\n\ntmap_mode(\"view\")\ntm_shape(buffer_1km) +\n  tm_polygons() +\ntm_shape(CHAS) +\n  tm_dots()\n\n\n\n\n\n\n\n\n\n\n\n\nLastly, the code chunk below is used to count the number of CHAS clinics with 1km of each eldercare centre.\n\nbuffer_1km$pts_count &lt;- lengths(\n  st_intersects(buffer_1km, CHAS))"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#importing-data",
+    "href": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#importing-data",
+    "title": "In-class Exercise 9: Geography of Accessibility",
+    "section": "\n3 Importing Data",
+    "text": "3 Importing Data\n\n\nGeospatail data\nOD Matrix\n\n\n\n\nmpsz &lt;- st_read(dsn = \"data/geospatial\",\n                layer = \"MP14_SUBZONE_NO_SEA_PL\") %&gt;%\n  st_transform(crs = 3414)\n\nhexagons &lt;- st_read(dsn = \"data/geospatial\",\n                   layer = \"hexagons\") %&gt;%\n  st_transform(crs = 3414)\n\neldercare &lt;- st_read(dsn = \"data/geospatial\",\n                     layer = \"ELDERCARE\") %&gt;%\n  st_transform(csr = 3414)\n\n\n\n\nODMatrix &lt;- read_csv(\"data/aspatial/OD_Matrix.csv\", \n                     skip = 0)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#data-cleaning-and-updating-attributes",
+    "href": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#data-cleaning-and-updating-attributes",
+    "title": "In-class Exercise 9: Geography of Accessibility",
+    "section": "\n4 Data cleaning and Updating Attributes",
+    "text": "4 Data cleaning and Updating Attributes\n\n\nSupply\nDemand\nOD Matrix\n\n\n\n\neldercare &lt;- eldercare %&gt;%\n  select(fid, ADDRESSPOS) %&gt;%\n  mutate(capacity = 100)\n\n\n\n\nhexagons &lt;- hexagons %&gt;%\n  select(fid) %&gt;%\n  mutate(demand = 100)\n\n\n\n\ndistmat &lt;- ODMatrix %&gt;%\n  select(origin_id, destination_id, total_cost) %&gt;%\n  spread(destination_id, total_cost)%&gt;%\n  select(c(-c('origin_id')))\n\n\ndistmat_km &lt;- as.matrix(distmat/1000)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#computing-handsens-accessibility",
+    "href": "In-class_Ex/In-class_Ex09/In-class_Ex09.html#computing-handsens-accessibility",
+    "title": "In-class Exercise 9: Geography of Accessibility",
+    "section": "\n5 Computing Handsen’s Accessibility",
+    "text": "5 Computing Handsen’s Accessibility\n\n\npower=0.5\npower=1\npower=1.5\npower=2\npower=2.5\n\n\n\n\nacc_Hansen_05 &lt;- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 0.5, \n                            family = \"Hansen\"))\n\ncolnames(acc_Hansen_05) &lt;- \"accHansen_05\"\nacc_Hansen_05 &lt;- as_tibble(acc_Hansen_05)\nhexagon_Hansen_05 &lt;- bind_cols(hexagons, acc_Hansen_05)\n\n\n\n\nacc_Hansen_10 &lt;- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 1, \n                            family = \"Hansen\"))\n\ncolnames(acc_Hansen_10) &lt;- \"accHansen_10\"\nacc_Hansen_10 &lt;- as_tibble(acc_Hansen_10)\nhexagon_Hansen_10 &lt;- bind_cols(hexagons, acc_Hansen_10)\n\n\n\n\nacc_Hansen_15 &lt;- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 0.5, \n                            family = \"Hansen\"))\n\ncolnames(acc_Hansen_15) &lt;- \"accHansen_15\"\nacc_Hansen_15 &lt;- as_tibble(acc_Hansen_15)\nhexagon_Hansen_15 &lt;- bind_cols(hexagons, acc_Hansen_15)\n\n\n\n\nacc_Hansen_20 &lt;- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 2, \n                            family = \"Hansen\"))\n#  Tidy the output\ncolnames(acc_Hansen_20) &lt;- \"accHansen_20\"\nacc_Hansen_20 &lt;- as_tibble(acc_Hansen_20)\nhexagon_Hansen_20 &lt;- bind_cols(hexagons, acc_Hansen_20)\n\n\n\n\nacc_Hansen_25 &lt;- data.frame(ac(hexagons$demand,\n                            eldercare$capacity,\n                            distmat_km, \n                            #d0 = 50,\n                            power = 2.5, \n                            family = \"Hansen\"))\n#  Tidy the output\ncolnames(acc_Hansen_25) &lt;- \"accHansen_25\"\nacc_Hansen_25 &lt;- as_tibble(acc_Hansen_25)\nhexagon_Hansen_25 &lt;- bind_cols(hexagons, acc_Hansen_25)\n\n\n\n\n\n\n5.1 Visualising Accessibility\n\n\npower=0.5\npower=1\npower=1.5\npower=2\npower=2.5\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n5.2 Statistical graphic\n\n\npower=0.5\npower=1\npower=1.5\npower=2\npower=2.5\n\n\n\n\nhexagon_Hansen_05 &lt;- st_join(hexagon_Hansen_05, mpsz, \n                          join = st_intersects)\n\n\n\n\n\n\n\n\n\n\n\n\nhexagon_Hansen_10 &lt;- st_join(hexagon_Hansen_10, mpsz, \n                          join = st_intersects)\n\n\n\n\n\n\n\n\n\n\n\n\nhexagon_Hansen_15 &lt;- st_join(hexagon_Hansen_15, mpsz, \n                          join = st_intersects)\n\n\n\n\n\n\n\n\n\n\n\n\nhexagon_Hansen_20 &lt;- st_join(hexagon_Hansen_20, mpsz, \n                          join = st_intersects)\n\n\n\n\n\n\n\n\n\n\n\n\nhexagon_Hansen_25 &lt;- st_join(hexagon_Hansen_25, mpsz, \n                          join = st_intersects)"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/data/geospatial/hexagons.html",
+    "href": "In-class_Ex/In-class_Ex09/data/geospatial/hexagons.html",
+    "title": "ISSS626-GAA",
+    "section": "",
+    "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n                 0 0     false"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex09/data/geospatial/ELDERCARE.html",
+    "href": "Hands-on_Ex/Hands-on_Ex09/data/geospatial/ELDERCARE.html",
+    "title": "ISSS626-GAA",
+    "section": "",
+    "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;  ELDERCARE  ENG dataset\n\nELDERCARE\n\n                 0 0     false"
+  },
+  {
+    "objectID": "Hands-on_Ex/Hands-on_Ex09/data/geospatial/hexagons.html",
+    "href": "Hands-on_Ex/Hands-on_Ex09/data/geospatial/hexagons.html",
+    "title": "ISSS626-GAA",
+    "section": "",
+    "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;     dataset\n\n\n                 0 0     false"
+  },
+  {
+    "objectID": "In-class_Ex/In-class_Ex09/data/geospatial/ELDERCARE.html",
+    "href": "In-class_Ex/In-class_Ex09/data/geospatial/ELDERCARE.html",
+    "title": "ISSS626-GAA",
+    "section": "",
+    "text": "&lt;!DOCTYPE qgis PUBLIC ‘http://mrcc.com/qgis.dtd’ ‘SYSTEM’&gt;  ELDERCARE  ENG dataset\n\nELDERCARE\n\n                 0 0     false"
   }
 ]
