@@ -20,12 +20,10 @@ editor: visual
 
 ## Getting Started
 
-::: {style="font-size: 1.5em"}
 ```{r}
 pacman::p_load(SpatialAcc, sf, tidyverse, 
                tmap, ggstatsplot)
 ```
-:::
 
 ## Count Number of Points within a Distance
 
@@ -120,22 +118,18 @@ eldercare <- st_read(dsn = "data/geospatial",
   st_transform(csr = 3414)
 ```
 
-
 ### OD Matrix
-
 
 ```{r}
 ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", 
                      skip = 0)
 ```
-
 :::::
 
 ## Data cleaning and Updating Attributes
 
 :::::: panel-tabset
 ### Supply
-
 
 ```{r}
 eldercare <- eldercare %>%
@@ -146,7 +140,6 @@ eldercare <- eldercare %>%
 
 ### Demand
 
-
 ```{r}
 hexagons <- hexagons %>%
   select(fid) %>%
@@ -155,7 +148,6 @@ hexagons <- hexagons %>%
 
 
 ### OD Matrix
-
 
 ```{r}
 distmat <- ODMatrix %>%
@@ -254,10 +246,10 @@ hexagon_Hansen_25 <- bind_cols(hexagons, acc_Hansen_25)
 
 ------------------------------------------------------------------------
 
-### Visualising Accessibility
+## Visualising Accessibility
 
 :::: panel-tabset
-#### power=0.5
+### power=0.5
 
 ```{r}
 #| fig-width: 12
@@ -274,6 +266,9 @@ tm_shape(hexagon_Hansen_05,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
+  tm_dots(size = 0.3,
+          fill = "red",
+          col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
@@ -290,7 +285,7 @@ tm_shape(eldercare) +
 ```
 
 
-#### power=1
+### power=1
 
 ```{r}
 #| fig-width: 12
@@ -307,6 +302,9 @@ tm_shape(hexagon_Hansen_10,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
+  tm_dots(size = 0.3,
+          fill = "red",
+          col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
@@ -321,7 +319,7 @@ tm_shape(eldercare) +
   tm_scale_bar() +
   tm_grid(lwd = 0.1, alpha = 0.5)
 ```
-#### power=1.5
+### power=1.5
 
 ```{r}
 #| fig-width: 12
@@ -338,6 +336,9 @@ tm_shape(hexagon_Hansen_15,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
+  tm_dots(size = 0.3,
+          fill = "red",
+          col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
@@ -353,7 +354,7 @@ tm_shape(eldercare) +
   tm_grid(lwd = 0.1, alpha = 0.5)
 ```
 
-#### power=2
+### power=2
 
 ```{r}
 #| fig-width: 12
@@ -370,6 +371,9 @@ tm_shape(hexagon_Hansen_20,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
+  tm_dots(size = 0.3,
+          fill = "red",
+          col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
@@ -385,7 +389,7 @@ tm_shape(eldercare) +
   tm_grid(lwd = 0.1, alpha = 0.5)
 ```
 
-#### power=2.5
+### power=2.5
 
 ```{r}
 #| fig-width: 12
@@ -402,6 +406,9 @@ tm_shape(hexagon_Hansen_25,
           border.col = "black",
           border.lwd = 1) +
 tm_shape(eldercare) +
+  tm_dots(size = 0.3,
+          fill = "red",
+          col = "black") +
   tm_symbols(size = 0.1) +
   tm_layout(main.title = "Accessibility to eldercare: Hansen method",
             main.title.position = "center",
@@ -420,7 +427,7 @@ tm_shape(eldercare) +
 
 ------------------------------------------------------------------------
 
-### Statistical graphic
+## Statistical graphic
 
 ::::: panel-tabset
 
