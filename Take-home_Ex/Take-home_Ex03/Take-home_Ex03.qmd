@@ -22,19 +22,931 @@ number-offset: 1
 editor: visual
 ---
 
-## Overview
+## 1. Introduction
 
+### 1.1 Background & Motivation
 
-### Objectives
+### 1.2 Research Objectives
 
+## 2. Data & Methodology
 
-### Analysis Questions
+### 2.1 Import R packages
 
+```{r}
+pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot, httr, jsonlite)
+```
 
-### The Data
+### 2.2 Data Sources
 
+|  |  |  |  |
+|-----------------|------------------|--------------------|-----------------|
+| **Dataset Name** | **Description** | **Use Case** | **Format** |
+| **HDB Resale Flat Prices** | Transaction records of HDB resale flats. Filtered for 4-room flats only. | Primary outcome variable (`resale_price`) and source of structural predictors (`floor_area_sqm`, `remaining_lease_years`, `storey_midpoint`) | CSV |
+| **Singapore Boundary** | A polygon feature data providing information of URA 2014 Master Plan Planning Subzone boundary data | Provides spatial context for mapping. Used as basemap reference in visualizations. | SHP (point geometry) |
+| **Hawker Centres** | Point locations of hawker centres, representing affordable dining options and community gathering spaces. | Calculate proximity to nearest hawker centre (`dist_hawker`) | GeoJSON |
+| **Parks** | Point or polygon locations of national parks, regional parks, and neighborhood parks managed by NParks. | Calculate proximity to nearest park (`dist_park`) | GeoJSON |
+| **Supermarkets** | Point locations of major supermarket chains across Singapore. | Calculate proximity to nearest supermarket (`dist_supermarket`) | GeoJSON |
+| **Eldercare Centres** | Point locations of eldercare facilities including senior activity centres, senior care centres, and nursing homes. | Calculate proximity to nearest eldercare facility (`dist_eldercare`), relevant for multi-generational households and aging population considerations. | SHP (point geometry) |
+| **Preschools** | Point locations of registered preschools across Singapore, including both public and private institutions. | Count number of kindergartens within 350m buffer (`n_preschool_350m`) | GeoJSON |
+| **Kindergartens** | Point locations of registered kindergartens across Singapore, including both public and private institutions. | Count number of kindergartens within 350m buffer (`n_kindergarten_350m`) | GeoJSON |
+| **Childcare Centres** | Point locations of licensed childcare centres providing infant and toddler care services. | Count number of childcare centres within 350m buffer (`n_childcare_350m`) to evaluate childcare accessibility, important for working parents. | GeoJSON |
+| **Bus Stops** | Point locations of all public bus stops in Singapore's bus network. | Count number of bus stops within 350m buffer (`n_busstop_350m`) as a measure of public transport connectivity and accessibility. | SHP (point geometry) |
 
-## Set up R environment
+### 2.3 Data Import & Initial Manipulation
 
+#### 2.3.1 Singapore Boundary
 
-## Data Import & Preparation
+```{r}
+#| label: import-singapore-boundary
+#| code-summary: Import Singapore boundary for mapping context
+
+# Import Singapore boundary (adjust path as needed)
+singapore_boundary <- st_read(
+  dsn = "data/geospatial",
+  layer = "MP14_SUBZONE_WEB_PL",  # or your boundary layer name
+  quiet = TRUE
+) %>%
+  st_transform(3414) %>%
+  st_union()  # Dissolve to single boundary
+
+cat("✓ Singapore boundary imported\n")
+cat("  CRS:", st_crs(singapore_boundary)$input, "\n")
+```
+
+```{r}
+#| code-summary: Report the extent of mpsz_svy21 layer by its lower and upper limits
+
+st_bbox(singapore_boundary)
+```
+
+#### 2.3.2 HDB Resale Flat Prices
+
+```{r}
+#| code-summary: Read CSV file
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+#| eval: false # saved rds already
+
+HDBresale <- read_csv("data/rawdata/HDBresale.csv") %>% 
+  filter (flat_type == "4 ROOM") %>% 
+  filter (month >= "2025-01" & month <"2025-10")
+```
+
+```{r}
+#| code-summary: Define a function to convert the address into latitude and longitude using OneMapSG API
+#| output: true
+#| warning: false
+#| error: false
+#| message: false
+
+geocode <- function(block, streetname) {
+  base_url <- "https://onemap.gov.sg/api/common/elastic/search"
+  address <- paste(block, streetname, sep=" ")
+  query <- list("searchVal" = address,
+                "returnGeom" = "Y",
+                "getAddrDetails" = "N",
+                "pageNum" = "1")
+  
+  res <- GET(base_url, query=query)
+  restext <- content(res, as="text")
+  
+  output <- fromJSON(restext) %>%
+    as.data.frame %>%
+    select(results.LATITUDE, results.LONGITUDE)
+  
+  return(output)
+}
+```
+
+```{r}
+#| code-summary: Cleaning street names
+#| eval: false
+
+HDBresale$street_name <- gsub("ST\\.", "SAINT", HDBresale$street_name)
+```
+
+```{r}
+#| code-summary: Apply the function
+#| output: false
+#| warning: false
+#| error: false
+#| message: false
+#| eval: false # saved rds already, no need to call API again to save time
+
+HDBresale$LATITUDE <- 0
+HDBresale$LONGITUDE <- 0
+
+for (i in 1:nrow(HDBresale)) {
+  temp_output <- geocode(HDBresale[i, 4], HDBresale[i, 5])
+  
+  HDBresale$LATITUDE[i] <- temp_output$results.LATITUDE
+  HDBresale$LONGITUDE[i] <- temp_output$results.LONGITUDE
+}
+```
+
+```{r}
+#| code-summary: Convert HDB resale to sf
+#| eval: false # saved rds already
+
+HDBresale_sf <- HDBresale %>%
+  st_as_sf(
+    coords = c("LONGITUDE", "LATITUDE"),
+    crs=4326
+  ) %>%
+  st_transform(crs=3414)
+```
+
+```{r}
+#| code-summary: Save rds for HDBresale_sf
+#| eval: false
+#| echo: false
+
+write_rds(HDBresale_sf, "data/rds/HDBresale_sf.rds")
+```
+
+```{r}
+#| echo: false
+#| output: false
+HDBresale_sf <- read_rds("data/rds/HDBresale_sf.rds")
+```
+
+#### 2.3.3 Neighborhood and local facilities data
+
+::: panel-tabset
+
+#### CBD Area
+
+```{r}
+#| code-summary: Create CBD points dataframe with SVY21 coordinates
+
+cbd_data <- data.frame(
+  name = c("Raffles Place", "Tanjong Pagar", "Marina Bay"),
+  x = c(30214.5, 29527.8, 31324.7),
+  y = c(29414.2, 28645.1, 29877.3)
+)
+```
+
+#### Hawker Centres
+
+```{r}
+#| code-summary: Import Hawker Centres data
+
+hawkerCenters = st_read(
+  "data/geospatial/HawkerCentresGEOJSON.geojson") %>%
+  st_transform(crs= 3414)
+```
+#### Parks
+
+```{r}
+#| code-summary: Import Parks data
+
+parks = st_read(
+  "data/geospatial/Parks.geojson") %>%
+  st_transform(crs= 3414)
+```
+
+#### Supermarkets
+
+```{r}
+#| code-summary: Import Supermarkets data
+
+supermarkets = st_read(
+  "data/geospatial/SupermarketsGEOJSON.geojson") %>%
+  st_transform(crs= 3414)
+```
+
+#### Eldercare Centres
+
+```{r}
+#| code-summary: Import Eldercare Centres data
+
+eldercare <- st_read(
+  dsn = "data/geospatial", 
+  layer = "ELDERCARE"
+) %>% 
+  st_transform(crs = 3414)
+```
+
+#### Preschools
+
+```{r}
+#| code-summary: Import Preschool data
+
+preschool = st_read(
+  "data/geospatial/PreSchoolsLocation.kml") %>%
+  st_transform(crs= 3414)
+```
+
+#### Kindergartens
+
+```{r}
+#| code-summary: Import Kindergartens data
+
+kindergartens = st_read(
+  "data/geospatial/Kindergartens.geojson") %>%
+  st_transform(crs= 3414)
+```
+
+#### Childcare Centres
+
+```{r}
+#| code-summary: Import Childcare Centres data
+
+childCareServices = st_read(
+  "data/geospatial/ChildCareServices.geojson") %>%
+  st_transform(crs= 3414)
+```
+
+#### Bus Stops
+
+```{r}
+#| code-summary: Import Bus Stops data
+
+busStops <- st_read(
+  dsn = "data/geospatial", 
+  layer = "BusStop"
+) %>% 
+  st_transform(crs = 3414)
+```
+
+```{r}
+#| code-summary: Convert to sf object with SVY21 CRS (EPSG:3414)
+
+cbd_sf <- st_as_sf(cbd_data, 
+                   coords = c("x", "y"), 
+                   crs = 3414)
+
+# View the result
+print(cbd_sf)
+```
+:::
+
+### 2.4 Proximity Analysis
+
+```{r}
+#| code-summary: Count number of preschools, kindergartens, childcare services, and bus stops
+
+# Preschool
+within_350m <- st_is_within_distance(
+  HDBresale_sf, preschool, dist = 350)
+
+HDBresale_sf <- HDBresale_sf %>%
+  mutate(N_350M_PRESCHOOL = map_int(within_350m, length))
+
+# Kindergartens
+within_350m <- st_is_within_distance(
+  HDBresale_sf, kindergartens, dist = 350)
+
+HDBresale_sf <- HDBresale_sf %>%
+  mutate(N_350M_KINDERG = map_int(within_350m, length))
+
+# Child care
+within_350m <- st_is_within_distance(
+  HDBresale_sf, childCareServices, dist = 350)
+
+HDBresale_sf <- HDBresale_sf %>%
+  mutate(N_350M_CHILDCARE = map_int(within_350m, length))
+
+# Bus Stop
+within_350m <- st_is_within_distance(
+  HDBresale_sf, busStops, dist = 350)
+
+HDBresale_sf <- HDBresale_sf %>%
+  mutate(N_350M_BUSSTOP = map_int(within_350m, length))
+
+```
+
+```{r}
+#| code-summary: Create function for nearest distance calculation
+
+calc_nearest_dist <- function(from_geom, to_sf) {
+  as.numeric(
+    st_distance(
+      from_geom,
+      to_sf[st_nearest_feature(from_geom, to_sf), ],
+      by_element = TRUE
+    )
+  )
+}
+```
+
+```{r}
+#| code-summary: Apply function to get the nearest distance to the facilities
+
+hdb_model <- HDBresale_sf %>%
+  mutate(
+    PROX_CBD           = calc_nearest_dist(geometry, cbd_sf),
+    PROX_HAWKER        = calc_nearest_dist(geometry, hawkerCenters),
+    PROX_PARK          = calc_nearest_dist(geometry, parks),
+    PROX_SUPERMARKET   = calc_nearest_dist(geometry, supermarkets),
+    PROX_ELDERCARE     = calc_nearest_dist(geometry, eldercare)
+  )
+
+hdb_model
+```
+
+```{r}
+#| code-summary: Save rds for hdb_model
+#| eval: false
+#| echo: false
+
+write_rds(hdb_model, "data/rds/hdb_model.rds")
+```
+
+```{r}
+#| echo: false
+#| output: false
+
+hdb_model <- read_rds("data/rds/hdb_model.rds")
+```
+
+### 2.5 Aspatial Data Cleaning
+
+::: panel-tabset
+
+#### Step 1: Initial Data Inspection
+
+```{r}
+#| code-summary: Check structure
+
+glimpse(hdb_model)
+```
+
+```{r}
+#| code-summary: Check dimensions
+
+cat("Dataset dimensions:", nrow(hdb_model), "rows ×", ncol(hdb_model), "columns\n")
+```
+
+```{r}
+#| code-summary: Check for missing values
+
+missing_summary <- hdb_model %>%
+  st_drop_geometry() %>%  # Remove geometry for cleaner summary
+  summarise(across(everything(), ~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "variable", values_to = "missing_count") %>%
+  filter(missing_count > 0) %>%
+  arrange(desc(missing_count))
+
+if(nrow(missing_summary) > 0) {
+  cat("\n⚠ Missing values detected:\n")
+  print(missing_summary)
+} else {
+  cat("\n✓ No missing values detected\n")
+}
+```
+
+#### Step 2: Clean Structural Variables
+
+Purpose: Prepare structural variables for modeling
+
+ - Convert storey_range to numeric midpoint (e.g., "13 TO 15" → 14)
+ - Convert remaining_lease to numeric years
+ - Extract month as date object
+
+```{r}
+#| code-summary: Clean and transform structural variables
+
+hdb_clean <- hdb_model %>%
+  mutate(
+    # Convert storey_range (e.g., "13 TO 15" → 14)
+    storey_midpoint = as.numeric(str_extract(storey_range, "^\\d+")) + 1,
+    
+    # Convert remaining_lease to numeric years
+    # Original format like "56 years 03 months"
+    remaining_lease_years = case_when(
+      str_detect(remaining_lease, "years") & str_detect(remaining_lease, "months") ~
+        as.numeric(str_extract(remaining_lease, "^\\d+")) + 
+        as.numeric(str_extract(remaining_lease, "(?<=years )\\d+")) / 12,
+      str_detect(remaining_lease, "years") ~
+        as.numeric(str_extract(remaining_lease, "^\\d+")),
+      TRUE ~ NA_real_
+    ),
+    
+    # Convert month to date
+    month_date = as.Date(paste0(month, "-01")),
+    
+    # Extract year and month for temporal analysis
+    year = year(month_date),
+    month_num = month(month_date)
+  )
+
+# Check transformations
+cat("✓ Storey midpoint range:", 
+    min(hdb_clean$storey_midpoint, na.rm = TRUE), "to", 
+    max(hdb_clean$storey_midpoint, na.rm = TRUE), "\n")
+
+cat("✓ Remaining lease range:", 
+    round(min(hdb_clean$remaining_lease_years, na.rm = TRUE), 1), "to", 
+    round(max(hdb_clean$remaining_lease_years, na.rm = TRUE), 1), "years\n")
+```
+#### Step 3: Check for Outliers
+
+```{r}
+#| code-summary: Identify outliers in key variables of `resale_price` and `resale_price`
+
+# Function to detect outliers using IQR method
+detect_outliers <- function(x) {
+  Q1 <- quantile(x, 0.25, na.rm = TRUE)
+  Q3 <- quantile(x, 0.75, na.rm = TRUE)
+  IQR <- Q3 - Q1
+  lower_bound <- Q1 - 1.5 * IQR
+  upper_bound <- Q3 + 1.5 * IQR
+  return(x < lower_bound | x > upper_bound)
+}
+
+# Check outliers in resale_price
+outlier_price <- detect_outliers(hdb_clean$resale_price)
+cat("Outliers in resale_price:", sum(outlier_price), 
+    "(", round(sum(outlier_price)/nrow(hdb_clean)*100, 2), "%)\n")
+
+# Check outliers in resale_price
+outlier_area <- detect_outliers(hdb_clean$floor_area_sqm)
+cat("Outliers in floor_area_sqm:", sum(outlier_area), 
+    "(", round(sum(outlier_area)/nrow(hdb_clean)*100, 2), "%)\n")
+
+# Visual inspection with boxplots
+par(mfrow = c(1, 2))
+boxplot(hdb_clean$resale_price, main = "Resale Price", ylab = "Price (SGD)")
+boxplot(hdb_clean$floor_area_sqm, main = "Floor Area", ylab = "Square Meters")
+par(mfrow = c(1, 1))
+```
+For now, we don't remove outliers yet. We just flag them using 2 additional columns of `outlier_price` and `outlier_area`, and keep in the dataset. Those detected will be report "TRUE" in `outlier_price` or `outlier_area` columns.
+
+```{r}
+#| code-summary: Flag outliers
+
+hdb_clean <- hdb_clean %>%
+  mutate(
+    outlier_price = detect_outliers(resale_price),
+    outlier_area = detect_outliers(floor_area_sqm)
+  )
+
+hdb_clean
+```
+
+:::
+
+```{r}
+#| code-summary: Save rds for hdb_clean
+#| eval: false
+#| echo: false
+
+write_rds(hdb_clean, "data/rds/hdb_clean.rds")
+```
+
+```{r}
+#| echo: false
+#| output: false
+
+hdb_clean <- read_rds("data/rds/hdb_clean.rds")
+```
+
+## 3. Exploratory Spatial Data Analysis
+
+### 3.1 Descriptive Statistics
+
+#### 3.1.1 Summary in tables
+
+::: panel-tabset
+
+#### Structural variables
+
+```{r}
+#| code-summary: Summary statistics for structural variables
+
+structural_vars <- c("resale_price", "floor_area_sqm", "storey_midpoint", 
+                     "remaining_lease_years")
+
+structural_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(all_of(structural_vars)) %>%
+  summarise(across(everything(), 
+                   list(mean = ~mean(., na.rm = TRUE),
+                        median = ~median(., na.rm = TRUE),
+                        sd = ~sd(., na.rm = TRUE),
+                        min = ~min(., na.rm = TRUE),
+                        max = ~max(., na.rm = TRUE)),
+                   .names = "{.col}_{.fn}")) %>%
+  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
+  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
+  pivot_wider(names_from = statistic, values_from = value)
+
+knitr::kable(structural_summary, 
+             digits = 2,
+             caption = "Descriptive Statistics: Structural Variables",
+             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
+```
+
+#### Proximity variables
+
+```{r}
+#| code-summary: Summary statistics for Proximity variables summary (in meters)
+
+prox_vars <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(starts_with("PROX_")) %>%
+  names()
+
+location_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(all_of(prox_vars)) %>%
+  summarise(across(everything(), 
+                   list(mean = ~mean(., na.rm = TRUE),
+                        median = ~median(., na.rm = TRUE),
+                        sd = ~sd(., na.rm = TRUE),
+                        min = ~min(., na.rm = TRUE),
+                        max = ~max(., na.rm = TRUE)),
+                   .names = "{.col}_{.fn}")) %>%
+  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
+  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
+  pivot_wider(names_from = statistic, values_from = value)
+
+knitr::kable(location_summary, 
+             digits = 2,
+             caption = "Descriptive Statistics: Location Variables (Proximity in meters)",
+             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
+```
+
+#### COUNT variables
+
+```{r}
+#| code-summary: Descriptive statistics for count variables
+
+# --- Location Variables: Counts (within buffer) ---
+count_vars <- names(hdb_clean)[str_detect(names(hdb_clean), "^N_")]
+
+count_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(all_of(count_vars)) %>%
+  summarise(across(everything(), 
+                   list(mean = ~mean(., na.rm = TRUE),
+                        median = ~median(., na.rm = TRUE),
+                        sd = ~sd(., na.rm = TRUE),
+                        min = ~min(., na.rm = TRUE),
+                        max = ~max(., na.rm = TRUE)),
+                   .names = "{.col}_{.fn}")) %>%
+  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
+  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
+  pivot_wider(names_from = statistic, values_from = value)
+
+knitr::kable(count_summary, 
+             digits = 1,
+             caption = "Table 3: Descriptive Statistics - Count Variables (facilities within buffer)",
+             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
+```
+
+:::
+
+#### 3.1.2 Summary with Visualization 
+
+::: panel-tabset
+
+#### Distribution Analysis
+
+```{r}
+#| code-summary: Visualize distributions of key variables
+#| fig-width: 12
+#| fig-height: 8
+
+# Create histogram panels for key variables
+library(patchwork)
+
+# Resale price distribution
+p1 <- ggplot(hdb_clean, aes(x = resale_price)) +
+  geom_histogram(bins = 50, fill = "#440154", alpha = 0.7) +
+  geom_vline(aes(xintercept = median(resale_price)), 
+             color = "red", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of Resale Prices",
+       x = "Resale Price (SGD)", y = "Frequency") +
+  scale_x_continuous(labels = scales::comma) +
+  theme_minimal()
+
+# Floor area distribution
+p2 <- ggplot(hdb_clean, aes(x = floor_area_sqm)) +
+  geom_histogram(bins = 30, fill = "#31688e", alpha = 0.7) +
+  geom_vline(aes(xintercept = median(floor_area_sqm)), 
+             color = "red", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of Floor Area",
+       x = "Floor Area (sqm)", y = "Frequency") +
+  theme_minimal()
+
+# Remaining lease distribution
+p3 <- ggplot(hdb_clean, aes(x = remaining_lease_years)) +
+  geom_histogram(bins = 40, fill = "#35b779", alpha = 0.7) +
+  geom_vline(aes(xintercept = median(remaining_lease_years)), 
+             color = "red", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of Remaining Lease",
+       x = "Remaining Lease (years)", y = "Frequency") +
+  theme_minimal()
+
+# Storey distribution
+p4 <- ggplot(hdb_clean, aes(x = storey_midpoint)) +
+  geom_histogram(bins = 20, fill = "#fde724", alpha = 0.7) +
+  geom_vline(aes(xintercept = median(storey_midpoint)), 
+             color = "red", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of Storey Level",
+       x = "Storey Midpoint", y = "Frequency") +
+  theme_minimal()
+
+# Combine plots
+(p1 + p2) / (p3 + p4) +
+  plot_annotation(
+    title = "Distribution of Structural Variables",
+    subtitle = "Red dashed line indicates median value"
+  )
+```
+
+#### Distribution of Count variables
+
+```{r}
+#| code-summary: Distribution of count variables  
+#| fig-width: 12
+#| fig-height: 10
+
+# Count variables distributions
+c1 <- ggplot(hdb_clean, aes(x = N_350M_PRESCHOOL)) +
+  geom_bar(fill = "#440154", alpha = 0.7) +
+  labs(title = "Preschools within 350m", x = "Count", y = "Frequency") +
+  theme_minimal()
+
+c2 <- ggplot(hdb_clean, aes(x = N_350M_KINDERG)) +
+  geom_bar(fill = "#31688e", alpha = 0.7) +
+  labs(title = "Kindergartens within 350m", x = "Count", y = "Frequency") +
+  theme_minimal()
+
+c3 <- ggplot(hdb_clean, aes(x = N_350M_CHILDCARE)) +
+  geom_bar(fill = "#35b779", alpha = 0.7) +
+  labs(title = "Childcare Centres within 350m", x = "Count", y = "Frequency") +
+  theme_minimal()
+
+c4 <- ggplot(hdb_clean, aes(x = N_350M_BUSSTOP)) +
+  geom_bar(fill = "#fde724", alpha = 0.7) +
+  labs(title = "Bus Stops within 350m", x = "Count", y = "Frequency") +
+  theme_minimal()
+
+(c1 + c2) / (c3 + c4) +
+  plot_annotation(
+    title = "Figure 2: Distribution of Count Variables",
+    subtitle = "Number of facilities within buffer zones"
+  )
+```
+
+#### Temporal Distribution
+
+```{r}
+#| code-summary: Transaction volume and prices over time
+#| fig-width: 12
+#| fig-height: 6
+
+# Transaction volume by month
+t1 <- hdb_clean %>%
+  st_drop_geometry() %>%
+  count(month_date) %>%
+  ggplot(aes(x = month_date, y = n)) +
+  geom_line(color = "#440154", linewidth = 1) +
+  geom_point(color = "#440154", size = 2) +
+  labs(title = "Transaction Volume Over Time",
+       x = "Month", y = "Number of Transactions") +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Median price by month
+t2 <- hdb_clean %>%
+  st_drop_geometry() %>%
+  group_by(month_date) %>%
+  summarise(
+    median_price = median(resale_price),
+    mean_price = mean(resale_price),
+    .groups = "drop"
+  ) %>%
+  ggplot(aes(x = month_date)) +
+  geom_line(aes(y = median_price, color = "Median"), linewidth = 1) +
+  geom_line(aes(y = mean_price, color = "Mean"), linewidth = 1) +
+  geom_point(aes(y = median_price, color = "Median"), size = 2) +
+  geom_point(aes(y = mean_price, color = "Mean"), size = 2) +
+  labs(title = "Resale Price Trends Over Time",
+       x = "Month", y = "Resale Price (SGD)", color = "Statistic") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_x_date(date_breaks = "1 month", date_labels = "%b %Y") +
+  scale_color_manual(values = c("Median" = "#440154", "Mean" = "#fde724")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+t1 / t2
+```
+
+#### Summary by Town
+
+```{r}
+#| code-summary: Resale prices by town
+
+# Calculate summary statistics by town
+town_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  group_by(town) %>%
+  summarise(
+    n_transactions = n(),
+    median_price = median(resale_price),
+    mean_price = mean(resale_price),
+    min_price = min(resale_price),
+    max_price = max(resale_price),
+    .groups = "drop"
+  ) %>%
+  arrange(desc(median_price))
+
+# Display table
+knitr::kable(town_summary, 
+             digits = 0,
+             caption = "Resale Price Summary by Town (4-Room Flats)",
+             col.names = c("Town", "Transactions", "Median Price", 
+                          "Mean Price", "Min Price", "Max Price"),
+             format.args = list(big.mark = ","))
+
+# Top 10 most expensive towns
+top10_towns <- town_summary %>%
+  slice_max(median_price, n = 10) %>%
+  ggplot(aes(x = reorder(town, median_price), y = median_price)) +
+  geom_col(fill = "#440154", alpha = 0.8) +
+  geom_text(aes(label = scales::comma(median_price)), 
+            hjust = -0.1, size = 3) +
+  coord_flip() +
+  labs(title = "Top 10 Towns by Median Resale Price",
+       subtitle = "4-Room Flats (Jan-Sep 2025)",
+       x = "Town", y = "Median Resale Price (SGD)") +
+  scale_y_continuous(labels = scales::comma, 
+                     expand = expansion(mult = c(0, 0.1))) +
+  theme_minimal()
+
+print(top10_towns)
+```
+
+#### Summary by Flat Model
+
+```{r}
+#| code-summary: Resale prices by flat model
+
+# Summary by flat_model
+model_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  group_by(flat_model) %>%
+  summarise(
+    n_transactions = n(),
+    median_price = median(resale_price),
+    pct_of_total = n() / nrow(hdb_clean) * 100,
+    .groups = "drop"
+  ) %>%
+  arrange(desc(n_transactions))
+
+knitr::kable(model_summary, 
+             digits = 1,
+             caption = "Resale Price Summary by Flat Model",
+             col.names = c("Flat Model", "Transactions", 
+                          "Median Price", "% of Total"),
+             format.args = list(big.mark = ","))
+```
+
+:::
+
+#### 3.1.3 Bivariate Relationships
+
+```{r}
+#| code-summary: Key relationships between price and predictors
+#| fig-width: 12
+#| fig-height: 10
+
+# Price vs Floor Area
+b1 <- ggplot(hdb_clean, aes(x = floor_area_sqm, y = resale_price)) +
+  geom_point(alpha = 0.3, color = "#440154") +
+  geom_smooth(method = "lm", color = "#fde724", linewidth = 1.5) +
+  labs(title = "Price vs Floor Area",
+       x = "Floor Area (sqm)", y = "Resale Price (SGD)") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal()
+
+# Price vs Remaining Lease
+b2 <- ggplot(hdb_clean, aes(x = remaining_lease_years, y = resale_price)) +
+  geom_point(alpha = 0.3, color = "#31688e") +
+  geom_smooth(method = "lm", color = "#fde724", linewidth = 1.5) +
+  labs(title = "Price vs Remaining Lease",
+       x = "Remaining Lease (years)", y = "Resale Price (SGD)") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal()
+
+# Price vs Storey
+b3 <- ggplot(hdb_clean, aes(x = storey_midpoint, y = resale_price)) +
+  geom_point(alpha = 0.3, color = "#35b779") +
+  geom_smooth(method = "lm", color = "#fde724", linewidth = 1.5) +
+  labs(title = "Price vs Storey Level",
+       x = "Storey Midpoint", y = "Resale Price (SGD)") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal()
+
+# Price vs Distance to CBD
+b4 <- ggplot(hdb_clean, aes(x = PROX_CBD, y = resale_price)) +
+  geom_point(alpha = 0.3, color = "#fde724") +
+  geom_smooth(method = "lm", color = "#440154", linewidth = 1.5) +
+  labs(title = "Price vs Distance to CBD",
+       x = "Distance to CBD (meters)", y = "Resale Price (SGD)") +
+  scale_x_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal()
+
+(b1 + b2) / (b3 + b4) +
+  plot_annotation(
+    title = "Figure 6: Bivariate Relationships with Resale Price",
+    subtitle = "Linear trend lines shown in yellow/purple"
+  )
+```
+
+### 3.2 Spatial Distribution of Resale Prices
+
+::: panel-tabset
+
+#### Basic Point Map of Transactions
+
+```{r}
+#| label: map-transaction-points
+#| code-summary: Point map showing all HDB resale transactions
+#| fig-width: 10
+#| fig-height: 12
+
+tmap_mode("plot")  # Static map mode
+
+# Create basic point map
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_clean) +
+  tm_dots(col = "resale_price",
+          palette = "YlOrRd",
+          size = 0.05,
+          alpha = 0.6,
+          title = "Resale Price (SGD)",
+          breaks = c(0, 500000, 600000, 700000, 800000, 900000, 1500000),
+          labels = c("< $500k", "$500k-$600k", "$600k-$700k", 
+                     "$700k-$800k", "$800k-$900k", "> $900k")) +
+  tm_layout(
+    main.title = "Map 1: Spatial Distribution of HDB 4-Room Resale Prices",
+    main.title.size = 1.2,
+    main.title.position = "center",
+    legend.outside = TRUE,
+    legend.outside.position = "right",
+    legend.title.size = 1,
+    legend.text.size = 0.7,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
+  # Scale bar removed due to tmap bug
+```
+
+### 3.3 Correlation Structure
+
+### 3.4 Spatial Autocorrelation
+
+## 4. Model Calibration
+
+### 4.1 OLS Baseline Model
+
+#### 4.1.1 Model Specification
+
+#### 4.1.2 Results & Diagnostics
+
+#### 4.1.3 Spatial Autocorrelation Test
+
+### 4.2 Geographically Weighted Regression
+
+#### 4.2.1 Bandwidth Selection
+
+\[Explain CV vs AIC choice\] \
+
+#### 4.2.2 Model Results 
+
+#### 4.2.3 Model Comparison
+
+## 5. Spatial Patterns & Interpretation
+
+### 5.1 Overview of Local Variations
+
+### 5.2 Key Findings by Variable
+
+\[Subsection for each important coefficient\] \
+
+### 5.3 Policy & Market Implications
+
+## 6. Limitations & Conclusions
+
+### 6.1 Study Limitations
+
+\[Data period, 4-room only, modifiable areal unit problem, etc.\] \
+
+### 6.2 Conclusions \
+
+### 6.3 Future Research Directions
+
+## Appendix
+
+### References

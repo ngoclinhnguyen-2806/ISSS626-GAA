@@ -863,7 +863,6 @@ plot_moran_quadrant <- function(lisa_sf, column_name, sig = 0.05) {
 ```
 
 ::: panel-tabset
-
 ##### Weekday Morning Peak
 
 ```{r}
@@ -1407,7 +1406,6 @@ plot_lmsa_agreement <- function(moran_sf, gi_sf, period_name) {
 ```
 
 ::: panel-tabset
-
 ##### Weekday Morning Peak
 
 ```{r}
@@ -1420,7 +1418,7 @@ morning_comparison <- compare_lmsa_methods(
 )
 ```
 
-The comparative analysis reveals strong concordance between Local Moran’s I and Getis-Ord Gi* methods, with 77 hexagons (42.8% of significant Moran’s I cases) classified as strong hotspots where both methods agree (High-High and Hot Spot). This dual confirmation provides high confidence for prioritizing these locations in transport planning. The cross-tabulation indicates 180 hexagons significant in Moran’s I, while Gi* significance could not be determined (NA), suggesting Moran’s I is more sensitive to spatial patterns under the current configuration.
+The comparative analysis reveals strong concordance between Local Moran’s I and Getis-Ord Gi\* methods, with 77 hexagons (42.8% of significant Moran’s I cases) classified as strong hotspots where both methods agree (High-High and Hot Spot). This dual confirmation provides high confidence for prioritizing these locations in transport planning. The cross-tabulation indicates 180 hexagons significant in Moran’s I, while Gi\* significance could not be determined (NA), suggesting Moran’s I is more sensitive to spatial patterns under the current configuration.
 
 ```{r}
 #| code-summary: Create agreement maps
@@ -1428,11 +1426,11 @@ The comparative analysis reveals strong concordance between Local Moran’s I an
 plot_lmsa_agreement(morning_moran, morning_gi, "Weekday Morning Peak")
 ```
 
-The agreement map displays strong hotspots (dark red) concentrated in established residential corridors across northern zones (Woodlands, Sembawang, Yishun), central regions (Bishan, Ang Mo Kio, Toa Payoh), western areas (Jurong East, Clementi, Bukit Batok), and eastern estates (Tampines, Bedok, Pasir Ris). These represent the most robust evidence of sustained high boarding activity, with 77 dual-confirmed hotspots where both Local Moran’s I and Getis-Ord Gi* methods agree—warranting priority for capacity allocation and service-frequency optimization.
+The agreement map displays strong hotspots (dark red) concentrated in established residential corridors across northern zones (Woodlands, Sembawang, Yishun), central regions (Bishan, Ang Mo Kio, Toa Payoh), western areas (Jurong East, Clementi, Bukit Batok), and eastern estates (Tampines, Bedok, Pasir Ris). These represent the most robust evidence of sustained high boarding activity, with 77 dual-confirmed hotspots where both Local Moran’s I and Getis-Ord Gi\* methods agree—warranting priority for capacity allocation and service-frequency optimization.
 
-Orange clusters indicate “Moran Only (High-High)” hexagons—26 locations showing significant spatial clustering in Moran’s I but not meeting Gi*’s stricter hotspot threshold. These represent moderate-intensity clusters still relevant for transport planning. Yellow patches show 47 “Spatial Outlier (Moran)” hexagons with Low-High patterns scattered across various regions, representing areas of lower boarding surrounded by high-activity neighbors—potentially transit-dependent zones, parks, or areas with mixed land-use characteristics requiring investigation.
+Orange clusters indicate “Moran Only (High-High)” hexagons—26 locations showing significant spatial clustering in Moran’s I but not meeting Gi\*’s stricter hotspot threshold. These represent moderate-intensity clusters still relevant for transport planning. Yellow patches show 47 “Spatial Outlier (Moran)” hexagons with Low-High patterns scattered across various regions, representing areas of lower boarding surrounded by high-activity neighbors—potentially transit-dependent zones, parks, or areas with mixed land-use characteristics requiring investigation.
 
-Notably absent are blue “Strong Coldspot (Both Agree)” hexagons, confirming that no areas exhibit statistically significant low-activity clustering under both methods. The light-blue “Gi Only (Hot Spot)”* category—23 locations—identifies hotspots detected by Gi* but missed by Moran’s I, though their extent remains limited. The predominant grey coverage (91.7 % of hexagons) indicates areas without significant spatial autocorrelation, confirming that meaningful clustering remains localized to specific corridors rather than distributed uniformly across Singapore.
+Notably absent are blue “Strong Coldspot (Both Agree)” hexagons, confirming that no areas exhibit statistically significant low-activity clustering under both methods. The light-blue “Gi Only (Hot Spot)”\* category—23 locations—identifies hotspots detected by Gi\* but missed by Moran’s I, though their extent remains limited. The predominant grey coverage (91.7 % of hexagons) indicates areas without significant spatial autocorrelation, confirming that meaningful clustering remains localized to specific corridors rather than distributed uniformly across Singapore.
 
 ##### Weekday Afternoon Peak
 
@@ -1446,7 +1444,7 @@ afternoon_comparison <- compare_lmsa_methods(
 )
 ```
 
-The afternoon peak shows lower concordance between Local Moran’s I and Getis-Ord Gi* methods than the morning period, with only 38 dual-confirmed hotspots (31.4% of significant cases) compared to 77 in the morning. This indicates more spatial dispersion of boarding activity around employment centers. Moran’s I identifies 121 significant hexagons, while Gi* results are unavailable in this comparison, suggesting that Moran’s I remains the more sensitive indicator for detecting afternoon spatial clustering.
+The afternoon peak shows lower concordance between Local Moran’s I and Getis-Ord Gi\* methods than the morning period, with only 38 dual-confirmed hotspots (31.4% of significant cases) compared to 77 in the morning. This indicates more spatial dispersion of boarding activity around employment centers. Moran’s I identifies 121 significant hexagons, while Gi\* results are unavailable in this comparison, suggesting that Moran’s I remains the more sensitive indicator for detecting afternoon spatial clustering.
 
 ```{r}
 #| code-summary: Create agreement maps
@@ -1456,7 +1454,7 @@ plot_lmsa_agreement(afternoon_moran, afternoon_gi, "Weekday Afternoon Peak")
 
 Strong hotspots (dark red) appear scattered across northern areas (Woodlands, Yishun), central business districts, western zones (Jurong, Clementi), and eastern regions (Tampines, Bedok), representing key employment departure points. However, the smaller clusters and wider dispersion confirm that afternoon mobility lacks the spatial cohesion observed during the morning peak, reflecting more diversified trip destinations.
 
-Orange clusters indicate “Moran Only (High-High)” hexagons—14 locations showing significant clustering under Moran’s I but not meeting Gi\*’s hotspot threshold. Yellow patches mark 28 “Spatial Outlier (Moran)” hexagons exhibiting Low-High patterns, suggesting localized low-boarding zones surrounded by high-activity areas—potentially near transit interchanges or mixed-use developments. The light-blue “Gi Only (Hot Spot)”* group—21 locations—represents hotspots uniquely identified by Gi*, though relatively limited in extent. The dominant grey coverage (93.3 % of hexagons) indicates non-significant areas, confirming that afternoon clustering is highly localized rather than forming extensive corridors.
+Orange clusters indicate “Moran Only (High-High)” hexagons—14 locations showing significant clustering under Moran’s I but not meeting Gi\*’s hotspot threshold. Yellow patches mark 28 “Spatial Outlier (Moran)” hexagons exhibiting Low-High patterns, suggesting localized low-boarding zones surrounded by high-activity areas—potentially near transit interchanges or mixed-use developments. The light-blue “Gi Only (Hot Spot)”\* group—21 locations—represents hotspots uniquely identified by Gi\*, though relatively limited in extent. The dominant grey coverage (93.3 % of hexagons) indicates non-significant areas, confirming that afternoon clustering is highly localized rather than forming extensive corridors.
 
 The reduced 38 dual-confirmed hotspots compared with the morning’s 77 and their fragmented distribution suggest the afternoon period requires distributed service capacity across multiple employment and commercial hubs—such as the CBD, Raffles Place, Jurong Gateway, and Tampines Regional Centre—rather than the corridor-focused strategy seen in the morning. These strong hotspots nevertheless warrant targeted high-capacity service despite the overall dispersed pattern.
 
@@ -1472,7 +1470,7 @@ weekend_comparison <- compare_lmsa_methods(
 )
 ```
 
-Weekend and holiday periods show intermediate concordance between Local Moran’s I and Getis-Ord Gi* methods, with 59 dual-confirmed hotspots (42.1% of significant cases)—falling between the morning’s 77 and afternoon’s 38. Moran’s I identifies 140 significant hexagons, the highest count among all periods, suggesting broader spatial clustering despite lower trip volumes. This implies that weekend travel patterns remain spatially structured, while Gi* continues to apply stricter thresholds for hotspot detection.
+Weekend and holiday periods show intermediate concordance between Local Moran’s I and Getis-Ord Gi\* methods, with 59 dual-confirmed hotspots (42.1% of significant cases)—falling between the morning’s 77 and afternoon’s 38. Moran’s I identifies 140 significant hexagons, the highest count among all periods, suggesting broader spatial clustering despite lower trip volumes. This implies that weekend travel patterns remain spatially structured, while Gi\* continues to apply stricter thresholds for hotspot detection.
 
 ```{r}
 #| code-summary: Create agreement maps
@@ -1483,7 +1481,7 @@ plot_lmsa_agreement(weekend_moran, weekend_gi, "Weekend/Holiday")
 
 Strong hotspots (dark red) are broadly distributed across northern zones (Woodlands, Yishun), central urban areas (Orchard, Marina Bay), central-southern regions (notably Geylang and Paya Lebar), western mall districts (Jurong East), and eastern coastal areas (Tampines, Bedok, Pasir Ris). This dispersion reflects diverse weekend trip purposes—including shopping, entertainment, dining, and recreation—rather than the concentrated commuter corridors seen on weekdays.
 
-Orange clusters represent “Moran Only (High-High)” hexagons—15 locations showing moderate clustering under Moran’s I but not meeting Gi\*’s hotspot threshold, suggesting smaller yet notable local activity centers. Yellow patches denote “Spatial Outlier (Moran)” hexagons—16 Low-High locations—indicating isolated low-boarding areas surrounded by higher activity, often adjacent to parks, leisure zones, or coastal attractions. The light-blue “Gi Only (Hot Spot)”* category includes 19 locations, marking hotspots uniquely identified by Gi*. The grey coverage (92.3 % of hexagons) confirms that significant clustering remains limited to major leisure and retail nodes.
+Orange clusters represent “Moran Only (High-High)” hexagons—15 locations showing moderate clustering under Moran’s I but not meeting Gi\*’s hotspot threshold, suggesting smaller yet notable local activity centers. Yellow patches denote “Spatial Outlier (Moran)” hexagons—16 Low-High locations—indicating isolated low-boarding areas surrounded by higher activity, often adjacent to parks, leisure zones, or coastal attractions. The light-blue “Gi Only (Hot Spot)”\* category includes 19 locations, marking hotspots uniquely identified by Gi\*. The grey coverage (92.3 % of hexagons) confirms that significant clustering remains limited to major leisure and retail nodes.
 
 The 59 dual-confirmed hotspots highlight key multi-functional centers such as regional town hubs, coastal entertainment districts, and mixed-use commercial areas. Compared with weekday patterns, weekend and holiday clustering is broader and more evenly distributed, emphasizing balanced service coverage across recreation and attraction nodes rather than focused corridor capacity.
 :::
@@ -2152,7 +2150,6 @@ When running the code above, an long warning of `Error exit, tauk2, IFAULT = 12`
 -   Mann-Kendall test requires variation to detect trends
 
 ::: panel-tabset
-
 #### Weekday Morning Peak
 
 ```{r}
@@ -2191,14 +2188,13 @@ ggplot(data = ehsa_weekend, aes(x = classification)) +
 ```
 
 Weekend patterns show similar dominance of "no pattern detected" hexagons (approximately 1,500), indicating stable leisure travel patterns. Persistent cold spots are more prominent than weekdays, reflecting zones with consistently low weekend activity. Consecutive cold spots appear slightly elevated, suggesting emerging low-activity areas. Hot spot patterns remain minimal, confirming weekend boarding disperses across multiple recreational nodes rather than forming concentrated emerging trends.
-
 :::
 
 ### Combine Gi\* values with EHSA classification
 
 ::: panel-tabset
 \
-#### Weekday Morning Peak
+\#### Weekday Morning Peak
 
 ```{r}
 #| code-summary: Merge Gi* values with EHSA classifications
@@ -2224,7 +2220,8 @@ ehsa_sig_am <- ehsa_morning_complete %>% filter(p_value < 0.05)
 ehsa_sig_am
 
 ```
-The absence of significant EHSA patterns (p < 0.05) reflects the limited three-month temporal window and stable boarding patterns across the study period. With only three time points, detecting statistically significant emerging trends requires substantial month-to-month variation. Most hexagons maintain consistent activity levels, preventing identification of meaningful hotspot evolution despite spatial clustering at individual time slices.
+
+The absence of significant EHSA patterns (p \< 0.05) reflects the limited three-month temporal window and stable boarding patterns across the study period. With only three time points, detecting statistically significant emerging trends requires substantial month-to-month variation. Most hexagons maintain consistent activity levels, preventing identification of meaningful hotspot evolution despite spatial clustering at individual time slices.
 
 #### Weekday Afternoon Peak
 
@@ -2253,7 +2250,8 @@ ehsa_sig_pm <- ehsa_afternoon_complete %>% filter(p_value < 0.05)
 ehsa_sig_pm
 
 ```
-Afternoon peak similarly shows no significant EHSA patterns (p < 0.05), mirroring morning results. The three-month timeframe proves insufficient for detecting meaningful temporal trends in afternoon boarding patterns. Employment-based departure patterns remain stable across the study period, with no emerging hotspots or significant spatial-temporal evolution. Extended monitoring would better capture potential seasonal or longer-term employment center dynamics.
+
+Afternoon peak similarly shows no significant EHSA patterns (p \< 0.05), mirroring morning results. The three-month timeframe proves insufficient for detecting meaningful temporal trends in afternoon boarding patterns. Employment-based departure patterns remain stable across the study period, with no emerging hotspots or significant spatial-temporal evolution. Extended monitoring would better capture potential seasonal or longer-term employment center dynamics.
 
 #### Weekend/Holiday
 
@@ -2283,8 +2281,7 @@ ehsa_sig_pm
 
 ```
 
-Weekend patterns also show no significant EHSA classifications (p < 0.05), consistent with both weekday periods. Leisure travel patterns remain stable across three months, with no emerging recreational hotspots. The uniform lack of significant temporal trends across all three periods confirms the three-month window is insufficient for detecting meaningful spatial-temporal evolution in Singapore's bus boarding patterns.
-
+Weekend patterns also show no significant EHSA classifications (p \< 0.05), consistent with both weekday periods. Leisure travel patterns remain stable across three months, with no emerging recreational hotspots. The uniform lack of significant temporal trends across all three periods confirms the three-month window is insufficient for detecting meaningful spatial-temporal evolution in Singapore's bus boarding patterns.
 :::
 
 ## Conclusions and Recommendations
@@ -2293,13 +2290,13 @@ This study successfully identified spatial clustering patterns in Singapore's bu
 
 ### Key Conclusions
 
-Local Moran’s I and Getis-Ord Gi* analyses identified significant spatial clustering with strong method concordance (77 dual-confirmed morning hotspots, 38 afternoon, and 59 weekend/holiday). Weekday morning hotspots concentrate in residential corridors (Jurong East, Clementi, Sengkang, Punggol, Woodlands, Yishun, Tampines, Bedok), confirming origin-based commuter patterns. Afternoon hotspots are more geographically dispersed across employment and commercial centers, reflecting distributed workplace departures, while weekend patterns highlight leisure-oriented and recreational nodes with broader spatial spread.
+Local Moran’s I and Getis-Ord Gi\* analyses identified significant spatial clustering with strong method concordance (77 dual-confirmed morning hotspots, 38 afternoon, and 59 weekend/holiday). Weekday morning hotspots concentrate in residential corridors (Jurong East, Clementi, Sengkang, Punggol, Woodlands, Yishun, Tampines, Bedok), confirming origin-based commuter patterns. Afternoon hotspots are more geographically dispersed across employment and commercial centers, reflecting distributed workplace departures, while weekend patterns highlight leisure-oriented and recreational nodes with broader spatial spread.
 
 However, EHSA revealed no significant emerging trends across all periods, indicating stable boarding patterns within the three-month window. The right-skewed trip distribution and presence of 21 isolated hexagons with valid data underscore Singapore's heterogeneous spatial structure.
 
 ### Limitations
 
-Several methodological and data constraints limit the study's scope. 
+Several methodological and data constraints limit the study's scope.
 
 The three-month observation window (July-September 2025) proved insufficient for EHSA trend detection, as Mann-Kendall tests require substantial temporal variation across multiple time points to identify meaningful evolution. This brief period cannot capture seasonal variations, policy interventions, or longer-term urban development impacts on mobility patterns. Additionally, monthly aggregation without daily granularity obscures intra-period variations such as weekday-specific fluctuations, public holidays, or weather-related disruptions that influence boarding behavior.
 
@@ -2310,5 +2307,3 @@ The analysis also excludes critical contextual variables that could explain spat
 For infrastructure planning, prioritize persistent dual-confirmed hotspots requiring sustained high-capacity service. Implement dynamic capacity allocation for period-specific zones—morning residential corridors need peak-hour scaling, while weekend recreational nodes warrant flexible frequency adjustments.
 
 Methodologically, extend temporal coverage to 12+ months spanning multiple seasons to enable meaningful EHSA trend detection. Incorporate daily granularity to capture intra-period variations and validate stability assumptions. Integrate socioeconomic variables and land-use data to explain spatial outliers and isolated hexagon patterns, enhancing predictive capacity for proactive transport planning interventions.
-
-

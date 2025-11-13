@@ -29,8 +29,7 @@ pacman::p_load(SpatialAcc, sf, tidyverse,
 
 The task is to count number of point features (i.e. CHAS clinics) within 1km of another point features (i.e. eldercare centre).
 
-::::::::::::: panel-tabset
-
+:::::: panel-tabset
 ### Read data
 
 ```{r}
@@ -45,6 +44,7 @@ eldercare <- st_read(dsn = "data/rawdata/ELDERCARE",
 CHAS <- st_read("data/rawdata/CHASClinics.kml") %>%
   st_transform(crs = 3414)
 ```
+
 ### Buffering
 
 Next, `st_buffer()` of sf package is used to create a buffer of 1km around each eldercare features
@@ -56,8 +56,8 @@ buffer_1km <- st_buffer(eldercare,
 
 ### Visualising
 
-::::::: columns
-:::: {.column width="40%"}
+::::: columns
+::: {.column width="40%"}
 The code chunk below is used to plot the newly created buffers and the CHAS clinics.
 
 ```{r}
@@ -68,11 +68,9 @@ tm_shape(buffer_1km) +
 tm_shape(CHAS) +
   tm_dots()
 ```
+:::
 
-::::
-
-:::: {.column width="60%"}
-
+::: {.column width="60%"}
 ```{r}
 #| echo: false
 tmap_mode("view")
@@ -81,25 +79,23 @@ tm_shape(buffer_1km) +
 tm_shape(CHAS) +
   tm_dots()
 ```
-::::
-:::::::
+:::
+:::::
 
 ### Counting points
 
 Lastly, the code chunk below is used to count the number of CHAS clinics with 1km of each eldercare centre.
 
-
 ```{r}
 buffer_1km$pts_count <- lengths(
   st_intersects(buffer_1km, CHAS))
 ```
-:::::::::::::
+::::::
 
 ## Importing Data
 
-::::: panel-tabset
+::: panel-tabset
 ### Geospatail data
-
 
 ```{r}
 #| output: false
@@ -122,11 +118,11 @@ eldercare <- st_read(dsn = "data/geospatial",
 ODMatrix <- read_csv("data/aspatial/OD_Matrix.csv", 
                      skip = 0)
 ```
-:::::
+:::
 
 ## Data cleaning and Updating Attributes
 
-:::::: panel-tabset
+::: panel-tabset
 ### Supply
 
 ```{r}
@@ -135,7 +131,6 @@ eldercare <- eldercare %>%
   mutate(capacity = 100)
 ```
 
-
 ### Demand
 
 ```{r}
@@ -143,7 +138,6 @@ hexagons <- hexagons %>%
   select(fid) %>%
   mutate(demand = 100)
 ```
-
 
 ### OD Matrix
 
@@ -157,13 +151,11 @@ distmat <- ODMatrix %>%
 ```{r}
 distmat_km <- as.matrix(distmat/1000)
 ```
-
-::::::
+:::
 
 ## Computing Handsen's Accessibility
 
-:::::: panel-tabset
-
+::: panel-tabset
 ### power=0.5
 
 ```{r}
@@ -226,7 +218,6 @@ hexagon_Hansen_20 <- bind_cols(hexagons, acc_Hansen_20)
 
 ### power=2.5
 
-
 ```{r}
 acc_Hansen_25 <- data.frame(ac(hexagons$demand,
                             eldercare$capacity,
@@ -239,15 +230,13 @@ colnames(acc_Hansen_25) <- "accHansen_25"
 acc_Hansen_25 <- as_tibble(acc_Hansen_25)
 hexagon_Hansen_25 <- bind_cols(hexagons, acc_Hansen_25)
 ```
-
-::::::
+:::
 
 ------------------------------------------------------------------------
 
 ## Visualising Accessibility
 
-:::: panel-tabset
-
+::: panel-tabset
 ### power=0.5
 
 ```{r}
@@ -279,7 +268,6 @@ tm_shape(eldercare) +
   tm_grid(lwd = 0.1, alpha = 0.5)
 ```
 
-
 ### power=1
 
 ```{r}
@@ -310,6 +298,7 @@ tm_shape(eldercare) +
   tm_scale_bar() +
   tm_grid(lwd = 0.1, alpha = 0.5)
 ```
+
 ### power=1.5
 
 ```{r}
@@ -402,14 +391,13 @@ tm_shape(eldercare) +
   tm_scale_bar() +
   tm_grid(lwd = 0.1, alpha = 0.5)
 ```
-::::
+:::
 
 ------------------------------------------------------------------------
 
 ## Statistical graphic
 
-::::: panel-tabset
-
+::: panel-tabset
 ### power=0.5
 
 ```{r}
@@ -499,5 +487,4 @@ ggbetweenstats(
   y = accHansen_25,
   type = "p")
 ```
-
-:::::
+:::
