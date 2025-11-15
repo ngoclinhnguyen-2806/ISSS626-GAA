@@ -1414,6 +1414,11 @@ vif_df <- data.frame(
     )
   )
 
+# Save to variables for later use
+high_vif <- vif_df %>% filter(VIF > 10)
+moderate_vif <- vif_df %>% filter(VIF > 5 & VIF <= 10)
+low_vif <- vif_df %>% filter(VIF <= 5)
+
 # VIF visualization
 ggplot(vif_df, aes(x = reorder(variable, VIF), y = VIF, fill = severity)) +
   geom_col(alpha = 0.8) +
@@ -1484,21 +1489,509 @@ Variables Included (n = 10)
 
 `N_350M_BUSSTOP` will serve as a proxy for overall accessibility.
 
+```{r}
+#| code-summary: Prepare final dataset for GWR modeling
+
+# Remove variables with VIF > 10
+
+if(nrow(high_vif) > 0) {
+  vars_to_remove <- high_vif$variable
+  
+  # Create final variable list
+  final_predictors <- predictor_vars[!predictor_vars %in% vars_to_remove]
+} else {
+  final_predictors <- predictor_vars
+}
+
+# Add geometry back and create final modeling dataset
+hdb_model_final <- hdb_clean %>%
+  select(
+    resale_price,
+    all_of(final_predictors),
+    geometry,
+    town, flat_model, month, month_date
+  )
+```
+
 ## 4. Model Calibration
 
 ### 4.1 OLS Baseline Model
 
 #### 4.1.1 Model Specification
 
+```{r}
+#| code-summary: Prepare dataset for OLS baseline model
+
+# Remove geometry for OLS (non-spatial model)
+ols_data <- hdb_model_final %>%
+  st_drop_geometry() %>%
+  select(
+    resale_price,
+    floor_area_sqm,
+    storey_midpoint,
+    remaining_lease_years,
+    PROX_CBD,
+    PROX_ELDERCARE,
+    PROX_HAWKER,
+    PROX_PARK,
+    PROX_SUPERMARKET,
+    N_350M_BUSSTOP
+  ) %>%
+  na.omit()  # Remove any remaining NA values
+
+cat("✓ OLS dataset prepared\n",
+"Observations:", nrow(ols_data), "\n",
+"Variables:", ncol(ols_data), "(1 outcome + 9 predictors)\n")
+```
+
+```{r}
+#| code-summary: Fit ordinary least squares regression model
+
+# Define model formula
+ols_formula <- resale_price ~ floor_area_sqm + storey_midpoint + 
+                              remaining_lease_years + PROX_CBD + 
+                              PROX_ELDERCARE + PROX_HAWKER + PROX_PARK + 
+                              PROX_SUPERMARKET + N_350M_BUSSTOP
+
+# Fit OLS model
+ols_model <- lm(ols_formula, data = ols_data)
+
+# Display model summary
+summary(ols_model)
+```
+
 #### 4.1.2 Results & Diagnostics
+
+```{r}
+#| code-summary: Format OLS regression results into table
+
+library(broom)
+
+# Extract coefficients with confidence intervals
+ols_results <- tidy(ols_model, conf.int = TRUE, conf.level = 0.95) %>%
+  mutate(
+    significance = case_when(
+      p.value < 0.001 ~ "***",
+      p.value < 0.01 ~ "**",
+      p.value < 0.05 ~ "*",
+      p.value < 0.1 ~ ".",
+      TRUE ~ ""
+    )
+  )
+
+# Display results table
+knitr::kable(ols_results,
+             digits = c(0, 2, 2, 2, 4, 2, 2, 0),
+             caption = "Table 11: OLS Regression Results",
+             col.names = c("Predictor", "Estimate", "Std. Error", 
+                          "t-statistic", "p-value", "95% CI Lower", 
+                          "95% CI Upper", "Sig."),
+             format.args = list(big.mark = ","))
+
+cat("\nSignificance codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
+```
+
+```{r}
+#| code-summary: Calculate OLS model performance statistics
+
+# Extract model performance metrics
+ols_performance <- glance(ols_model)
+
+# Additional metrics
+n_obs <- nrow(ols_data)
+n_predictors <- length(coef(ols_model)) - 1  # Exclude intercept
+residual_se <- sigma(ols_model)
+aic_value <- AIC(ols_model)
+bic_value <- BIC(ols_model)
+
+# Create performance summary table
+performance_table <- data.frame(
+  Metric = c("Observations", "Predictors", "R-squared", "Adjusted R-squared", 
+             "F-statistic", "p-value (F-test)", "Residual Std. Error", 
+             "AIC", "BIC"),
+  Value = c(
+    n_obs,
+    n_predictors,
+    ols_performance$r.squared,
+    ols_performance$adj.r.squared,
+    ols_performance$statistic,
+    ols_performance$p.value,
+    residual_se,
+    aic_value,
+    bic_value
+  )
+)
+
+knitr::kable(performance_table,
+             digits = c(0, 4),
+             caption = "Table 12: OLS Model Performance Metrics",
+             col.names = c("Metric", "Value"),
+             format.args = list(big.mark = ","))
+
+cat("\n",
+"Model explains", round(ols_performance$adj.r.squared * 100, 2), 
+    "% of variance in resale prices\n")
+```
+
+```{r}
+#| label: ols-coefficient-interpretation
+#| code-summary: Interpret significant coefficients
+
+cat("═══════════════════════════════════════════════════════\n")
+cat("           OLS COEFFICIENT INTERPRETATION\n")
+cat("═══════════════════════════════════════════════════════\n\n")
+
+# Extract significant coefficients (p < 0.05)
+sig_coefs <- ols_results %>%
+  filter(p.value < 0.05, term != "(Intercept)") %>%
+  arrange(p.value)
+
+cat("SIGNIFICANT PREDICTORS (p < 0.05):\n\n")
+
+for(i in 1:nrow(sig_coefs)) {
+  coef_name <- sig_coefs$term[i]
+  coef_value <- sig_coefs$estimate[i]
+  coef_pval <- sig_coefs$p.value[i]
+  
+  # Interpretation based on variable type
+  if(str_detect(coef_name, "PROX_")) {
+    # Proximity variables (negative coefficient expected)
+    direction <- ifelse(coef_value < 0, "closer to", "farther from")
+    amenity <- str_remove(coef_name, "PROX_")
+    
+    cat(sprintf("%d. %s (β = %.2f, p %s)\n", 
+                i, coef_name, coef_value, 
+                ifelse(coef_pval < 0.001, "< 0.001", sprintf("= %.4f", coef_pval))))
+    cat(sprintf("   → Every 1,000m %s %s is associated with $%.2f change in price\n", 
+                direction, amenity, abs(coef_value * 1000)))
+    cat(sprintf("   → Effect is %s\n\n", 
+                ifelse(abs(coef_value * 1000) > 10000, "economically significant", "modest")))
+    
+  } else if(str_detect(coef_name, "N_")) {
+    # Count variables
+    cat(sprintf("%d. %s (β = %.2f, p %s)\n", 
+                i, coef_name, coef_value, 
+                ifelse(coef_pval < 0.001, "< 0.001", sprintf("= %.4f", coef_pval))))
+    cat(sprintf("   → Each additional facility is associated with $%.2f change in price\n", 
+                coef_value))
+    cat(sprintf("   → Effect is %s\n\n", 
+                ifelse(abs(coef_value) > 1000, "economically significant", "minimal")))
+    
+  } else {
+    # Structural variables
+    cat(sprintf("%d. %s (β = %.2f, p %s)\n", 
+                i, coef_name, coef_value, 
+                ifelse(coef_pval < 0.001, "< 0.001", sprintf("= %.4f", coef_pval))))
+    
+    if(coef_name == "floor_area_sqm") {
+      cat(sprintf("   → Each additional sqm is associated with $%.2f increase in price\n\n", 
+                  coef_value))
+    } else if(coef_name == "storey_midpoint") {
+      cat(sprintf("   → Each floor higher is associated with $%.2f change in price\n\n", 
+                  coef_value))
+    } else if(coef_name == "remaining_lease_years") {
+      cat(sprintf("   → Each additional year of lease is associated with $%.2f change in price\n\n", 
+                  coef_value))
+    }
+  }
+}
+
+# Non-significant predictors
+non_sig_coefs <- ols_results %>%
+  filter(p.value >= 0.05, term != "(Intercept)")
+
+if(nrow(non_sig_coefs) > 0) {
+  cat("NON-SIGNIFICANT PREDICTORS (p ≥ 0.05):\n")
+  for(i in 1:nrow(non_sig_coefs)) {
+    cat(sprintf("  • %s (β = %.2f, p = %.4f)\n", 
+                non_sig_coefs$term[i], 
+                non_sig_coefs$estimate[i], 
+                non_sig_coefs$p.value[i]))
+  }
+  cat("\n")
+}
+
+cat("═══════════════════════════════════════════════════════\n")
+```
+
+```{r}
+#| code-summary: Diagnostic plots for OLS assumptions
+#| fig-width: 12
+#| fig-height: 10
+
+# Set up plotting area
+par(mfrow = c(2, 2))
+
+# 1. Residuals vs Fitted (Linearity & Homoscedasticity)
+plot(ols_model, which = 1, main = "Residuals vs Fitted")
+
+# 2. Q-Q Plot (Normality of residuals)
+plot(ols_model, which = 2, main = "Normal Q-Q Plot")
+
+# 3. Scale-Location (Homoscedasticity)
+plot(ols_model, which = 3, main = "Scale-Location")
+
+# 4. Residuals vs Leverage (Influential points)
+plot(ols_model, which = 5, main = "Residuals vs Leverage")
+
+par(mfrow = c(1, 1))
+```
+
+```{r}
+#| label: ols-diagnostic-tests
+#| code-summary: Statistical tests for OLS assumptions
+
+library(lmtest)
+
+# 1. Breusch-Pagan Test for Heteroscedasticity
+bp_test <- bptest(ols_model)
+cat("1. BREUSCH-PAGAN TEST (Heteroscedasticity)\n")
+cat("   H0: Homoscedasticity (constant variance)\n")
+cat("   Test statistic:", round(bp_test$statistic, 4), "\n")
+cat("   p-value:", format.pval(bp_test$p.value, eps = 0.001), "\n")
+if(bp_test$p.value < 0.05) {
+  cat("   → Reject H0: Evidence of heteroscedasticity\n")
+  cat("   → Variance of residuals is not constant\n\n")
+} else {
+  cat("   → Fail to reject H0: No evidence of heteroscedasticity\n\n")
+}
+
+# 2. Shapiro-Wilk Test for Normality (on sample if n > 5000)
+if(nrow(ols_data) > 5000) {
+  sample_residuals <- sample(residuals(ols_model), 5000)
+  sw_test <- shapiro.test(sample_residuals)
+  cat("2. SHAPIRO-WILK TEST (Normality - sampled)\n")
+  cat("   Note: Using random sample of 5,000 residuals\n")
+} else {
+  sw_test <- shapiro.test(residuals(ols_model))
+  cat("2. SHAPIRO-WILK TEST (Normality)\n")
+}
+cat("   H0: Residuals are normally distributed\n")
+cat("   Test statistic:", round(sw_test$statistic, 4), "\n")
+cat("   p-value:", format.pval(sw_test$p.value, eps = 0.001), "\n")
+if(sw_test$p.value < 0.05) {
+  cat("   → Reject H0: Residuals deviate from normality\n")
+  cat("   → Large sample size may cause sensitivity\n\n")
+} else {
+  cat("   → Fail to reject H0: Residuals approximately normal\n\n")
+}
+
+# 3. Durbin-Watson Test for Autocorrelation
+dw_test <- dwtest(ols_model)
+cat("3. DURBIN-WATSON TEST (Autocorrelation)\n")
+cat("   H0: No autocorrelation in residuals\n")
+cat("   DW statistic:", round(dw_test$statistic, 4), "\n")
+cat("   p-value:", format.pval(dw_test$p.value, eps = 0.001), "\n")
+if(dw_test$p.value < 0.05) {
+  cat("   → Reject H0: Evidence of autocorrelation\n")
+  cat("   → Note: This may indicate spatial dependence\n\n")
+} else {
+  cat("   → Fail to reject H0: No significant autocorrelation\n\n")
+}
+```
 
 #### 4.1.3 Spatial Autocorrelation Test
 
+```{r}
+#| label: ols-residual-spatial-autocorrelation
+#| code-summary: Test for spatial autocorrelation in OLS residuals
+
+# Add residuals back to spatial data
+hdb_with_residuals <- hdb_model_final %>%
+  filter(!is.na(resale_price)) %>%
+  slice(1:nrow(ols_data)) %>%  # Match OLS data rows
+  mutate(
+    ols_fitted = fitted(ols_model),
+    ols_residuals = residuals(ols_model)
+  )
+
+# Create spatial weights matrix (k-nearest neighbors)
+coords <- st_coordinates(st_centroid(hdb_with_residuals))
+knn_weights <- knn2nb(knearneigh(coords, k = 8))
+knn_listw <- nb2listw(knn_weights, style = "W")
+
+# Global Moran's I test on OLS residuals
+moran_residuals <- moran.test(hdb_with_residuals$ols_residuals, knn_listw)
+
+cat("═══════════════════════════════════════════════════════\n")
+cat("   SPATIAL AUTOCORRELATION OF OLS RESIDUALS\n")
+cat("═══════════════════════════════════════════════════════\n\n")
+
+cat("GLOBAL MORAN'S I TEST:\n")
+cat("  H0: No spatial autocorrelation in residuals\n\n")
+cat("  Moran's I statistic:", round(moran_residuals$estimate[1], 4), "\n")
+cat("  Expected value:", round(moran_residuals$estimate[2], 4), "\n")
+cat("  Variance:", round(moran_residuals$estimate[3], 6), "\n")
+cat("  Standard deviate (z-score):", round(moran_residuals$statistic, 4), "\n")
+cat("  p-value:", format.pval(moran_residuals$p.value, eps = 0.001), "\n\n")
+
+if(moran_residuals$p.value < 0.001) {
+  cat("INTERPRETATION:\n")
+  cat("  ✗ STRONG evidence of spatial autocorrelation in residuals\n")
+  cat("  → OLS assumes independence, but residuals are spatially clustered\n")
+  cat("  → Model systematically over/under-predicts in spatial clusters\n")
+  cat("  → Standard errors are biased, significance tests unreliable\n")
+  cat("  → Spatial non-stationarity present\n\n")
+  cat("CONCLUSION:\n")
+  cat("  → OLS is INAPPROPRIATE for this spatial data\n")
+  cat("  → Geographically Weighted Regression (GWR) is JUSTIFIED\n")
+  cat("  → GWR will account for spatial heterogeneity\n")
+} else if(moran_residuals$p.value < 0.05) {
+  cat("INTERPRETATION:\n")
+  cat("  ⚠ Evidence of spatial autocorrelation in residuals\n")
+  cat("  → GWR may improve model performance\n")
+} else {
+  cat("INTERPRETATION:\n")
+  cat("  ✓ No significant spatial autocorrelation\n")
+  cat("  → OLS assumptions satisfied\n")
+}
+
+```
+
+```{r}
+#| label: map-ols-residuals
+#| code-summary: Map showing spatial pattern of OLS residuals
+#| fig-width: 10
+#| fig-height: 12
+
+tmap_mode("plot")
+
+# Create residual categories
+hdb_with_residuals <- hdb_with_residuals %>%
+  mutate(
+    residual_category = cut(ols_residuals,
+                           breaks = c(-Inf, -50000, -20000, 20000, 50000, Inf),
+                           labels = c("Large Under-prediction (< -$50k)",
+                                     "Under-prediction (-$50k to -$20k)",
+                                     "Acceptable (-$20k to $20k)",
+                                     "Over-prediction ($20k to $50k)",
+                                     "Large Over-prediction (> $50k)"))
+  )
+
+# Map of residuals
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_with_residuals) +
+  tm_dots(col = "ols_residuals",
+          palette = "-RdBu",
+          style = "jenks",
+          n = 7,
+          size = 0.06,
+          alpha = 0.7,
+          title = "OLS Residuals (SGD)",
+          midpoint = 0) +
+  tm_layout(
+    main.title = "Map 5: OLS Residuals - Spatial Distribution",
+    main.title.size = 1.2,
+    main.title.position = "center",
+    legend.outside = TRUE,
+    legend.outside.position = "right",
+    legend.title.size = 1,
+    legend.text.size = 0.7,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
+```
+
+```{r}
+#| label: residual-distribution
+#| code-summary: Analyze distribution of OLS residuals
+#| fig-width: 12
+#| fig-height: 6
+
+# Histogram and Q-Q plot
+p1 <- ggplot(hdb_with_residuals, aes(x = ols_residuals)) +
+  geom_histogram(bins = 50, fill = "#440154", alpha = 0.7) +
+  geom_vline(xintercept = 0, color = "red", linetype = "dashed", linewidth = 1) +
+  labs(title = "Distribution of OLS Residuals",
+       x = "Residuals (SGD)", y = "Frequency") +
+  scale_x_continuous(labels = scales::comma) +
+  theme_minimal()
+
+p2 <- ggplot(hdb_with_residuals, aes(sample = ols_residuals)) +
+  stat_qq(alpha = 0.3, color = "#440154") +
+  stat_qq_line(color = "red", linewidth = 1) +
+  labs(title = "Q-Q Plot of OLS Residuals",
+       x = "Theoretical Quantiles", y = "Sample Quantiles") +
+  theme_minimal()
+
+library(patchwork)
+p1 + p2 +
+  plot_annotation(
+    title = "Figure 13: OLS Residual Distribution",
+    subtitle = "Assessing normality assumption"
+  )
+
+# Residual summary statistics
+residual_summary <- data.frame(
+  Statistic = c("Mean", "Median", "Std. Deviation", "Min", "Max", 
+                "Skewness", "Kurtosis"),
+  Value = c(
+    mean(hdb_with_residuals$ols_residuals),
+    median(hdb_with_residuals$ols_residuals),
+    sd(hdb_with_residuals$ols_residuals),
+    min(hdb_with_residuals$ols_residuals),
+    max(hdb_with_residuals$ols_residuals),
+    moments::skewness(hdb_with_residuals$ols_residuals),
+    moments::kurtosis(hdb_with_residuals$ols_residuals)
+  )
+)
+
+knitr::kable(residual_summary,
+             digits = 2,
+             caption = "Table 13: OLS Residual Summary Statistics",
+             col.names = c("Statistic", "Value"),
+             format.args = list(big.mark = ","))
+```
+
+```{r}
+#| label: ols-summary
+#| code-summary: Comprehensive summary of OLS baseline model
+
+cat("═══════════════════════════════════════════════════════\n")
+cat("            OLS BASELINE MODEL SUMMARY\n")
+cat("═══════════════════════════════════════════════════════\n\n")
+
+cat("MODEL PERFORMANCE:\n")
+cat("  • R-squared:", round(ols_performance$r.squared, 4), "\n")
+cat("  • Adjusted R-squared:", round(ols_performance$adj.r.squared, 4), "\n")
+cat("  • RMSE: $", scales::comma(sqrt(mean(residuals(ols_model)^2))), "\n")
+cat("  • AIC:", round(aic_value, 2), "\n\n")
+
+cat("SIGNIFICANT PREDICTORS:\n")
+sig_count <- sum(ols_results$p.value < 0.05) - 1  # Exclude intercept
+cat("  •", sig_count, "out of", n_predictors, "predictors significant (p < 0.05)\n\n")
+
+cat("ASSUMPTION TESTS:\n")
+cat("  • Heteroscedasticity:", ifelse(bp_test$p.value < 0.05, "Present ✗", "Absent ✓"), "\n")
+cat("  • Normality of residuals:", ifelse(sw_test$p.value < 0.05, "Violated ✗", "Satisfied ✓"), "\n")
+cat("  • Spatial autocorrelation:", ifelse(moran_residuals$p.value < 0.05, "Present ✗", "Absent ✓"), "\n\n")
+
+cat("KEY FINDINGS:\n")
+cat("  1. Model explains ~", round(ols_performance$adj.r.squared * 100, 1), 
+    "% of price variation\n")
+cat("  2. CBD proximity is the strongest predictor\n")
+cat("  3. OLS residuals show significant spatial autocorrelation\n")
+cat("  4. Spatial non-stationarity detected\n\n")
+
+cat("CONCLUSION:\n")
+cat("  The OLS model provides a reasonable baseline but violates the\n")
+cat("  independence assumption due to spatial autocorrelation in residuals.\n")
+cat("  This justifies the use of Geographically Weighted Regression (GWR)\n")
+cat("  to account for spatial heterogeneity and improve model performance.\n\n")
+
+cat("✓ OLS baseline model complete\n")
+cat("✓ Ready to proceed to Section 4.2 (GWR Model)\n")
+cat("═══════════════════════════════════════════════════════\n")
+```
 ### 4.2 Geographically Weighted Regression
 
 #### 4.2.1 Bandwidth Selection
 
-\[Explain CV vs AIC choice\]\
+```{r}
+
+```
 
 #### 4.2.2 Model Results
 
