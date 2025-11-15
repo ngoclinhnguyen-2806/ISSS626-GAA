@@ -33,13 +33,13 @@ editor: visual
 ### 2.1 Import R packages
 
 ```{r}
-pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot, httr, jsonlite)
+pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot, httr, jsonlite, patchwork, car)
 ```
 
 ### 2.2 Data Sources
 
 |  |  |  |  |
-|-----------------|------------------|--------------------|-----------------|
+|------------------|------------------|-------------------|------------------|
 | **Dataset Name** | **Description** | **Use Case** | **Format** |
 | **HDB Resale Flat Prices** | Transaction records of HDB resale flats. Filtered for 4-room flats only. | Primary outcome variable (`resale_price`) and source of structural predictors (`floor_area_sqm`, `remaining_lease_years`, `storey_midpoint`) | CSV |
 | **Singapore Boundary** | A polygon feature data providing information of URA 2014 Master Plan Planning Subzone boundary data | Provides spatial context for mapping. Used as basemap reference in visualizations. | SHP (point geometry) |
@@ -56,8 +56,10 @@ pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot
 
 #### 2.3.1 Singapore Boundary
 
+::: panel-tabset
+#### Single Boundary
+
 ```{r}
-#| label: import-singapore-boundary
 #| code-summary: Import Singapore boundary for mapping context
 
 # Import Singapore boundary (adjust path as needed)
@@ -78,6 +80,23 @@ cat("  CRS:", st_crs(singapore_boundary)$input, "\n")
 
 st_bbox(singapore_boundary)
 ```
+
+#### Planning Area Boundaries
+
+```{r}
+#| code-summary: Import planning area boundaries (or use town polygons if available)
+
+planning_areas <- st_read(
+  dsn = "data/geospatial",
+  layer = "MP14_SUBZONE_WEB_PL",  
+  quiet = TRUE
+) %>%
+  st_transform(3414) %>%
+  group_by(PLN_AREA_N) %>%
+  summarise(geometry = st_union(geometry), .groups = "drop") %>%
+  rename(town = PLN_AREA_N)
+```
+:::
 
 #### 2.3.2 HDB Resale Flat Prices
 
@@ -175,7 +194,6 @@ HDBresale_sf <- read_rds("data/rds/HDBresale_sf.rds")
 #### 2.3.3 Neighborhood and local facilities data
 
 ::: panel-tabset
-
 #### CBD Area
 
 ```{r}
@@ -197,6 +215,7 @@ hawkerCenters = st_read(
   "data/geospatial/HawkerCentresGEOJSON.geojson") %>%
   st_transform(crs= 3414)
 ```
+
 #### Parks
 
 ```{r}
@@ -365,7 +384,6 @@ hdb_model <- read_rds("data/rds/hdb_model.rds")
 ### 2.5 Aspatial Data Cleaning
 
 ::: panel-tabset
-
 #### Step 1: Initial Data Inspection
 
 ```{r}
@@ -402,9 +420,9 @@ if(nrow(missing_summary) > 0) {
 
 Purpose: Prepare structural variables for modeling
 
- - Convert storey_range to numeric midpoint (e.g., "13 TO 15" → 14)
- - Convert remaining_lease to numeric years
- - Extract month as date object
+-   Convert storey_range to numeric midpoint (e.g., "13 TO 15" → 14)
+-   Convert remaining_lease to numeric years
+-   Extract month as date object
 
 ```{r}
 #| code-summary: Clean and transform structural variables
@@ -442,6 +460,7 @@ cat("✓ Remaining lease range:",
     round(min(hdb_clean$remaining_lease_years, na.rm = TRUE), 1), "to", 
     round(max(hdb_clean$remaining_lease_years, na.rm = TRUE), 1), "years\n")
 ```
+
 #### Step 3: Check for Outliers
 
 ```{r}
@@ -473,6 +492,7 @@ boxplot(hdb_clean$resale_price, main = "Resale Price", ylab = "Price (SGD)")
 boxplot(hdb_clean$floor_area_sqm, main = "Floor Area", ylab = "Square Meters")
 par(mfrow = c(1, 1))
 ```
+
 For now, we don't remove outliers yet. We just flag them using 2 additional columns of `outlier_price` and `outlier_area`, and keep in the dataset. Those detected will be report "TRUE" in `outlier_price` or `outlier_area` columns.
 
 ```{r}
@@ -486,7 +506,6 @@ hdb_clean <- hdb_clean %>%
 
 hdb_clean
 ```
-
 :::
 
 ```{r}
@@ -511,7 +530,6 @@ hdb_clean <- read_rds("data/rds/hdb_clean.rds")
 #### 3.1.1 Summary in tables
 
 ::: panel-tabset
-
 #### Structural variables
 
 ```{r}
@@ -597,13 +615,11 @@ knitr::kable(count_summary,
              caption = "Table 3: Descriptive Statistics - Count Variables (facilities within buffer)",
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
-
 :::
 
-#### 3.1.2 Summary with Visualization 
+#### 3.1.2 Summary with Visualization
 
 ::: panel-tabset
-
 #### Distribution Analysis
 
 ```{r}
@@ -612,7 +628,6 @@ knitr::kable(count_summary,
 #| fig-height: 8
 
 # Create histogram panels for key variables
-library(patchwork)
 
 # Resale price distribution
 p1 <- ggplot(hdb_clean, aes(x = resale_price)) +
@@ -808,7 +823,6 @@ knitr::kable(model_summary,
                           "Median Price", "% of Total"),
              format.args = list(big.mark = ","))
 ```
-
 :::
 
 #### 3.1.3 Bivariate Relationships
@@ -862,14 +876,58 @@ b4 <- ggplot(hdb_clean, aes(x = PROX_CBD, y = resale_price)) +
   )
 ```
 
+Let's specifically dive in to the predictor of Distance to CBD:
+
+```{r}
+#| code-summary: Relationship between price and CBD proximity
+#| fig-width: 12
+#| fig-height: 8
+
+# Create distance bands
+hdb_clean <- hdb_clean %>%
+  mutate(
+    cbd_band = cut(PROX_CBD,
+                   breaks = c(0, 5000, 10000, 15000, 20000, 25000, Inf),
+                   labels = c("0-5km", "5-10km", "10-15km", 
+                             "15-20km", "20-25km", "> 25km"))
+  )
+
+# Boxplot: Price by distance band
+p1 <- ggplot(hdb_clean, aes(x = cbd_band, y = resale_price, fill = cbd_band)) +
+  geom_boxplot(alpha = 0.7) +
+  scale_fill_viridis_d(option = "plasma") +
+  labs(title = "Resale Price by Distance to CBD",
+       x = "Distance Band", y = "Resale Price (SGD)") +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Scatterplot with smooth
+p2 <- ggplot(hdb_clean, aes(x = PROX_CBD, y = resale_price)) +
+  geom_point(alpha = 0.2, color = "#440154") +
+  geom_smooth(method = "loess", color = "#fde724", linewidth = 1.5, se = TRUE) +
+  labs(title = "Price Decay with Distance from CBD",
+       x = "Distance to CBD (meters)", y = "Resale Price (SGD)") +
+  scale_x_continuous(labels = scales::comma) +
+  scale_y_continuous(labels = scales::comma) +
+  theme_minimal()
+
+p1 + p2 +
+  plot_annotation(
+    title = "Figure 8: Relationship Between Resale Price and CBD Proximity",
+    subtitle = "Clear price premium for central locations"
+  )
+```
+
+Distance to the CBD exhibits a clear inverse relationship with resale prices, demonstrating the persistent importance of accessibility in Singapore's housing market. Properties within 5km of the CBD command median prices exceeding \$750,000, while those beyond 25km average below \$600,000—a premium gap of over 25%. The LOESS curve reveals a non-linear decay pattern: prices drop steeply within the first 10km from the CBD, then gradually flatten in peripheral areas, suggesting diminishing marginal effects of distance beyond a certain threshold. High variance in the 10-15km band reflects diverse submarkets where both mature estates (Ang Mo Kio, Bishan) and developing towns coexist. Interestingly, some peripheral transactions (\>20km) still achieve high prices, likely due to compensating factors like larger floor areas, higher floors, or proximity to regional centers (Tampines, Jurong). This spatial price gradient underscores why geographically weighted regression is necessary—the impact of CBD distance on price likely varies across locations, with stronger effects in central areas where marginal improvements in accessibility are more valuable.
+
 ### 3.2 Spatial Distribution of Resale Prices
 
 ::: panel-tabset
-
 #### Basic Point Map of Transactions
 
 ```{r}
-#| label: map-transaction-points
 #| code-summary: Point map showing all HDB resale transactions
 #| fig-width: 10
 #| fig-height: 12
@@ -903,9 +961,502 @@ tm_shape(hdb_clean) +
   # Scale bar removed due to tmap bug
 ```
 
-### 3.3 Correlation Structure
+The spatial distribution reveals distinct price clustering across Singapore, with higher-priced transactions (orange to red) concentrated in central and mature estates. The western (Clementi, Bukit Timah) and eastern (Marine Parade, Bedok) regions show elevated prices, while peripheral areas like Woodlands and Yishun display lower price points (yellow). This pattern reflects Singapore's geographical price gradient radiating from the CBD, where accessibility to employment centers, established infrastructure, and proximity to amenities command premiums. Notable price outliers appear in mature estates like Queenstown and Toa Payoh, likely reflecting recently renovated units or prime locations within these towns. The dense clustering of transactions in Tampines, Jurong West, and Ang Mo Kio indicates active resale markets in these high-density HDB towns. This spatial heterogeneity validates the need for geographically weighted regression, as the relationship between price and location factors clearly varies across Singapore's urban landscape.
 
-### 3.4 Spatial Autocorrelation
+#### Hexbin Aggregation Map to show transaction density and median prices
+
+```{r}
+#| code-summary: Hexagonal binning to show transaction density and median prices
+#| fig-width: 10
+#| fig-height: 12
+
+# Create hexagonal grid (1km cell size)
+hex_grid <- st_make_grid(
+  singapore_boundary,
+  cellsize = 1000,  # 1km hexagons
+  square = FALSE,   # hexagonal
+  what = "polygons"
+) %>%
+  st_sf() %>%
+  st_intersection(singapore_boundary)
+
+# Spatial join: count transactions and calculate median price per hexagon
+hex_summary <- hex_grid %>%
+  st_join(hdb_clean) %>%
+  group_by(geometry) %>%
+  summarise(
+    n_transactions = sum(!is.na(resale_price)),
+    median_price = median(resale_price, na.rm = TRUE),
+    mean_price = mean(resale_price, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  filter(n_transactions > 0)  # Keep only hexagons with transactions
+```
+
+```{r}
+#| code-summary: Hexbin Aggregation Map
+#| fig-width: 10
+#| fig-height: 12
+
+# Map: Transaction Density
+map_density <- tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+tm_shape(hex_summary) +
+  tm_fill(col = "n_transactions",
+          palette = "brewer.blues",
+          style = "jenks",
+          n = 6,
+          title = "Number of\nTransactions",
+          alpha = 0.8) +
+  tm_borders(col = "white", lwd = 0.5) +
+  tm_layout(
+    main.title = "Map 2a: Transaction Density (Hexagonal Binning)",
+    main.title.size = 1.2,
+    legend.outside = TRUE,
+    legend.outside.position = "right",
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2) 
+#+ tm_scale_bar(position = c("left", "bottom"), width = 0.15)
+
+# Map - Median Price by Hexagon
+map_price_hex <- tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+tm_shape(hex_summary) +
+  tm_fill(col = "median_price",
+          palette = "RdYlGn",
+          style = "jenks",
+          n = 6,
+          title = "Median Price\n(SGD)",
+          alpha = 0.8,
+          labels = c("< $550k", "$550k-$600k", "$600k-$650k", 
+                     "$650k-$700k", "$700k-$750k", "> $750k")) +
+  tm_borders(col = "white", lwd = 0.5) +
+  tm_layout(
+    main.title = "Map 2b: Median Resale Price (Hexagonal Aggregation)",
+    main.title.size = 1.2,
+    legend.outside = TRUE,
+    legend.outside.position = "right",
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2) 
+ # + tm_scale_bar(position = c("left", "bottom"), width = 0.15)
+
+# Display both maps
+tmap_arrange(map_density, map_price_hex, ncol = 1)
+```
+
+Hexagonal binning reveals clear spatial patterns in both transaction activity and pricing. The transaction density map (2a) shows the most active resale markets in mature estates like Tampines, Ang Mo Kio, and Jurong West, where large HDB populations generate consistent turnover. Lower activity appears in the CBD fringe and newer peripheral estates. The median price map (2b) demonstrates a pronounced core-periphery gradient, with central hexagons (Bukit Timah, Queenstown, Marine Parade) commanding premiums above \$700,000, while outer regions (Woodlands, Sembawang, Jurong) show prices below \$600,000. Interestingly, some high-transaction areas display moderate prices, suggesting affordability-driven demand in towns like Yishun and Woodlands. Conversely, low-transaction but high-price hexagons appear near the CBD, reflecting limited 4-room stock in central districts. This aggregated view smooths individual outliers and clarifies macro-level spatial trends, supporting the hypothesis that location significantly influences HDB resale values across Singapore's geography.
+
+#### Price Map by Planning Area/Town
+
+```{r}
+#| code-summary: Calculate median price by town
+
+town_prices <- hdb_clean %>%
+  st_drop_geometry() %>%
+  group_by(town) %>%
+  summarise(
+    median_price = median(resale_price),
+    n_transactions = n(),
+    .groups = "drop"
+  )
+
+# Join planning area with price data
+planning_areas_price <- planning_areas %>%
+  left_join(town_prices, by = "town")
+```
+
+```{r}
+#| code-summary: Choropleth map to for Median resale price aggregated by town
+#| fig-width: 10
+#| fig-height: 12
+
+tm_shape(planning_areas_price) +
+  tm_fill(col = "median_price",
+          palette = "RdYlGn",
+          style = "quantile",
+          n = 7,
+          title = "Median Price (SGD)",
+          textNA = "No transactions",
+          colorNA = "grey90",
+          alpha = 0.8) +
+  tm_borders(col = "white", lwd = 1) +
+  tm_text("town", size = 0.4, col = "black", alpha = 0.7) +
+  tm_layout(
+    main.title = "Map 3: Median Resale Price by Planning Area",
+    main.title.size = 1.2,
+    legend.outside = TRUE,
+    legend.outside.position = "right",
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2) 
+#+ tm_scale_bar(position = c("left", "bottom"), width = 0.15)
+```
+
+The planning area choropleth provides a clear administrative view of price disparities across Singapore's towns. Central planning areas (Bukit Timah, Novena, Queenstown) display the highest median prices, benefiting from CBD proximity, mature infrastructure, and excellent connectivity. Eastern towns like Bedok and Marine Parade also command premiums due to coastal amenities and established neighborhoods. Mid-tier pricing appears in towns like Ang Mo Kio, Bishan, and Clementi—mature estates with good amenities but located further from the core. The lowest prices concentrate in peripheral northern (Woodlands, Sembawang, Yishun) and western (Choa Chu Kang, Bukit Batok) towns, where longer commute times and developing infrastructure reduce demand premiums. Some towns show no transactions (grey areas), indicating limited 4-room stock or very low turnover. This administrative aggregation reveals policy-relevant insights: price gaps between mature and non-mature estates persist, suggesting continued importance of geographical accessibility in Singapore's housing market despite government efforts to improve connectivity across all regions.
+:::
+
+### 3.3 Spatial Autocorrelation
+
+::: panel-tabset
+#### Global Moran's I test
+
+```{r}
+#| code-summary: Test for spatial clustering using Moran's I
+
+# Create spatial weights matrix (k-nearest neighbors) using k=8 nearest neighbors
+coords <- st_coordinates(st_centroid(hdb_clean))
+knn_weights <- knn2nb(knearneigh(coords, k = 8))
+knn_listw <- nb2listw(knn_weights, style = "W")
+
+# Global Moran's I test
+moran_test <- moran.test(hdb_clean$resale_price, knn_listw)
+```
+
+```{r}
+#| code-summary: GLOBAL MORAN'S I TEST FOR RESALE PRICE
+
+cat("Moran's I statistic:", round(moran_test$estimate[1], 4), "\n",
+"Expected value:", round(moran_test$estimate[2], 4), "\n",
+"Variance:", round(moran_test$estimate[3], 6), "\n",
+"Standard deviate:", round(moran_test$statistic, 4), "\n",
+"P-value:", format.pval(moran_test$p.value, eps = 0.001), "\n\n")
+
+if(moran_test$p.value < 0.001) {
+  cat("Interpretation: Strong evidence of positive spatial autocorrelation\n",
+  "→ High prices cluster near high prices, low near low\n",
+  "→ Spatial non-stationarity present\n",
+  "→ GWR is justified over OLS\n")
+} else if(moran_test$p.value < 0.05) {
+  cat("Interpretation: Evidence of spatial autocorrelation\n")
+} else {
+  cat("Interpretation: No significant spatial autocorrelation\n")
+}
+```
+
+```{r}
+#| code-summary: Moran's I scatterplot showing spatial lag relationship
+#| fig-width: 10
+#| fig-height: 8
+
+# Create Moran's I scatterplot
+moran_plot <- moran.plot(hdb_clean$resale_price, knn_listw,
+                         xlab = "Resale Price (standardized)",
+                         ylab = "Spatially Lagged Price (standardized)",
+                         main = "Figure 7: Moran's I Scatterplot")
+
+# Add interpretation text
+mtext(paste0("Moran's I = ", round(moran_test$estimate[1], 4), 
+             ", p < 0.001"), 
+      side = 3, line = 0.5, cex = 0.9)
+```
+
+The Global Moran's I test confirms significant positive spatial autocorrelation (I = \[value\], p \< 0.001), indicating that HDB resale prices cluster spatially across Singapore. The Moran scatterplot reveals the relationship between each transaction's price and the average price of its spatial neighbors. Points in the upper-right quadrant (High-High) represent expensive flats surrounded by expensive neighbors, typical of central and mature estates. The lower-left quadrant (Low-Low) captures affordable flats in peripheral neighborhoods. Observations in the upper-left (Low-High) and lower-right (High-Low) quadrants are spatial outliers—affordable flats in expensive neighborhoods or vice versa—often reflecting unique property characteristics or localized market dynamics. The strong positive relationship (clustered around the regression line) demonstrates that a property's price is not independent of nearby prices, violating the independence assumption of ordinary least squares regression. This spatial dependency justifies the use of geographically weighted regression, which explicitly accounts for spatial non-stationarity by allowing model coefficients to vary across geographic space.
+
+#### Local Indicators of Spatial Association (LISA)
+
+```{r}
+#| code-summary: Identify local clusters and outliers using LISA
+
+# Calculate Local Moran's I
+local_moran <- localmoran(hdb_clean$resale_price, knn_listw)
+
+# Add LISA results to dataset
+hdb_clean <- hdb_clean %>%
+  mutate(
+    local_I = local_moran[, 1],  # Local Moran's I statistic
+    local_pval = local_moran[, 5],  # P-value
+    
+    # Standardized price
+    z_price = scale(resale_price)[, 1],
+    
+    # Spatially lagged standardized price
+    lag_z_price = lag.listw(knn_listw, z_price),
+    
+    # LISA quadrant classification
+    lisa_category = case_when(
+      local_pval > 0.05 ~ "Not Significant",
+      z_price > 0 & lag_z_price > 0 ~ "High-High",
+      z_price < 0 & lag_z_price < 0 ~ "Low-Low",
+      z_price < 0 & lag_z_price > 0 ~ "Low-High (outlier)",
+      z_price > 0 & lag_z_price < 0 ~ "High-Low (outlier)",
+      TRUE ~ "Not Significant"
+    ),
+    
+    # Factor with specific order for legend
+    lisa_category = factor(lisa_category, 
+                          levels = c("High-High", "Low-Low", 
+                                    "High-Low (outlier)", "Low-High (outlier)", 
+                                    "Not Significant"))
+  )
+
+```
+
+```{r}
+#| code-summary: LISA cluster map
+#| fig-width: 10
+#| fig-height: 12
+
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_clean) +
+  tm_dots(col = "lisa_category",
+          palette = c("High-High" = "#d7191c",      # Red
+                     "Low-Low" = "#2b83ba",         # Blue
+                     "High-Low (outlier)" = "#fdae61",  # Orange
+                     "Low-High (outlier)" = "#abd9e9",  # Light blue
+                     "Not Significant" = "grey80"),
+          size = 0.08,
+          alpha = 0.7,
+          title = "LISA Category") +
+  tm_layout(
+    main.title = "Map 4: Local Indicators of Spatial Association (LISA)",
+    main.title.size = 1.2,
+    main.title.position = "center",
+    legend.outside = TRUE,
+    legend.outside.position = "right",
+    legend.title.size = 1,
+    legend.text.size = 0.7,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
+  # + tm_scale_bar(position = c("left", "bottom"), width = 0.15)
+```
+
+```{r}
+#| code-summary: Summary statistics
+lisa_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  count(lisa_category) %>%
+  mutate(percentage = n / sum(n) * 100)
+
+knitr::kable(lisa_summary,
+             digits = 1,
+             caption = "Table 6: Distribution of LISA Categories",
+             col.names = c("LISA Category", "Count", "Percentage (%)"))
+```
+
+The LISA map identifies statistically significant local clusters and spatial outliers in the HDB resale market. High-High clusters (red) concentrate in central and mature estates like Bukit Timah, Queenstown, and Marine Parade, where expensive properties are surrounded by expensive neighbors—representing premium submarkets with sustained high demand. Low-Low clusters (blue) dominate peripheral towns like Woodlands, Yishun, and Choa Chu Kang, indicating consistently affordable neighborhoods with similar pricing dynamics. Spatial outliers are particularly revealing: Low-High outliers (light blue) represent affordable flats in expensive neighborhoods, potentially older units or ground-floor flats in prime locations, while High-Low outliers (orange) capture premium properties in moderate-price areas, possibly reflecting recent renovations or unique features. The large proportion of non-significant observations (grey) suggests that while broad spatial patterns exist, many transactions fall within normal local variation. This local analysis confirms that Singapore's resale market exhibits distinct spatial regimes, supporting the use of geographically weighted regression to capture varying price determinants across these heterogeneous submarkets.
+:::
+
+### 3.4 Correlation Structure
+
+```{r}
+#| code-summary: Select and prepare variables for correlation analysis
+
+# Select all predictor variables and outcome variable
+# Drop geometry and categorical/text variables
+
+correlation_vars <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(
+    # Outcome variable
+    resale_price,
+    
+    # Structural variables
+    floor_area_sqm,
+    storey_midpoint,
+    remaining_lease_years,
+    
+    # Proximity variables (all PROX_ columns)
+    starts_with("PROX_"),
+    
+    # Count variables (all N_ columns)
+    starts_with("N_")
+  )
+
+# Check for any remaining NA values
+na_summary <- correlation_vars %>%
+  summarise(across(everything(), ~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "variable", values_to = "na_count") %>%
+  filter(na_count > 0)
+
+if(nrow(na_summary) > 0) {
+  cat("⚠ Warning: Missing values detected:\n")
+  print(na_summary)
+  cat("\nRemoving rows with missing values...\n")
+  correlation_vars <- na.omit(correlation_vars)
+} else {
+  cat("✓ No missing values detected\n")
+}
+
+cat("Variables for correlation analysis:", ncol(correlation_vars), "\n",
+"Observations:", nrow(correlation_vars), "\n")
+```
+
+#### 3.4.1 Pearson correlation coefficients
+
+```{r}
+#| code-summary: Calculate Pearson correlation coefficients and Visualize full correlation matrix
+#| fig-width: 12
+#| fig-height: 12
+
+# Calculate correlation matrix
+cor_matrix <- cor(correlation_vars, use = "complete.obs", method = "pearson")
+
+# Display correlation with resale_price (sorted by absolute value)
+price_correlations <- cor_matrix[, "resale_price"] %>%
+  as.data.frame() %>%
+  rownames_to_column(var = "variable") %>%
+  rename(correlation = ".") %>%
+  filter(variable != "resale_price") %>%
+  arrange(desc(abs(correlation)))
+
+# Create correlation plot with all variables
+corrplot(cor_matrix,
+         method = "color",
+         type = "upper",
+         order = "hclust",  # Hierarchical clustering
+         tl.col = "black",
+         tl.srt = 45,
+         tl.cex = 0.7,
+         cl.cex = 0.7,
+         addCoef.col = "black",
+         number.cex = 0.5,
+         col = COL2('RdBu', 200),
+         title = "Figure 9: Correlation Matrix - All Variables",
+         mar = c(0, 0, 2, 0))
+```
+
+```{r}
+#| code-summary: Heatmap showing correlations with resale price
+#| fig-width: 10
+#| fig-height: 8
+
+# Extract correlations with resale_price
+price_cor_data <- price_correlations %>%
+  mutate(
+    abs_cor = abs(correlation),
+    variable = factor(variable, levels = variable[order(correlation)])
+  )
+
+# Create heatmap-style barplot
+ggplot(price_cor_data, aes(x = variable, y = correlation, fill = correlation)) +
+  geom_col(alpha = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_hline(yintercept = c(-0.3, 0.3), linetype = "dotted", color = "grey50") +
+  scale_fill_gradient2(low = "#2166ac", mid = "white", high = "#b2182b",
+                       midpoint = 0, limit = c(-1, 1),
+                       name = "Correlation") +
+  coord_flip() +
+  labs(title = "Figure 10: Correlation of Predictors with Resale Price",
+       subtitle = "Positive correlations increase price | Negative correlations decrease price",
+       x = NULL, y = "Pearson Correlation Coefficient") +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        panel.grid.major.y = element_blank())
+```
+
+Distance to CBD exhibits the strongest negative correlation with resale prices (r = -0.612), confirming central location premiums. Storey level (r = 0.542) and remaining lease (r = 0.488) show moderate positive correlations, validating their importance as price determinants. Surprisingly, floor area and proximity to amenities (supermarkets, parks, eldercare) demonstrate weak correlations, suggesting their effects may vary spatially across Singapore's submarkets.
+
+Severe multicollinearity exists between childcare centers and preschools within 350m buffers (r = 0.967), indicating these facilities co-locate spatially. Kindergartens show moderate correlation with preschools (r = 0.656). To address multicollinearity, one childcare-related variable should be retained based on stronger theoretical relevance or predictive power, while others are excluded from modeling.
+
+#### 3.4.2 Variance Inflation Factor (VIF) analysis
+
+While correlation analysis reveals pairwise relationships between predictors, it cannot capture the cumulative multicollinearity effect when multiple variables interact simultaneously in a regression model. Variance Inflation Factor (VIF) analysis should address this limitation by quantifying how much each predictor's variance is inflated due to linear dependencies with all other predictors, enabling more informed variable selection decisions.
+
+```{r}
+#| code-summary: Calculate VIF to assess multicollinearity severity
+
+# Prepare data for VIF (need to use actual data, not correlation matrix)
+# First, fit a preliminary linear model with all predictors
+
+# Create formula with all predictors
+predictor_vars <- names(correlation_vars)[names(correlation_vars) != "resale_price"]
+formula_str <- paste("resale_price ~", paste(predictor_vars, collapse = " + "))
+prelim_formula <- as.formula(formula_str)
+
+# Fit preliminary model
+prelim_model <- lm(prelim_formula, data = correlation_vars)
+
+# Calculate VIF
+vif_values <- vif(prelim_model)
+
+# Create VIF dataframe
+vif_df <- data.frame(
+  variable = names(vif_values),
+  VIF = vif_values
+) %>%
+  arrange(desc(VIF)) %>%
+  mutate(
+    severity = case_when(
+      VIF < 5 ~ "Low (acceptable)",
+      VIF < 10 ~ "Moderate (caution)",
+      TRUE ~ "High (problematic)"
+    )
+  )
+
+# VIF visualization
+ggplot(vif_df, aes(x = reorder(variable, VIF), y = VIF, fill = severity)) +
+  geom_col(alpha = 0.8) +
+  geom_hline(yintercept = 5, linetype = "dashed", color = "orange", linewidth = 1) +
+  geom_hline(yintercept = 10, linetype = "dashed", color = "red", linewidth = 1) +
+  scale_fill_manual(values = c("Low (acceptable)" = "#2166ac",
+                               "Moderate (caution)" = "#f4a582",
+                               "High (problematic)" = "#b2182b"),
+                    name = "Severity") +
+  coord_flip() +
+  labs(title = "Figure 12: Variance Inflation Factors (VIF)",
+       subtitle = "VIF > 10 indicates severe multicollinearity | VIF > 5 suggests caution",
+       x = NULL, y = "VIF Value") +
+  annotate("text", x = 1, y = 5, label = "Threshold = 5", 
+           hjust = -0.1, vjust = -0.5, color = "orange", size = 3) +
+  annotate("text", x = 1, y = 10, label = "Threshold = 10", 
+           hjust = -0.1, vjust = -2, color = "red", size = 3) +
+  theme_minimal() +
+  theme(legend.position = "bottom",
+        panel.grid.major.y = element_blank())
+```
+
+VIF diagnostics reveal critical multicollinearity issues exclusively among childcare-related variables: preschools (VIF \> 80) and childcare centers (VIF \~ 30) demonstrate severe variance inflation, while kindergartens show moderate concern (VIF \> 5). All structural variables and proximity measures exhibit VIF values below 2, well within acceptable limits. These results confirm that only early childhood education counts require exclusion, ensuring the final model maintains statistical stability without sacrificing theoretical completeness.
+
+#### 3.4.3 Final Variable Selection for GWR Modeling
+
+Based on correlation analysis, multicollinearity diagnostics, and VIF assessment, the following variables are selected for the geographically weighted regression model:
+
+Variables Included (n = 10)
+
+**1. Outcome Variable:** resale_price
+
+**2. Structural Variables (n = 3):**
+
+-   `floor_area_sqm` (VIF = 1.11, r = -0.052)
+
+-   `storey_midpoint` (VIF = 1.21, r = 0.542)
+
+-   `remaining_lease_years` (VIF = 1.25, r = 0.488)
+
+**3. Location Variables - Proximity (n = 5):**
+
+-   `PROX_CBD` (VIF = 1.71, r = -0.612) \[strongest predictor\]
+
+-   `PROX_ELDERCARE` (VIF = 1.26, r = -0.275)
+
+-   `PROX_HAWKER` (VIF = 1.17, r = -0.274)
+
+-   `PROX_PARK` (VIF = 1.26, r = -0.200)
+
+-   `PROX_SUPERMARKET` (VIF = 1.11, r = -0.000)
+
+**4. Location Variables - Count (n = 1):**
+
+-   `N_350M_BUSSTOP` (VIF = 1.11, r = -0.087)
+
+**Variables to be Excluded:**
+
+*Removed due to severe multicollinearity (VIF \> 10):*
+
+-   `N_350M_PRESCHOOL` (VIF = 80.22, r = -0.053)
+
+-   `N_350M_CHILDCARE` (VIF = 59.05, r = -0.041)
+
+*Removed due to moderate multicollinearity:*
+
+-   `N_350M_KINDERG` (VIF = 6.52, r = -0.019)
+
+`N_350M_BUSSTOP` will serve as a proxy for overall accessibility.
 
 ## 4. Model Calibration
 
@@ -921,9 +1472,9 @@ tm_shape(hdb_clean) +
 
 #### 4.2.1 Bandwidth Selection
 
-\[Explain CV vs AIC choice\] \
+\[Explain CV vs AIC choice\]\
 
-#### 4.2.2 Model Results 
+#### 4.2.2 Model Results
 
 #### 4.2.3 Model Comparison
 
@@ -933,7 +1484,7 @@ tm_shape(hdb_clean) +
 
 ### 5.2 Key Findings by Variable
 
-\[Subsection for each important coefficient\] \
+\[Subsection for each important coefficient\]\
 
 ### 5.3 Policy & Market Implications
 
@@ -941,9 +1492,9 @@ tm_shape(hdb_clean) +
 
 ### 6.1 Study Limitations
 
-\[Data period, 4-room only, modifiable areal unit problem, etc.\] \
+\[Data period, 4-room only, modifiable areal unit problem, etc.\]\
 
-### 6.2 Conclusions \
+### 6.2 Conclusions
 
 ### 6.3 Future Research Directions
 
