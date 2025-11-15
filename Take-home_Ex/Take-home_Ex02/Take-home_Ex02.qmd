@@ -49,7 +49,7 @@ Urban mobility patterns reveal how cities function and evolve. This exercise ana
 ### The Data
 
 | Dataset | Description | Source | Format |
-|------------------|------------------|------------------|------------------|
+|----|----|----|----|
 | Passenger Volume by Origin Destination Bus Stops | Bus passenger tap-on/tap-off records for spatial-temporal mobility analysis | [LTA DataMall](https://datamall.lta.gov.sg/content/datamall/en.html) | CSV |
 | Bus Stop Location | Geospatial coordinates and identifiers for bus stops across Singapore | [LTA DataMall](https://datamall.lta.gov.sg/content/datamall/en.html) | ESRI Shapefile |
 | Master Plan 2019 Subzone Boundary (No Sea) | Planning area and subzone boundaries for spatial context | [Data.gov.sg](https://data.gov.sg) | ESRI Shapefile |
@@ -711,7 +711,7 @@ For convenience, 4 reusable functions are created as below:
 **calculate_local_morans()**
 
 | **Parameter** | **Description** |
-|--------------------------|----------------------------------------------|
+|----|----|
 | `data` | `sf` object containing the target numeric column used for Local Moran’s I calculation. |
 | `listw` | `spdep::listw` object representing spatial weights; must have the same row order as `data`. |
 | `column_name` | Character string specifying the name of the variable to analyze. |

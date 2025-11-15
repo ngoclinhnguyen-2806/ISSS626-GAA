@@ -514,7 +514,7 @@ cat("Outliers in floor_area_sqm:", sum(outlier_area),
 par(mfrow = c(1, 2))
 boxplot(hdb_clean$resale_price, main = "Resale Price", ylab = "Price (SGD)")
 boxplot(hdb_clean$floor_area_sqm, main = "Floor Area", ylab = "Square Meters")
-par(mfrow = c(1, 1))
+# par(mfrow = c(1, 1))
 ```
 
 For now, we don't remove outliers yet. We just flag them using 2 additional columns of `outlier_price` and `outlier_area`, and keep in the dataset. Those detected will be report "TRUE" in `outlier_price` or `outlier_area` columns.
