@@ -26,7 +26,7 @@ Geographically weighted regression (GWR) accounts for non-stationary variables (
 ### The Data
 
 | Dataset | Source | Description | Format |
-|----|----|----|----|
+|------------------|------------------|------------------|------------------|
 | **Master Plan 2014 Subzone Boundary (Web)** | [data.gov.sg](https://data.gov.sg/) | Geospatial boundaries for Singapore's planning subzones. | ESRI Shapefile |
 | **Condo resale 2015** |  |  | CSV |
 
@@ -35,7 +35,7 @@ Geographically weighted regression (GWR) accounts for non-stationary variables (
 We will be using the following R packages:
 
 | R Package | Description |
-|----|----|
+|------------------------------------|------------------------------------|
 | [**olsrr**](https://olsrr.rsquaredacademy.com/) | R package for building OLS and performing diagnostics tests |
 | [**GWmodel**](https://cran.r-project.org/web/packages/GWmodel/index.html) | R package for calibrating geographical weighted family of models |
 | [**corrplot**](https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html) | R package for multivariate data visualisation and analysis |
