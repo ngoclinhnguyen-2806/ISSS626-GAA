@@ -581,7 +581,7 @@ tm_shape(condo_resale.sf) +
 ```
 
 ```{r}
-tmap_mode("plot")
+tmap_mode("view")
 ```
 
 The figure above shows signs of spatial autocorrelation.

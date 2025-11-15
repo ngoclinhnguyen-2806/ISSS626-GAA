@@ -188,6 +188,8 @@ write_rds(HDBresale_sf, "data/rds/HDBresale_sf.rds")
 ```{r}
 #| echo: false
 #| output: false
+#| eval: false # save RDS for cleaned and enhanced version already
+
 HDBresale_sf <- read_rds("data/rds/HDBresale_sf.rds")
 ```
 
@@ -198,6 +200,7 @@ HDBresale_sf <- read_rds("data/rds/HDBresale_sf.rds")
 
 ```{r}
 #| code-summary: Create CBD points dataframe with SVY21 coordinates
+#| eval: false # save RDS for cleaned and enhanced version already
 
 cbd_data <- data.frame(
   name = c("Raffles Place", "Tanjong Pagar", "Marina Bay"),
@@ -210,6 +213,7 @@ cbd_data <- data.frame(
 
 ```{r}
 #| code-summary: Import Hawker Centres data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 hawkerCenters = st_read(
   "data/geospatial/HawkerCentresGEOJSON.geojson") %>%
@@ -220,6 +224,7 @@ hawkerCenters = st_read(
 
 ```{r}
 #| code-summary: Import Parks data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 parks = st_read(
   "data/geospatial/Parks.geojson") %>%
@@ -230,6 +235,7 @@ parks = st_read(
 
 ```{r}
 #| code-summary: Import Supermarkets data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 supermarkets = st_read(
   "data/geospatial/SupermarketsGEOJSON.geojson") %>%
@@ -240,6 +246,7 @@ supermarkets = st_read(
 
 ```{r}
 #| code-summary: Import Eldercare Centres data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 eldercare <- st_read(
   dsn = "data/geospatial", 
@@ -252,6 +259,7 @@ eldercare <- st_read(
 
 ```{r}
 #| code-summary: Import Preschool data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 preschool = st_read(
   "data/geospatial/PreSchoolsLocation.kml") %>%
@@ -262,6 +270,7 @@ preschool = st_read(
 
 ```{r}
 #| code-summary: Import Kindergartens data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 kindergartens = st_read(
   "data/geospatial/Kindergartens.geojson") %>%
@@ -272,6 +281,7 @@ kindergartens = st_read(
 
 ```{r}
 #| code-summary: Import Childcare Centres data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 childCareServices = st_read(
   "data/geospatial/ChildCareServices.geojson") %>%
@@ -282,6 +292,7 @@ childCareServices = st_read(
 
 ```{r}
 #| code-summary: Import Bus Stops data
+#| eval: false # save RDS for cleaned and enhanced version already
 
 busStops <- st_read(
   dsn = "data/geospatial", 
@@ -292,6 +303,7 @@ busStops <- st_read(
 
 ```{r}
 #| code-summary: Convert to sf object with SVY21 CRS (EPSG:3414)
+#| eval: false # save RDS for cleaned and enhanced version already
 
 cbd_sf <- st_as_sf(cbd_data, 
                    coords = c("x", "y"), 
@@ -306,6 +318,7 @@ print(cbd_sf)
 
 ```{r}
 #| code-summary: Count number of preschools, kindergartens, childcare services, and bus stops
+#| eval: false # save RDS for cleaned and enhanced version already
 
 # Preschool
 within_350m <- st_is_within_distance(
@@ -339,6 +352,7 @@ HDBresale_sf <- HDBresale_sf %>%
 
 ```{r}
 #| code-summary: Create function for nearest distance calculation
+#| eval: false # save RDS for cleaned and enhanced version already
 
 calc_nearest_dist <- function(from_geom, to_sf) {
   as.numeric(
@@ -353,6 +367,7 @@ calc_nearest_dist <- function(from_geom, to_sf) {
 
 ```{r}
 #| code-summary: Apply function to get the nearest distance to the facilities
+#| eval: false # save RDS for cleaned and enhanced version already
 
 hdb_model <- HDBresale_sf %>%
   mutate(
@@ -454,9 +469,9 @@ hdb_clean <- hdb_model %>%
 # Check transformations
 cat("✓ Storey midpoint range:", 
     min(hdb_clean$storey_midpoint, na.rm = TRUE), "to", 
-    max(hdb_clean$storey_midpoint, na.rm = TRUE), "\n")
+    max(hdb_clean$storey_midpoint, na.rm = TRUE), "\n",
 
-cat("✓ Remaining lease range:", 
+"✓ Remaining lease range:", 
     round(min(hdb_clean$remaining_lease_years, na.rm = TRUE), 1), "to", 
     round(max(hdb_clean$remaining_lease_years, na.rm = TRUE), 1), "years\n")
 ```
@@ -475,18 +490,27 @@ detect_outliers <- function(x) {
   upper_bound <- Q3 + 1.5 * IQR
   return(x < lower_bound | x > upper_bound)
 }
+```
 
-# Check outliers in resale_price
+```{r}
+#| code-summary: Check outliers in resale_price
+
 outlier_price <- detect_outliers(hdb_clean$resale_price)
 cat("Outliers in resale_price:", sum(outlier_price), 
     "(", round(sum(outlier_price)/nrow(hdb_clean)*100, 2), "%)\n")
+```
 
-# Check outliers in resale_price
+```{r}
+#| code-summary: Check outliers in floor_area_sqm
+
 outlier_area <- detect_outliers(hdb_clean$floor_area_sqm)
 cat("Outliers in floor_area_sqm:", sum(outlier_area), 
     "(", round(sum(outlier_area)/nrow(hdb_clean)*100, 2), "%)\n")
+```
 
-# Visual inspection with boxplots
+```{r}
+#| code-summary: Visual inspection with boxplots
+
 par(mfrow = c(1, 2))
 boxplot(hdb_clean$resale_price, main = "Resale Price", ylab = "Price (SGD)")
 boxplot(hdb_clean$floor_area_sqm, main = "Floor Area", ylab = "Square Meters")
@@ -527,9 +551,10 @@ hdb_clean <- read_rds("data/rds/hdb_clean.rds")
 
 ### 3.1 Descriptive Statistics
 
-#### 3.1.1 Summary in tables
+#### 3.1.1 Summary of Variables
 
 ::: panel-tabset
+
 #### Structural variables
 
 ```{r}
@@ -557,70 +582,6 @@ knitr::kable(structural_summary,
              caption = "Descriptive Statistics: Structural Variables",
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
-
-#### Proximity variables
-
-```{r}
-#| code-summary: Summary statistics for Proximity variables summary (in meters)
-
-prox_vars <- hdb_clean %>%
-  st_drop_geometry() %>%
-  select(starts_with("PROX_")) %>%
-  names()
-
-location_summary <- hdb_clean %>%
-  st_drop_geometry() %>%
-  select(all_of(prox_vars)) %>%
-  summarise(across(everything(), 
-                   list(mean = ~mean(., na.rm = TRUE),
-                        median = ~median(., na.rm = TRUE),
-                        sd = ~sd(., na.rm = TRUE),
-                        min = ~min(., na.rm = TRUE),
-                        max = ~max(., na.rm = TRUE)),
-                   .names = "{.col}_{.fn}")) %>%
-  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
-  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
-  pivot_wider(names_from = statistic, values_from = value)
-
-knitr::kable(location_summary, 
-             digits = 2,
-             caption = "Descriptive Statistics: Location Variables (Proximity in meters)",
-             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
-```
-
-#### COUNT variables
-
-```{r}
-#| code-summary: Descriptive statistics for count variables
-
-# --- Location Variables: Counts (within buffer) ---
-count_vars <- names(hdb_clean)[str_detect(names(hdb_clean), "^N_")]
-
-count_summary <- hdb_clean %>%
-  st_drop_geometry() %>%
-  select(all_of(count_vars)) %>%
-  summarise(across(everything(), 
-                   list(mean = ~mean(., na.rm = TRUE),
-                        median = ~median(., na.rm = TRUE),
-                        sd = ~sd(., na.rm = TRUE),
-                        min = ~min(., na.rm = TRUE),
-                        max = ~max(., na.rm = TRUE)),
-                   .names = "{.col}_{.fn}")) %>%
-  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
-  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
-  pivot_wider(names_from = statistic, values_from = value)
-
-knitr::kable(count_summary, 
-             digits = 1,
-             caption = "Table 3: Descriptive Statistics - Count Variables (facilities within buffer)",
-             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
-```
-:::
-
-#### 3.1.2 Summary with Visualization
-
-::: panel-tabset
-#### Distribution Analysis
 
 ```{r}
 #| code-summary: Visualize distributions of key variables
@@ -674,10 +635,36 @@ p4 <- ggplot(hdb_clean, aes(x = storey_midpoint)) +
   )
 ```
 
-#### Distribution of Count variables
+#### COUNT variables
 
 ```{r}
-#| code-summary: Distribution of count variables  
+#| code-summary: Descriptive statistics for count variables
+
+# --- Location Variables: Counts (within buffer) ---
+count_vars <- names(hdb_clean)[str_detect(names(hdb_clean), "^N_")]
+
+count_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(all_of(count_vars)) %>%
+  summarise(across(everything(), 
+                   list(mean = ~mean(., na.rm = TRUE),
+                        median = ~median(., na.rm = TRUE),
+                        sd = ~sd(., na.rm = TRUE),
+                        min = ~min(., na.rm = TRUE),
+                        max = ~max(., na.rm = TRUE)),
+                   .names = "{.col}_{.fn}")) %>%
+  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
+  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
+  pivot_wider(names_from = statistic, values_from = value)
+
+knitr::kable(count_summary, 
+             digits = 1,
+             caption = "Table 3: Descriptive Statistics - Count Variables (facilities within buffer)",
+             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
+```
+
+```{r}
+#| code-summary: Visualization of Distribution of count variables  
 #| fig-width: 12
 #| fig-height: 10
 
@@ -708,6 +695,43 @@ c4 <- ggplot(hdb_clean, aes(x = N_350M_BUSSTOP)) +
     subtitle = "Number of facilities within buffer zones"
   )
 ```
+
+
+#### Proximity variables
+
+```{r}
+#| code-summary: Summary statistics for Proximity variables summary (in meters)
+
+prox_vars <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(starts_with("PROX_")) %>%
+  names()
+
+location_summary <- hdb_clean %>%
+  st_drop_geometry() %>%
+  select(all_of(prox_vars)) %>%
+  summarise(across(everything(), 
+                   list(mean = ~mean(., na.rm = TRUE),
+                        median = ~median(., na.rm = TRUE),
+                        sd = ~sd(., na.rm = TRUE),
+                        min = ~min(., na.rm = TRUE),
+                        max = ~max(., na.rm = TRUE)),
+                   .names = "{.col}_{.fn}")) %>%
+  pivot_longer(everything(), names_to = "stat", values_to = "value") %>%
+  separate(stat, into = c("variable", "statistic"), sep = "_(?=[^_]+$)") %>%
+  pivot_wider(names_from = statistic, values_from = value)
+
+knitr::kable(location_summary, 
+             digits = 2,
+             caption = "Descriptive Statistics: Location Variables (Proximity in meters)",
+             col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
+```
+
+:::
+
+#### 3.1.2 Exploration on different dimensions
+
+::: panel-tabset
 
 #### Temporal Distribution
 
@@ -958,7 +982,6 @@ tm_shape(hdb_clean) +
     frame = FALSE
   ) +
   tm_compass(position = c("left", "top"), size = 2)
-  # Scale bar removed due to tmap bug
 ```
 
 The spatial distribution reveals distinct price clustering across Singapore, with higher-priced transactions (orange to red) concentrated in central and mature estates. The western (Clementi, Bukit Timah) and eastern (Marine Parade, Bedok) regions show elevated prices, while peripheral areas like Woodlands and Yishun display lower price points (yellow). This pattern reflects Singapore's geographical price gradient radiating from the CBD, where accessibility to employment centers, established infrastructure, and proximity to amenities command premiums. Notable price outliers appear in mature estates like Queenstown and Toa Payoh, likely reflecting recently renovated units or prime locations within these towns. The dense clustering of transactions in Tampines, Jurong West, and Ang Mo Kio indicates active resale markets in these high-density HDB towns. This spatial heterogeneity validates the need for geographically weighted regression, as the relationship between price and location factors clearly varies across Singapore's urban landscape.
@@ -1017,7 +1040,6 @@ tm_shape(hex_summary) +
     frame = FALSE
   ) +
   tm_compass(position = c("left", "top"), size = 2) 
-#+ tm_scale_bar(position = c("left", "bottom"), width = 0.15)
 
 # Map - Median Price by Hexagon
 map_price_hex <- tm_shape(singapore_boundary) +
@@ -1040,7 +1062,6 @@ tm_shape(hex_summary) +
     frame = FALSE
   ) +
   tm_compass(position = c("left", "top"), size = 2) 
- # + tm_scale_bar(position = c("left", "bottom"), width = 0.15)
 
 # Display both maps
 tmap_arrange(map_density, map_price_hex, ncol = 1)
@@ -1091,7 +1112,6 @@ tm_shape(planning_areas_price) +
     frame = FALSE
   ) +
   tm_compass(position = c("left", "top"), size = 2) 
-#+ tm_scale_bar(position = c("left", "bottom"), width = 0.15)
 ```
 
 The planning area choropleth provides a clear administrative view of price disparities across Singapore's towns. Central planning areas (Bukit Timah, Novena, Queenstown) display the highest median prices, benefiting from CBD proximity, mature infrastructure, and excellent connectivity. Eastern towns like Bedok and Marine Parade also command premiums due to coastal amenities and established neighborhoods. Mid-tier pricing appears in towns like Ang Mo Kio, Bishan, and Clementi—mature estates with good amenities but located further from the core. The lowest prices concentrate in peripheral northern (Woodlands, Sembawang, Yishun) and western (Choa Chu Kang, Bukit Batok) towns, where longer commute times and developing infrastructure reduce demand premiums. Some towns show no transactions (grey areas), indicating limited 4-room stock or very low turnover. This administrative aggregation reveals policy-relevant insights: price gaps between mature and non-mature estates persist, suggesting continued importance of geographical accessibility in Singapore's housing market despite government efforts to improve connectivity across all regions.
@@ -1281,6 +1301,10 @@ if(nrow(na_summary) > 0) {
 } else {
   cat("✓ No missing values detected\n")
 }
+```
+
+```{r}
+#| code-summary: Summary on data
 
 cat("Variables for correlation analysis:", ncol(correlation_vars), "\n",
 "Observations:", nrow(correlation_vars), "\n")

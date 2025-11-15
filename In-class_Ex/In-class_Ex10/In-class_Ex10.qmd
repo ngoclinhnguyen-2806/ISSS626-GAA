@@ -1,0 +1,68 @@
+---
+title: "In-class Exercise 10: Market Area Analysis for Retail and Service Locations using Huff model"
+date: "Nov 13, 2025"
+date-modified: "last-modified"
+author: Linh Nguyen
+execute:
+  echo: true
+  eval: true
+  freeze: auto
+  message: false
+  warning: false
+  error: false
+format:
+  html:
+    code-link: true       # Clickable function links
+    toc: true             # Table of contents
+    code-fold: true       # Foldable code
+    code-tools: true      # Code tools menu
+number-sections: false
+number-offset: 1
+editor: visual
+---
+
+## Import R Packages
+
+```{r}
+pacman::p_load(sf, tidyverse, MCI, tmap, ggstatsplot)
+```
+
+## Import Data
+
+```{r}
+stores <- st_read(
+  dsn = "data/geospatial",
+  layer = "STORES_TC")
+```
+
+```{r}
+town <- st_read(
+  dsn = "data/geospatial",
+  layer = "TOWN_TC")
+```
+
+```{r}
+village <- st_read(
+  dsn = "cdata/geospatial",
+  layer = "VILLAGE_TC")
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
