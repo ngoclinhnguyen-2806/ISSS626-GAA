@@ -11,3 +11,4 @@ data/
 # R temporary files
 .RDataTmp*
 *.tmp
+*html.json
