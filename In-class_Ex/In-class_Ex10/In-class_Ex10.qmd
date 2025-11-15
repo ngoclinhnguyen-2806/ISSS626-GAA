@@ -43,8 +43,81 @@ town <- st_read(
 
 ```{r}
 village <- st_read(
-  dsn = "cdata/geospatial",
+  dsn = "data/geospatial",
   layer = "VILLAGE_TC")
+```
+
+```{r}
+pop2019 <- read_csv(
+  "data/aspatial/pop2019.csv")
+
+store_sales <- read_csv(
+  "data/aspatial/Store_sales_data.csv")
+```
+
+```{r}
+summary(store_sales)
+```
+
+## Data Preparation
+
+### Aggregating store sales
+
+```{r}
+store_sales_aggre <- store_sales %>%
+  group_by(`Store Code`) %>%
+  summarise(
+    "Total_Bill" = sum(Bills, na.rm = TRUE),
+    "Total_Sales" = sum(Amount, na.rm = TRUE))
+```
+
+### Relational join
+
+```{r}
+stores <- stores %>%
+  left_join(store_sales_aggre,
+            by = join_by(
+              Store_CD == `Store Code`)) %>%
+  mutate(Store_size = 100)
+```
+
+```{r}
+summary(stores)
+```
+
+### Tidying pop2019 data.frame
+
+```{r}
+glimpse(pop2019)
+```
+
+```{r}
+glimpse(village)
+```
+
+```{r}
+pop2019 <- pop2019 %>%
+  mutate(V_ID = str_remove_all(
+    V_ID, "-"))
+```
+
+```{r}
+village <- village %>%
+  left_join(pop2019,
+            by = join_by(
+              VILLCODE == V_ID))
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
 ```
 
 ```{r}

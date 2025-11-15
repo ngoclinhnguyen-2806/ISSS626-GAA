@@ -71,8 +71,8 @@ singapore_boundary <- st_read(
   st_transform(3414) %>%
   st_union()  # Dissolve to single boundary
 
-cat("✓ Singapore boundary imported\n")
-cat("  CRS:", st_crs(singapore_boundary)$input, "\n")
+cat("✓ Singapore boundary imported\n",
+"  CRS:", st_crs(singapore_boundary)$input, "\n")
 ```
 
 ```{r}
@@ -583,6 +583,7 @@ knitr::kable(structural_summary,
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
 
+
 ```{r}
 #| code-summary: Visualize distributions of key variables
 #| fig-width: 12
@@ -662,6 +663,7 @@ knitr::kable(count_summary,
              caption = "Table 3: Descriptive Statistics - Count Variables (facilities within buffer)",
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
+
 
 ```{r}
 #| code-summary: Visualization of Distribution of count variables  
@@ -986,7 +988,7 @@ tm_shape(hdb_clean) +
 
 The spatial distribution reveals distinct price clustering across Singapore, with higher-priced transactions (orange to red) concentrated in central and mature estates. The western (Clementi, Bukit Timah) and eastern (Marine Parade, Bedok) regions show elevated prices, while peripheral areas like Woodlands and Yishun display lower price points (yellow). This pattern reflects Singapore's geographical price gradient radiating from the CBD, where accessibility to employment centers, established infrastructure, and proximity to amenities command premiums. Notable price outliers appear in mature estates like Queenstown and Toa Payoh, likely reflecting recently renovated units or prime locations within these towns. The dense clustering of transactions in Tampines, Jurong West, and Ang Mo Kio indicates active resale markets in these high-density HDB towns. This spatial heterogeneity validates the need for geographically weighted regression, as the relationship between price and location factors clearly varies across Singapore's urban landscape.
 
-#### Hexbin Aggregation Map to show transaction density and median prices
+#### Hexbin Aggregation Map
 
 ```{r}
 #| code-summary: Hexagonal binning to show transaction density and median prices
