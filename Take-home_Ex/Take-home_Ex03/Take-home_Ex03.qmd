@@ -30,13 +30,7 @@ editor: visual
 
 ## 2. Data & Methodology
 
-### 2.1 Import R packages
-
-```{r}
-pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot, httr, jsonlite, patchwork, car)
-```
-
-### 2.2 Data Sources
+### 2.1 Data Sources
 
 |  |  |  |  |
 |------------------|------------------|-------------------|------------------|
@@ -51,6 +45,12 @@ pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot
 | **Kindergartens** | Point locations of registered kindergartens across Singapore, including both public and private institutions. | Count number of kindergartens within 350m buffer (`n_kindergarten_350m`) | GeoJSON |
 | **Childcare Centres** | Point locations of licensed childcare centres providing infant and toddler care services. | Count number of childcare centres within 350m buffer (`n_childcare_350m`) to evaluate childcare accessibility, important for working parents. | GeoJSON |
 | **Bus Stops** | Point locations of all public bus stops in Singapore's bus network. | Count number of bus stops within 350m buffer (`n_busstop_350m`) as a measure of public transport connectivity and accessibility. | SHP (point geometry) |
+
+### 2.2 Import R packages
+
+```{r}
+pacman::p_load(sf, spdep, GWmodel, tidyverse, lubridate, tmap, ggplot2, corrplot, httr, jsonlite, patchwork, car, lmtest, sp, broom)
+```
 
 ### 2.3 Data Import & Initial Manipulation
 
@@ -554,7 +554,6 @@ hdb_clean <- read_rds("data/rds/hdb_clean.rds")
 #### 3.1.1 Summary of Variables
 
 ::: panel-tabset
-
 #### Structural variables
 
 ```{r}
@@ -582,7 +581,6 @@ knitr::kable(structural_summary,
              caption = "Descriptive Statistics: Structural Variables",
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
-
 
 ```{r}
 #| code-summary: Visualize distributions of key variables
@@ -664,7 +662,6 @@ knitr::kable(count_summary,
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
 
-
 ```{r}
 #| code-summary: Visualization of Distribution of count variables  
 #| fig-width: 12
@@ -698,7 +695,6 @@ c4 <- ggplot(hdb_clean, aes(x = N_350M_BUSSTOP)) +
   )
 ```
 
-
 #### Proximity variables
 
 ```{r}
@@ -728,13 +724,11 @@ knitr::kable(location_summary,
              caption = "Descriptive Statistics: Location Variables (Proximity in meters)",
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
-
 :::
 
 #### 3.1.2 Exploration on different dimensions
 
 ::: panel-tabset
-
 #### Temporal Distribution
 
 ```{r}
@@ -1517,55 +1511,34 @@ hdb_model_final <- hdb_clean %>%
 
 ### 4.1 OLS Baseline Model
 
-#### 4.1.1 Model Specification
+#### 4.1.1 Fit OLS Model
+
+Fit ordinary least squares regression model
 
 ```{r}
-#| code-summary: Prepare dataset for OLS baseline model
+#| code-summary: Define model formula
 
-# Remove geometry for OLS (non-spatial model)
-ols_data <- hdb_model_final %>%
-  st_drop_geometry() %>%
-  select(
-    resale_price,
-    floor_area_sqm,
-    storey_midpoint,
-    remaining_lease_years,
-    PROX_CBD,
-    PROX_ELDERCARE,
-    PROX_HAWKER,
-    PROX_PARK,
-    PROX_SUPERMARKET,
-    N_350M_BUSSTOP
-  ) %>%
-  na.omit()  # Remove any remaining NA values
-
-cat("✓ OLS dataset prepared\n",
-"Observations:", nrow(ols_data), "\n",
-"Variables:", ncol(ols_data), "(1 outcome + 9 predictors)\n")
-```
-
-```{r}
-#| code-summary: Fit ordinary least squares regression model
-
-# Define model formula
 ols_formula <- resale_price ~ floor_area_sqm + storey_midpoint + 
                               remaining_lease_years + PROX_CBD + 
                               PROX_ELDERCARE + PROX_HAWKER + PROX_PARK + 
                               PROX_SUPERMARKET + N_350M_BUSSTOP
+```
 
-# Fit OLS model
-ols_model <- lm(ols_formula, data = ols_data)
+```{r}
+#| code-summary: Fit OLS model
 
-# Display model summary
+ols_model <- lm(ols_formula, data = hdb_model_final %>% st_drop_geometry())
+```
+
+```{r}
+#| code-summary: Display model summary
 summary(ols_model)
 ```
 
-#### 4.1.2 Results & Diagnostics
+#### 4.1.2 Model Results
 
 ```{r}
 #| code-summary: Format OLS regression results into table
-
-library(broom)
 
 # Extract coefficients with confidence intervals
 ols_results <- tidy(ols_model, conf.int = TRUE, conf.level = 0.95) %>%
@@ -1592,50 +1565,40 @@ cat("\nSignificance codes: 0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1\n")
 ```
 
 ```{r}
-#| code-summary: Calculate OLS model performance statistics
+#| code-summary: Diagnostic plots for OLS assumptions
+#| fig-width: 12
+#| fig-height: 10
 
-# Extract model performance metrics
-ols_performance <- glance(ols_model)
+# Set up plotting area
+par(mfrow = c(2, 2))
 
-# Additional metrics
-n_obs <- nrow(ols_data)
-n_predictors <- length(coef(ols_model)) - 1  # Exclude intercept
-residual_se <- sigma(ols_model)
-aic_value <- AIC(ols_model)
-bic_value <- BIC(ols_model)
+# 1. Residuals vs Fitted (Linearity & Homoscedasticity)
+plot(ols_model, which = 1, main = "Residuals vs Fitted")
 
-# Create performance summary table
-performance_table <- data.frame(
-  Metric = c("Observations", "Predictors", "R-squared", "Adjusted R-squared", 
-             "F-statistic", "p-value (F-test)", "Residual Std. Error", 
-             "AIC", "BIC"),
-  Value = c(
-    n_obs,
-    n_predictors,
-    ols_performance$r.squared,
-    ols_performance$adj.r.squared,
-    ols_performance$statistic,
-    ols_performance$p.value,
-    residual_se,
-    aic_value,
-    bic_value
-  )
-)
+# 2. Q-Q Plot (Normality of residuals)
+plot(ols_model, which = 2, main = "Normal Q-Q Plot")
 
-knitr::kable(performance_table,
-             digits = c(0, 4),
-             caption = "Table 12: OLS Model Performance Metrics",
-             col.names = c("Metric", "Value"),
-             format.args = list(big.mark = ","))
+# 3. Scale-Location (Homoscedasticity)
+plot(ols_model, which = 3, main = "Scale-Location")
 
-cat("\n",
-"Model explains", round(ols_performance$adj.r.squared * 100, 2), 
-    "% of variance in resale prices\n")
+# 4. Residuals vs Leverage (Influential points)
+plot(ols_model, which = 5, main = "Residuals vs Leverage")
+
+par(mfrow = c(1, 1))
 ```
 
 ```{r}
-#| label: ols-coefficient-interpretation
+#| code-summary: Interpretation of R-squared
+
+ols_performance <- glance(ols_model)
+
+cat("\nModel explains", round(ols_performance$adj.r.squared * 100, 1), 
+    "% of price variance\n\n")
+```
+
+```{r}
 #| code-summary: Interpret significant coefficients
+#| echo: false
 
 cat("═══════════════════════════════════════════════════════\n")
 cat("           OLS COEFFICIENT INTERPRETATION\n")
@@ -1711,111 +1674,38 @@ if(nrow(non_sig_coefs) > 0) {
   cat("\n")
 }
 
-cat("═══════════════════════════════════════════════════════\n")
-```
-
-```{r}
-#| code-summary: Diagnostic plots for OLS assumptions
-#| fig-width: 12
-#| fig-height: 10
-
-# Set up plotting area
-par(mfrow = c(2, 2))
-
-# 1. Residuals vs Fitted (Linearity & Homoscedasticity)
-plot(ols_model, which = 1, main = "Residuals vs Fitted")
-
-# 2. Q-Q Plot (Normality of residuals)
-plot(ols_model, which = 2, main = "Normal Q-Q Plot")
-
-# 3. Scale-Location (Homoscedasticity)
-plot(ols_model, which = 3, main = "Scale-Location")
-
-# 4. Residuals vs Leverage (Influential points)
-plot(ols_model, which = 5, main = "Residuals vs Leverage")
-
-par(mfrow = c(1, 1))
-```
-
-```{r}
-#| label: ols-diagnostic-tests
-#| code-summary: Statistical tests for OLS assumptions
-
-library(lmtest)
-
-# 1. Breusch-Pagan Test for Heteroscedasticity
-bp_test <- bptest(ols_model)
-cat("1. BREUSCH-PAGAN TEST (Heteroscedasticity)\n")
-cat("   H0: Homoscedasticity (constant variance)\n")
-cat("   Test statistic:", round(bp_test$statistic, 4), "\n")
-cat("   p-value:", format.pval(bp_test$p.value, eps = 0.001), "\n")
-if(bp_test$p.value < 0.05) {
-  cat("   → Reject H0: Evidence of heteroscedasticity\n")
-  cat("   → Variance of residuals is not constant\n\n")
-} else {
-  cat("   → Fail to reject H0: No evidence of heteroscedasticity\n\n")
-}
-
-# 2. Shapiro-Wilk Test for Normality (on sample if n > 5000)
-if(nrow(ols_data) > 5000) {
-  sample_residuals <- sample(residuals(ols_model), 5000)
-  sw_test <- shapiro.test(sample_residuals)
-  cat("2. SHAPIRO-WILK TEST (Normality - sampled)\n")
-  cat("   Note: Using random sample of 5,000 residuals\n")
-} else {
-  sw_test <- shapiro.test(residuals(ols_model))
-  cat("2. SHAPIRO-WILK TEST (Normality)\n")
-}
-cat("   H0: Residuals are normally distributed\n")
-cat("   Test statistic:", round(sw_test$statistic, 4), "\n")
-cat("   p-value:", format.pval(sw_test$p.value, eps = 0.001), "\n")
-if(sw_test$p.value < 0.05) {
-  cat("   → Reject H0: Residuals deviate from normality\n")
-  cat("   → Large sample size may cause sensitivity\n\n")
-} else {
-  cat("   → Fail to reject H0: Residuals approximately normal\n\n")
-}
-
-# 3. Durbin-Watson Test for Autocorrelation
-dw_test <- dwtest(ols_model)
-cat("3. DURBIN-WATSON TEST (Autocorrelation)\n")
-cat("   H0: No autocorrelation in residuals\n")
-cat("   DW statistic:", round(dw_test$statistic, 4), "\n")
-cat("   p-value:", format.pval(dw_test$p.value, eps = 0.001), "\n")
-if(dw_test$p.value < 0.05) {
-  cat("   → Reject H0: Evidence of autocorrelation\n")
-  cat("   → Note: This may indicate spatial dependence\n\n")
-} else {
-  cat("   → Fail to reject H0: No significant autocorrelation\n\n")
-}
 ```
 
 #### 4.1.3 Spatial Autocorrelation Test
 
-```{r}
-#| label: ols-residual-spatial-autocorrelation
-#| code-summary: Test for spatial autocorrelation in OLS residuals
+Test for spatial autocorrelation in OLS residuals
 
-# Add residuals back to spatial data
+```{r}
+#| code-summary: Add residuals back to spatial data
 hdb_with_residuals <- hdb_model_final %>%
   filter(!is.na(resale_price)) %>%
-  slice(1:nrow(ols_data)) %>%  # Match OLS data rows
+  slice(1:nrow(hdb_model_final)) %>%  # Match OLS data rows
   mutate(
     ols_fitted = fitted(ols_model),
     ols_residuals = residuals(ols_model)
   )
+```
 
-# Create spatial weights matrix (k-nearest neighbors)
+```{r}
+#| code-summary: Create spatial weights matrix (k-nearest neighbors)
 coords <- st_coordinates(st_centroid(hdb_with_residuals))
 knn_weights <- knn2nb(knearneigh(coords, k = 8))
 knn_listw <- nb2listw(knn_weights, style = "W")
+```
 
-# Global Moran's I test on OLS residuals
+```{r}
+#| code-summary: Global Moran's I test on OLS residuals
 moran_residuals <- moran.test(hdb_with_residuals$ols_residuals, knn_listw)
+```
 
-cat("═══════════════════════════════════════════════════════\n")
-cat("   SPATIAL AUTOCORRELATION OF OLS RESIDUALS\n")
-cat("═══════════════════════════════════════════════════════\n\n")
+```{r}
+#| code-summary: SPATIAL AUTOCORRELATION OF OLS RESIDUALS
+#| echo: false
 
 cat("GLOBAL MORAN'S I TEST:\n")
 cat("  H0: No spatial autocorrelation in residuals\n\n")
@@ -1849,7 +1739,6 @@ if(moran_residuals$p.value < 0.001) {
 ```
 
 ```{r}
-#| label: map-ols-residuals
 #| code-summary: Map showing spatial pattern of OLS residuals
 #| fig-width: 10
 #| fig-height: 12
@@ -1894,118 +1783,325 @@ tm_shape(hdb_with_residuals) +
   tm_compass(position = c("left", "top"), size = 2)
 ```
 
+Map 5 shows systematic spatial clustering of residuals:
+
+Blue: Under-prediction (model predicts too low)
+
+Red: Over-prediction (model predicts too high)
+
 ```{r}
-#| label: residual-distribution
-#| code-summary: Analyze distribution of OLS residuals
-#| fig-width: 12
-#| fig-height: 6
+#| code-summary: Comprehensive summary of OLS baseline model
+#| echo: false
 
-# Histogram and Q-Q plot
-p1 <- ggplot(hdb_with_residuals, aes(x = ols_residuals)) +
-  geom_histogram(bins = 50, fill = "#440154", alpha = 0.7) +
-  geom_vline(xintercept = 0, color = "red", linetype = "dashed", linewidth = 1) +
-  labs(title = "Distribution of OLS Residuals",
-       x = "Residuals (SGD)", y = "Frequency") +
-  scale_x_continuous(labels = scales::comma) +
-  theme_minimal()
+cat("OLS BASELINE MODEL SUMMARY:\n")
+cat("  • R² =", round(ols_performance$r.squared, 3), "\n")
+cat("  • Significant predictors:", sum(ols_results$p.value[-1] < 0.05), "out of", 
+    length(coef(ols_model)) - 1, "\n")
+cat("  • Spatial autocorrelation: Moran's I =", round(moran_residuals$estimate[1], 3), 
+    "(p < 0.001)\n")
+```
 
-p2 <- ggplot(hdb_with_residuals, aes(sample = ols_residuals)) +
-  stat_qq(alpha = 0.3, color = "#440154") +
-  stat_qq_line(color = "red", linewidth = 1) +
-  labs(title = "Q-Q Plot of OLS Residuals",
-       x = "Theoretical Quantiles", y = "Sample Quantiles") +
-  theme_minimal()
+**CONCLUSION:**
 
-library(patchwork)
-p1 + p2 +
-  plot_annotation(
-    title = "Figure 13: OLS Residual Distribution",
-    subtitle = "Assessing normality assumption"
+The OLS model provides a reasonable baseline but violates the independence assumption due to spatial autocorrelation in residuals. This justifies the use of Geographically Weighted Regression (GWR) to account for spatial heterogeneity and improve model performance.
+
+### 4.2 Geographically Weighted Regression
+
+#### 4.2.1 Prepare Data for GWR
+
+```{r}
+#| code-summary: Prepare spatial data for GWR analysis
+
+# GWmodel requires Spatial* objects, not sf
+# Convert sf to Spatial object
+
+# First, ensure we have the same data as OLS
+gwr_data <- hdb_model_final %>%
+  filter(!is.na(resale_price)) %>%
+  select(
+    resale_price,
+    floor_area_sqm,
+    storey_midpoint,
+    remaining_lease_years,
+    PROX_CBD,
+    PROX_ELDERCARE,
+    PROX_HAWKER,
+    PROX_PARK,
+    PROX_SUPERMARKET,
+    N_350M_BUSSTOP,
+    geometry
+  ) %>%
+  na.omit()
+```
+
+```{r}
+#| code-summary: Convert sf to Spatial object
+gwr_sp <- as(gwr_data, "Spatial")
+```
+
+```{r}
+#| code-summary: Summary of GWR dataset prepared
+#| echo: false
+
+cat("✓ GWR dataset prepared\n",
+"Observations:", nrow(gwr_sp@data), "\n",
+"Coordinate system:", proj4string(gwr_sp), "\n",
+"Predictors:", ncol(gwr_sp@data) - 1, "\n")
+```
+
+#### 4.2.2 Bandwidth Selection
+
+::: panel-tabset
+#### CV Approach
+
+-   **Method:** Cross-Validation (leave-one-out)
+
+-   **Kernel:** Bisquare (locally weighted)
+
+-   **Type:** Adaptive (number of nearest neighbors)
+
+```{r}
+#| code-summary: Determine optimal bandwidth using cross-validation
+#| cache-lazy: true
+
+start_time <- Sys.time()
+
+bw_cv <- bw.gwr(
+  resale_price ~ floor_area_sqm + storey_midpoint + remaining_lease_years + 
+                 PROX_CBD + PROX_ELDERCARE + PROX_HAWKER + PROX_PARK + 
+                 PROX_SUPERMARKET + N_350M_BUSSTOP,
+  data = gwr_sp,
+  approach = "CV",        # Cross-validation
+  kernel = "bisquare",    # Bisquare kernel
+  adaptive = TRUE,        # Adaptive bandwidth (# of neighbors)
+  longlat = FALSE         # We're using projected coordinates (SVY21)
+)
+
+# Record time for comparison later
+end_time <- Sys.time()
+time_taken <- difftime(end_time, start_time, units = "mins")
+```
+
+```{r}
+#| echo: false
+
+cat("\n✓ Bandwidth optimization complete\n")
+cat("  Time taken:", round(time_taken, 2), "minutes\n")
+cat("  Optimal bandwidth (CV):", round(bw_cv), "nearest neighbors\n")
+cat("  This means each local regression uses", round(bw_cv), "nearest observations\n\n")
+```
+
+#### AIC Approach
+
+```{r}
+#| code-summary: Determine optimal bandwidth using AIC
+
+start_time_aic <- Sys.time()
+
+bw_aic <- bw.gwr(
+  resale_price ~ floor_area_sqm + storey_midpoint + remaining_lease_years + 
+                 PROX_CBD + PROX_ELDERCARE + PROX_HAWKER + PROX_PARK + 
+                 PROX_SUPERMARKET + N_350M_BUSSTOP,
+  data = gwr_sp,
+  approach = "AIC", 
+  kernel = "bisquare",
+  adaptive = TRUE,
+  longlat = FALSE
+)
+
+end_time_aic <- Sys.time()
+time_taken_aic <- difftime(end_time_aic, start_time_aic, units = "mins")
+```
+
+```{r}
+#| echo: false 
+
+cat("\n✓ Bandwidth optimization (AIC) complete\n")
+cat("  Time taken:", round(time_taken_aic, 2), "minutes\n")
+cat("  Optimal bandwidth (AIC):", round(bw_aic), "nearest neighbors\n\n")
+```
+
+```{r}
+#| echo: false
+
+cat("BANDWIDTH COMPARISON:\n")
+cat("  CV bandwidth:", round(bw_cv), "neighbors\n")
+cat("  AIC bandwidth:", round(bw_aic), "neighbors\n")
+cat("  Difference:", abs(round(bw_cv) - round(bw_aic)), "neighbors\n\n")
+```
+
+:::
+
+```{r}
+#| code-summary: DECISION - Using CV bandwidth for final model (more robust)
+
+optimal_bw <- bw_cv
+```
+
+#### 4.2.3 Model Results
+
+```{r}
+#| code-summary: Fit geographically weighted regression (GWR) model
+
+gwr_model <- gwr.basic(
+  resale_price ~ floor_area_sqm + storey_midpoint + remaining_lease_years + 
+                 PROX_CBD + PROX_ELDERCARE + PROX_HAWKER + PROX_PARK + 
+                 PROX_SUPERMARKET + N_350M_BUSSTOP,
+  data = gwr_sp,
+  bw = optimal_bw,
+  kernel = "bisquare",
+  adaptive = TRUE,
+  longlat = FALSE,
+)
+```
+
+```{r}
+#| code-summary: Extract GWR Model Results 
+
+gwr_results_sp <- gwr_model$SDF
+
+hdb_gwr <- gwr_data %>%
+  mutate(
+    gwr_fitted = gwr_results_sp$yhat,
+    gwr_residuals = gwr_results_sp$residual,
+    local_r2 = gwr_results_sp$Local_R2,
+    coef_floor_area = gwr_results_sp$floor_area_sqm,
+    coef_storey = gwr_results_sp$storey_midpoint,
+    coef_lease = gwr_results_sp$remaining_lease_years,
+    coef_cbd = gwr_results_sp$PROX_CBD,
+    coef_eldercare = gwr_results_sp$PROX_ELDERCARE,
+    coef_hawker = gwr_results_sp$PROX_HAWKER,
+    coef_park = gwr_results_sp$PROX_PARK,
+    coef_supermarket = gwr_results_sp$PROX_SUPERMARKET,
+    coef_busstop = gwr_results_sp$N_350M_BUSSTOP
   )
+```
 
-# Residual summary statistics
-residual_summary <- data.frame(
-  Statistic = c("Mean", "Median", "Std. Deviation", "Min", "Max", 
-                "Skewness", "Kurtosis"),
-  Value = c(
-    mean(hdb_with_residuals$ols_residuals),
-    median(hdb_with_residuals$ols_residuals),
-    sd(hdb_with_residuals$ols_residuals),
-    min(hdb_with_residuals$ols_residuals),
-    max(hdb_with_residuals$ols_residuals),
-    moments::skewness(hdb_with_residuals$ols_residuals),
-    moments::kurtosis(hdb_with_residuals$ols_residuals)
+#### 4.2.4 Model Comparison
+
+```{r}
+#| code-summary: Compare OLS and GWR
+
+gwr_diagnostics <- gwr_model$GW.diagnostic
+gwr_rmse <- sqrt(mean(hdb_gwr$gwr_residuals^2))
+ols_rmse <- sqrt(mean(residuals(ols_model)^2))
+
+comparison_table <- data.frame(
+  Metric = c("R-squared", "AICc", "RMSE (SGD)"),
+  OLS = c(
+    round(ols_performance$r.squared, 4),
+    round(AIC(ols_model), 2),
+    scales::comma(round(ols_rmse))
+  ),
+  GWR = c(
+    round(gwr_diagnostics$gw.R2, 4),
+    round(gwr_diagnostics$AICc, 2),
+    scales::comma(round(gwr_rmse))
   )
 )
 
-knitr::kable(residual_summary,
-             digits = 2,
-             caption = "Table 13: OLS Residual Summary Statistics",
-             col.names = c("Statistic", "Value"),
-             format.args = list(big.mark = ","))
+knitr::kable(comparison_table,
+             caption = "Table 14: Model Comparison - OLS vs GWR")
 ```
 
 ```{r}
-#| label: ols-summary
-#| code-summary: Comprehensive summary of OLS baseline model
+#| echo: false
 
-cat("═══════════════════════════════════════════════════════\n")
-cat("            OLS BASELINE MODEL SUMMARY\n")
-cat("═══════════════════════════════════════════════════════\n\n")
-
-cat("MODEL PERFORMANCE:\n")
-cat("  • R-squared:", round(ols_performance$r.squared, 4), "\n")
-cat("  • Adjusted R-squared:", round(ols_performance$adj.r.squared, 4), "\n")
-cat("  • RMSE: $", scales::comma(sqrt(mean(residuals(ols_model)^2))), "\n")
-cat("  • AIC:", round(aic_value, 2), "\n\n")
-
-cat("SIGNIFICANT PREDICTORS:\n")
-sig_count <- sum(ols_results$p.value < 0.05) - 1  # Exclude intercept
-cat("  •", sig_count, "out of", n_predictors, "predictors significant (p < 0.05)\n\n")
-
-cat("ASSUMPTION TESTS:\n")
-cat("  • Heteroscedasticity:", ifelse(bp_test$p.value < 0.05, "Present ✗", "Absent ✓"), "\n")
-cat("  • Normality of residuals:", ifelse(sw_test$p.value < 0.05, "Violated ✗", "Satisfied ✓"), "\n")
-cat("  • Spatial autocorrelation:", ifelse(moran_residuals$p.value < 0.05, "Present ✗", "Absent ✓"), "\n\n")
-
-cat("KEY FINDINGS:\n")
-cat("  1. Model explains ~", round(ols_performance$adj.r.squared * 100, 1), 
-    "% of price variation\n")
-cat("  2. CBD proximity is the strongest predictor\n")
-cat("  3. OLS residuals show significant spatial autocorrelation\n")
-cat("  4. Spatial non-stationarity detected\n\n")
-
-cat("CONCLUSION:\n")
-cat("  The OLS model provides a reasonable baseline but violates the\n")
-cat("  independence assumption due to spatial autocorrelation in residuals.\n")
-cat("  This justifies the use of Geographically Weighted Regression (GWR)\n")
-cat("  to account for spatial heterogeneity and improve model performance.\n\n")
-
-cat("✓ OLS baseline model complete\n")
-cat("✓ Ready to proceed to Section 4.2 (GWR Model)\n")
-cat("═══════════════════════════════════════════════════════\n")
+cat("\nImprovement:\n")
+cat("  R² increase:", round((gwr_diagnostics$gw.R2 - ols_performance$r.squared) * 100, 2), "pp\n")
+cat("  RMSE reduction: $", scales::comma(round(ols_rmse - gwr_rmse)), "\n\n")
 ```
-### 4.2 Geographically Weighted Regression
 
-#### 4.2.1 Bandwidth Selection
+#### 4.2.5 Spatial Autocorrelation Test
 
 ```{r}
+#| code-summary: Test spatial autocorrelation of GWR residuals
 
+coords_gwr <- st_coordinates(st_centroid(hdb_gwr))
+knn_weights_gwr <- knn2nb(knearneigh(coords_gwr, k = 8))
+knn_listw_gwr <- nb2listw(knn_weights_gwr, style = "W")
 ```
 
-#### 4.2.2 Model Results
+```{r}
+#| code-summary: Global Moran's I test on GWR residuals
 
-#### 4.2.3 Model Comparison
+moran_gwr <- moran.test(hdb_gwr$gwr_residuals, knn_listw_gwr)
+```
+
+```{r}
+#| echo: false
+
+cat("Spatial Autocorrelation Test:\n")
+cat("  OLS residuals - Moran's I:", round(moran_residuals$estimate[1], 4), 
+    "(p < 0.001)\n")
+cat("  GWR residuals - Moran's I:", round(moran_gwr$estimate[1], 4), 
+    "(p =", round(moran_gwr$p.value, 4), ")\n")
+
+if(moran_gwr$p.value >= 0.05) {
+  cat("  ✓ Spatial autocorrelation eliminated\n")
+} else {
+  cat("  ⚠ Reduced by", round((1 - moran_gwr$estimate[1]/moran_residuals$estimate[1])*100, 1), "%\n")
+}
+```
 
 ## 5. Spatial Patterns & Interpretation
 
-### 5.1 Overview of Local Variations
+```{r}
+#| code-summary: Collect key statistics for Section 5
+#| echo: false
 
-### 5.2 Key Findings by Variable
+cat("1. MODEL PERFORMANCE:\n")
+cat("   OLS R²:", round(ols_performance$r.squared, 4), "\n")
+cat("   GWR R²:", round(gwr_diagnostics$gw.R2, 4), "\n")
+cat("   OLS AIC:", round(AIC(ols_model), 2), "\n")
+cat("   GWR AICc:", round(gwr_diagnostics$AICc, 2), "\n")
+cat("   Bandwidth:", round(optimal_bw), "neighbors\n\n")
 
-\[Subsection for each important coefficient\]\
+cat("2. LOCAL R² STATISTICS:\n")
+print(summary(hdb_gwr$local_r2))
+cat("\n")
 
-### 5.3 Policy & Market Implications
+cat("3. SPATIAL AUTOCORRELATION:\n")
+cat("   OLS Moran's I:", round(moran_residuals$estimate[1], 4), 
+    "p =", format.pval(moran_residuals$p.value, eps = 0.001), "\n")
+cat("   GWR Moran's I:", round(moran_gwr$estimate[1], 4), 
+    "p =", format.pval(moran_gwr$p.value, eps = 0.001), "\n\n")
+
+cat("4. LOCAL COEFFICIENT RANGES:\n\n")
+
+cat("   PROX_CBD:\n")
+print(summary(hdb_gwr$coef_cbd))
+cat("\n")
+
+cat("   Storey Midpoint:\n")
+print(summary(hdb_gwr$coef_storey))
+cat("\n")
+
+cat("   Remaining Lease:\n")
+print(summary(hdb_gwr$coef_lease))
+cat("\n")
+
+cat("   Floor Area:\n")
+print(summary(hdb_gwr$coef_floor_area))
+cat("\n")
+
+cat("5. COEFFICIENT VARIABILITY (Standard Deviations):\n")
+coef_variability <- hdb_gwr %>%
+  st_drop_geometry() %>%
+  summarise(
+    sd_cbd = sd(coef_cbd),
+    sd_storey = sd(coef_storey),
+    sd_lease = sd(coef_lease),
+    sd_area = sd(coef_floor_area)
+  )
+print(coef_variability)
+cat("\n")
+
+```
+
+```{r}
+print(coef_variability)
+```
 
 ## 6. Limitations & Conclusions
 
