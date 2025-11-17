@@ -26,7 +26,15 @@ editor: visual
 
 ### 1.1 Background & Motivation
 
+Singapore's public housing market, dominated by Housing & Development Board (HDB) flats, accommodates over 80% of the resident population. Resale flat prices exhibit substantial geographic variation—a 4-room flat in Bukit Timah commands premiums exceeding 50% over identical units in Woodlands. Traditional hedonic pricing models using ordinary least squares (OLS) regression assume price determinants operate uniformly across space, yet Singapore's diverse urban geography—ranging from CBD-proximate mature estates to peripheral new towns—suggests pricing mechanisms vary locally.
+
+Geographically Weighted Regression (GWR) addresses this limitation by allowing relationships between price and predictors to vary spatially, capturing neighborhood-specific market dynamics. Understanding these spatial heterogeneities informs targeted housing policies, assists buyers in location-specific valuation, and advances urban economics research on residential property markets.
+
 ### 1.2 Research Objectives
+
+This study aims to:
+
+Calibrate a GWR model to identify and evaluate factors influencing HDB 4-room resale prices (January–September 2025) Quantify spatial non-stationarity in key price determinants: structural attributes (floor area, storey, lease), proximity to amenities (CBD, parks, eldercare), and neighborhood accessibility (bus stops) Compare GWR performance against OLS baseline to demonstrate benefits of spatial modeling Map local coefficient variations to reveal Singapore's housing submarkets and their distinct pricing mechanisms
 
 ## 2. Data & Methodology
 
@@ -1929,7 +1937,6 @@ cat("  CV bandwidth:", round(bw_cv), "neighbors\n")
 cat("  AIC bandwidth:", round(bw_aic), "neighbors\n")
 cat("  Difference:", abs(round(bw_cv) - round(bw_aic)), "neighbors\n\n")
 ```
-
 :::
 
 ```{r}
@@ -2046,8 +2053,10 @@ if(moran_gwr$p.value >= 0.05) {
 
 ## 5. Spatial Patterns & Interpretation
 
+### 5.1 Model Performance
+
 ```{r}
-#| code-summary: Collect key statistics for Section 5
+#| code-summary: MODEL PERFORMANCE
 #| echo: false
 
 cat("1. MODEL PERFORMANCE:\n")
@@ -2056,63 +2065,205 @@ cat("   GWR R²:", round(gwr_diagnostics$gw.R2, 4), "\n")
 cat("   OLS AIC:", round(AIC(ols_model), 2), "\n")
 cat("   GWR AICc:", round(gwr_diagnostics$AICc, 2), "\n")
 cat("   Bandwidth:", round(optimal_bw), "neighbors\n\n")
-
-cat("2. LOCAL R² STATISTICS:\n")
-print(summary(hdb_gwr$local_r2))
-cat("\n")
-
-cat("3. SPATIAL AUTOCORRELATION:\n")
-cat("   OLS Moran's I:", round(moran_residuals$estimate[1], 4), 
-    "p =", format.pval(moran_residuals$p.value, eps = 0.001), "\n")
-cat("   GWR Moran's I:", round(moran_gwr$estimate[1], 4), 
-    "p =", format.pval(moran_gwr$p.value, eps = 0.001), "\n\n")
-
-cat("4. LOCAL COEFFICIENT RANGES:\n\n")
-
-cat("   PROX_CBD:\n")
-print(summary(hdb_gwr$coef_cbd))
-cat("\n")
-
-cat("   Storey Midpoint:\n")
-print(summary(hdb_gwr$coef_storey))
-cat("\n")
-
-cat("   Remaining Lease:\n")
-print(summary(hdb_gwr$coef_lease))
-cat("\n")
-
-cat("   Floor Area:\n")
-print(summary(hdb_gwr$coef_floor_area))
-cat("\n")
-
-cat("5. COEFFICIENT VARIABILITY (Standard Deviations):\n")
-coef_variability <- hdb_gwr %>%
-  st_drop_geometry() %>%
-  summarise(
-    sd_cbd = sd(coef_cbd),
-    sd_storey = sd(coef_storey),
-    sd_lease = sd(coef_lease),
-    sd_area = sd(coef_floor_area)
-  )
-print(coef_variability)
-cat("\n")
-
 ```
+
+GWR substantially outperforms OLS, with R² improving from 0.77 to 0.97—explaining 97% of price variance compared to OLS's 77%. The model uses 173 nearest neighbors, allowing coefficients to vary locally. Spatial autocorrelation in residuals dropped 94% (Moran's I: 0.81 → 0.05), confirming GWR successfully accounts for spatial non-stationarity.
+
+Local R² ranges from 0.65 to 0.99 (median = 0.96), showing the model fits well across most locations. Lower R² in peripheral areas suggests evolving market dynamics in newer developments.
+
+### 5.2 Local R² Statistics
 
 ```{r}
-print(coef_variability)
+#| label: map-local-r2
+#| code-summary: Map Local R²
+#| fig-width: 10
+#| fig-height: 12
+
+tmap_mode("plot")
+
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_gwr) +
+  tm_dots(col = "local_r2",
+          palette = "YlGnBu",
+          style = "quantile",
+          n = 7,
+          size = 0.06,
+          alpha = 0.7,
+          title = "Local R²") +
+  tm_layout(
+    main.title = "Map 6: Local R² - Model Fit Quality",
+    main.title.size = 1.1,
+    legend.outside = TRUE,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
 ```
+
+The model performs best (R² \> 0.96) in mature central estates with stable pricing patterns. Lower R² (0.65–0.85) appears in peripheral developments, reflecting greater price unpredictability from ongoing infrastructure changes. The consistently high median R² (0.96) demonstrates GWR effectively captures localized market dynamics across Singapore.
+
+### 5.3 Distance to CBD Effect
+
+```{r}
+#| label: map-coef-cbd
+#| fig-width: 10
+#| fig-height: 12
+
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_gwr) +
+  tm_dots(col = "coef_cbd",
+          palette = "-RdBu",
+          style = "jenks",
+          n = 7,
+          size = 0.06,
+          alpha = 0.7,
+          title = "CBD Coefficient",
+          midpoint = 0) +
+  tm_layout(
+    main.title = "Map 7: Local Coefficient - Distance to CBD",
+    main.title.size = 1.1,
+    legend.outside = TRUE,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
+```
+
+CBD proximity strongly affects prices in central and eastern regions (negative coefficients), where each kilometer further reduces prices by \$200+. Peripheral northern and western towns show near-zero effects, indicating CBD distance matters little—residents prioritize regional centers instead. This reveals Singapore has distinct housing submarkets with different valuation priorities.
+
+### 5.4 Storey Level Premium
+
+```{r}
+#| label: map-coef-storey
+#| fig-width: 10
+#| fig-height: 12
+
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_gwr) +
+  tm_dots(col = "coef_storey",
+          palette = "RdYlGn",
+          style = "jenks",
+          n = 7,
+          size = 0.06,
+          alpha = 0.7,
+          title = "Storey Coefficient") +
+  tm_layout(
+    main.title = "Map 8: Local Coefficient - Storey Level",
+    main.title.size = 1.1,
+    legend.outside = TRUE,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
+```
+
+Floor level premiums range from \$1,987 to \$8,575 per storey. Higher premiums appear in high-density central areas and coastal towns where views and air quality command significant value. Peripheral estates show moderate uniform premiums (\$3,500–4,500), indicating standard height-based pricing without exceptional view premiums.
+
+### 5.5 Remaining Lease Effect
+
+```{r}
+#| label: map-coef-lease
+#| fig-width: 10
+#| fig-height: 12
+
+tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_gwr) +
+  tm_dots(col = "coef_lease",
+          palette = "PuOr",
+          style = "jenks",
+          n = 7,
+          size = 0.06,
+          alpha = 0.7,
+          title = "Lease Coefficient",
+          midpoint = 5183) +
+  tm_layout(
+    main.title = "Map 9: Local Coefficient - Remaining Lease",
+    main.title.size = 1.1,
+    legend.outside = TRUE,
+    frame = FALSE
+  ) +
+  tm_compass(position = c("left", "top"), size = 2)
+```
+
+Lease tenure effects vary widely (-\$35,909 to +\$18,729 per year). Mature estates with older stock show high lease sensitivity (β \> \$8,000/year), where lease decay significantly impacts prices. Newer towns show lower coefficients as most units retain long leases, making tenure less critical.
+
+### 5.6 OLS vs GWR Residuals
+
+```{r}
+#| label: map-residuals-comparison
+#| fig-width: 14
+#| fig-height: 12
+
+map_ols <- tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_with_residuals) +
+  tm_dots(col = "ols_residuals",
+          palette = "-RdBu",
+          style = "jenks",
+          n = 5,
+          size = 0.04,
+          alpha = 0.6,
+          title = "OLS Residuals",
+          midpoint = 0) +
+  tm_layout(main.title = "OLS Residuals", frame = FALSE)
+
+map_gwr <- tm_shape(singapore_boundary) +
+  tm_borders(col = "grey50", lwd = 1) +
+  tm_fill(col = "grey95") +
+tm_shape(hdb_gwr) +
+  tm_dots(col = "gwr_residuals",
+          palette = "-RdBu",
+          style = "jenks",
+          n = 5,
+          size = 0.04,
+          alpha = 0.6,
+          title = "GWR Residuals",
+          midpoint = 0) +
+  tm_layout(main.title = "GWR Residuals", frame = FALSE)
+
+tmap_arrange(map_ols, map_gwr, ncol = 2)
+```
+
+OLS residuals show strong spatial clustering (Moran's I = 0.81): under-prediction in central mature estates (blue) and over-prediction in peripheral towns (red). GWR residuals are nearly random (Moran's I = 0.05), with clustering reduced 94%. This visual comparison proves GWR successfully captures geographic pricing differences that OLS's uniform coefficients cannot represent.
+
+### 5.7 Key Findings
+
+**Three distinct housing submarkets identified:**
+
+-   CBD-centric mature estates (central/eastern): CBD proximity dominates, with strong negative distance effects (-\$200+ per km).
+
+-   Regional hubs (Tampines, Jurong): CBD distance irrelevant; storey and lease premiums drive prices.
+
+-   Peripheral towns (northern/western): Moderate uniform effects across all variables; lower model fit suggests transitional markets.
+
+**Implications:**
+
+-   For buyers: Location matters differently by area. In mature estates, proximity trumps unit features; in new towns, floor area and storey matter more.
+
+-   For policymakers: Cooling measures and transport investments have spatially uneven impacts. Lease decay management requires geographic targeting.
+
+-   Model limitations: Small residual autocorrelation persists, suggesting unmeasured factors (school reputation, crime) remain unaccounted.
 
 ## 6. Limitations & Conclusions
 
-### 6.1 Study Limitations
+### 6.1 Conclusions
 
-\[Data period, 4-room only, modifiable areal unit problem, etc.\]\
+This study successfully applied GWR to model HDB 4-room resale prices, achieving 97% explanatory power—a substantial improvement over OLS (77%). Spatial analysis confirmed three distinct submarkets: CBD-centric mature estates, self-sufficient regional hubs, and transitional peripheral towns, each exhibiting unique pricing mechanisms.
 
-### 6.2 Conclusions
+GWR's local coefficients revealed that CBD proximity, storey premiums, and lease sensitivity vary dramatically across Singapore's geography, validating the spatial non-stationarity hypothesis. The 94% reduction in residual autocorrelation demonstrates GWR effectively captures spatial heterogeneity that global models cannot represent.
 
-### 6.3 Future Research Directions
+These findings inform spatially-targeted housing policies and provide buyers with location-specific valuation insights, advancing understanding of Singapore's complex residential property market.
 
-## Appendix
+### 6.2 Study Limitations
 
-### References
+-   Variable selection: Excluded MRT proximity due to data issues. Missing variables (school reputation, crime rates, ethnic composition) may explain residual spatial autocorrelation (Moran's I = 0.05, p \< 0.001).
+
+-   Methodological considerations: Fixed bandwidth (173 neighbors) may over-smooth heterogeneous areas. Multicollinearity among early childhood facilities (VIF \> 10) required variable exclusion, potentially omitting relevant amenity effects.
+
+
