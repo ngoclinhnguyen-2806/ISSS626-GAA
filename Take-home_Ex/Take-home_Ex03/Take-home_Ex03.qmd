@@ -34,7 +34,13 @@ Geographically Weighted Regression (GWR) addresses this limitation by allowing r
 
 This study aims to:
 
-Calibrate a GWR model to identify and evaluate factors influencing HDB 4-room resale prices (January–September 2025) Quantify spatial non-stationarity in key price determinants: structural attributes (floor area, storey, lease), proximity to amenities (CBD, parks, eldercare), and neighborhood accessibility (bus stops) Compare GWR performance against OLS baseline to demonstrate benefits of spatial modeling Map local coefficient variations to reveal Singapore's housing submarkets and their distinct pricing mechanisms
+-   Calibrate a GWR model to identify and evaluate factors influencing HDB 4-room resale prices (January–September 2025)
+
+-   Quantify spatial non-stationarity in key price determinants: structural attributes (floor area, storey, lease), proximity to amenities (CBD, parks, eldercare), and neighborhood accessibility (bus stops)
+
+-   Compare GWR performance against OLS baseline to demonstrate benefits of spatial modeling
+
+-   Map local coefficient variations to reveal Singapore's housing submarkets and their distinct pricing mechanisms
 
 ## 2. Data & Methodology
 
@@ -642,6 +648,8 @@ p4 <- ggplot(hdb_clean, aes(x = storey_midpoint)) +
   )
 ```
 
+The distributions reveal typical 4-room HDB characteristics: standardized floor areas clustered at 93 sqm, right-skewed resale prices (median $630,000), and concentration at lower storey levels reflecting Singapore's predominantly mid-rise public housing. The bimodal remaining lease distribution indicates a mix of older and newer estates, with most flats having 40-95 years remaining.
+
 #### COUNT variables
 
 ```{r}
@@ -703,6 +711,9 @@ c4 <- ggplot(hdb_clean, aes(x = N_350M_BUSSTOP)) +
   )
 ```
 
+
+These facility count distributions show Singapore's well-developed public infrastructure. Preschools (mean 5.5) and childcare centers (mean 4.7) demonstrate strong early childhood support. The extremely low kindergarten count (mean 0.9) reflects Singapore's integration of kindergartens into preschools. Bus stops average 8 per buffer zone, indicating excellent public transport accessibility crucial for car-lite HDB estates.Retry
+
 #### Proximity variables
 
 ```{r}
@@ -732,6 +743,9 @@ knitr::kable(location_summary,
              caption = "Descriptive Statistics: Location Variables (Proximity in meters)",
              col.names = c("Variable", "Mean", "Median", "SD", "Min", "Max"))
 ```
+
+Proximity statistics reveal spatial patterns of Singapore's urban planning. Most amenities are highly accessible: hawker centers (median 647m), parks (661m), and supermarkets (278m) are within walkable distances. The CBD's greater distance (median 12.9km) reflects HDB estates' suburban locations. Eldercare facilities show wider dispersion (SD 634m), possibly indicating uneven distribution across neighborhoods.
+
 :::
 
 #### 3.1.2 Exploration on different dimensions
@@ -782,6 +796,8 @@ t2 <- hdb_clean %>%
 t1 / t2
 ```
 
+Transaction volumes show typical seasonal patterns with a notable spike in January 2025 and subsequent decline. Resale prices demonstrate steady upward momentum throughout 2024-2025, with median prices rising from $620k to $640k. The widening gap between mean and median prices suggests increasing price dispersion, potentially driven by premium transactions in mature estates or renovated units.
+
 #### Summary by Town
 
 ```{r}
@@ -827,6 +843,8 @@ top10_towns <- town_summary %>%
 print(top10_towns)
 ```
 
+Central Area's premium pricing reflects Singapore's stark locational hierarchy, where proximity to employment and amenities justifies paying double compared to peripheral towns. The price compression in mature estates suggests gentrification limits, while high transaction volumes in new towns like Sengkang and Tampines indicate these areas are maturing into self-sufficient regional hubs, potentially reshaping Singapore's traditionally CBD-centric urban structure.
+
 #### Summary by Flat Model
 
 ```{r}
@@ -851,6 +869,9 @@ knitr::kable(model_summary,
                           "Median Price", "% of Total"),
              format.args = list(big.mark = ","))
 ```
+
+Model A's dominance (66.5% of transactions) reflects HDB's mass standardization, but DBSS ($880k) and Type S1 ($1.37M) flats command significant premiums. This growing price gap suggests buyers increasingly pay extra to escape standard designs, indicating Singapore's public housing market is splitting into tiers. This trend may challenge HDB's goal of maintaining social equality as income differences become more visible in housing choices.
+
 :::
 
 #### 3.1.3 Bivariate Relationships
@@ -903,6 +924,8 @@ b4 <- ggplot(hdb_clean, aes(x = PROX_CBD, y = resale_price)) +
     subtitle = "Linear trend lines shown in yellow/purple"
   )
 ```
+
+Floor area shows minimal price impact due to standardization, while remaining lease and storey level demonstrate clear positive relationships with price. CBD distance shows expected negative correlation—properties closer to the CBD command higher prices due to work commute convenience and urban amenities. This strong distance-decay effect suggests CBD accessibility remains a primary price driver, warranting closer examination of how centrality shapes Singapore's housing market.
 
 Let's specifically dive in to the predictor of Distance to CBD:
 
@@ -958,7 +981,7 @@ Distance to the CBD exhibits a clear inverse relationship with resale prices, de
 ```{r}
 #| code-summary: Point map showing all HDB resale transactions
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tmap_mode("plot")  # Static map mode
 
@@ -995,7 +1018,7 @@ The spatial distribution reveals distinct price clustering across Singapore, wit
 ```{r}
 #| code-summary: Hexagonal binning to show transaction density and median prices
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 # Create hexagonal grid (1km cell size)
 hex_grid <- st_make_grid(
@@ -1023,7 +1046,7 @@ hex_summary <- hex_grid %>%
 ```{r}
 #| code-summary: Hexbin Aggregation Map
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 # Map: Transaction Density
 map_density <- tm_shape(singapore_boundary) +
@@ -1095,7 +1118,7 @@ planning_areas_price <- planning_areas %>%
 ```{r}
 #| code-summary: Choropleth map to for Median resale price aggregated by town
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tm_shape(planning_areas_price) +
   tm_fill(col = "median_price",
@@ -1220,7 +1243,7 @@ hdb_clean <- hdb_clean %>%
 ```{r}
 #| code-summary: LISA cluster map
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tm_shape(singapore_boundary) +
   tm_borders(col = "grey50", lwd = 1) +
@@ -1319,7 +1342,7 @@ cat("Variables for correlation analysis:", ncol(correlation_vars), "\n",
 ```{r}
 #| code-summary: Calculate Pearson correlation coefficients and Visualize full correlation matrix
 #| fig-width: 12
-#| fig-height: 12
+#| fig-height: 8
 
 # Calculate correlation matrix
 cor_matrix <- cor(correlation_vars, use = "complete.obs", method = "pearson")
@@ -1749,7 +1772,7 @@ if(moran_residuals$p.value < 0.001) {
 ```{r}
 #| code-summary: Map showing spatial pattern of OLS residuals
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tmap_mode("plot")
 
@@ -2075,9 +2098,9 @@ Local R² ranges from 0.65 to 0.99 (median = 0.96), showing the model fits well 
 
 ```{r}
 #| label: map-local-r2
-#| code-summary: Map Local R²
+#| code-summary: Local R² - Model Fit Quality
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tmap_mode("plot")
 
@@ -2107,8 +2130,9 @@ The model performs best (R² \> 0.96) in mature central estates with stable pric
 
 ```{r}
 #| label: map-coef-cbd
+#| code-summary: Local Coefficient - Distance to CBD
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tm_shape(singapore_boundary) +
   tm_borders(col = "grey50", lwd = 1) +
@@ -2137,8 +2161,9 @@ CBD proximity strongly affects prices in central and eastern regions (negative c
 
 ```{r}
 #| label: map-coef-storey
+#| code-summary: Local Coefficient - Storey Level
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tm_shape(singapore_boundary) +
   tm_borders(col = "grey50", lwd = 1) +
@@ -2166,8 +2191,9 @@ Floor level premiums range from \$1,987 to \$8,575 per storey. Higher premiums a
 
 ```{r}
 #| label: map-coef-lease
+#| code-summary: Local Coefficient - Remaining Lease
 #| fig-width: 10
-#| fig-height: 12
+#| fig-height: 8
 
 tm_shape(singapore_boundary) +
   tm_borders(col = "grey50", lwd = 1) +
@@ -2196,8 +2222,9 @@ Lease tenure effects vary widely (-\$35,909 to +\$18,729 per year). Mature estat
 
 ```{r}
 #| label: map-residuals-comparison
+#| code-summary: Compare OLS and GWR residuals
 #| fig-width: 14
-#| fig-height: 12
+#| fig-height: 8
 
 map_ols <- tm_shape(singapore_boundary) +
   tm_borders(col = "grey50", lwd = 1) +
@@ -2265,5 +2292,3 @@ These findings inform spatially-targeted housing policies and provide buyers wit
 -   Variable selection: Excluded MRT proximity due to data issues. Missing variables (school reputation, crime rates, ethnic composition) may explain residual spatial autocorrelation (Moran's I = 0.05, p \< 0.001).
 
 -   Methodological considerations: Fixed bandwidth (173 neighbors) may over-smooth heterogeneous areas. Multicollinearity among early childhood facilities (VIF \> 10) required variable exclusion, potentially omitting relevant amenity effects.
-
-
